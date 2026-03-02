@@ -68,6 +68,10 @@ This repo primarily contains Markdown and Python. Follow these conventions:
 - Use YAML frontmatter for metadata fields (name, description, scope, triggers)
 - Keep command prompts actionable and specific
 - No emojis unless the user explicitly requested them
+- No file > 300 lines
+- `description` fields must not exceed 400 characters
+- Agents that should auto-trigger must include `Use PROACTIVELY when [specific condition]` in their description — only for agents users would otherwise skip, not for agents users always invoke explicitly
+- Agents may be organized in subfolders: `core/` for cross-cutting concerns, `<stack>/` for tech-specific agents
 
 ### Python (hooks)
 - Type hints on all functions

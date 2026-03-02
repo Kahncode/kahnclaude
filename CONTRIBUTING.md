@@ -54,7 +54,14 @@ Use GitHub Issues. Include:
 
 ## Adding a Slash Command
 
-Commands live in `.claude/commands/<name>.md`. Every command file requires YAML frontmatter:
+Commands are Markdown files with YAML frontmatter. **Location depends on scope:**
+
+| Scope       | Location                        | Invocation   | Meaning                                  |
+| ----------- | ------------------------------- | ------------ | ---------------------------------------- |
+| `project`   | `.claude/commands/<name>.md`    | `/<name>`    | Installed into target projects.          |
+| `framework` | `.claude/commands/kc/<name>.md` | `/kc:<name>` | Framework management only. Never copied. |
+
+Project command example:
 
 ```markdown
 ---
@@ -67,14 +74,21 @@ Your command prompt here. Write in imperative form — instructions Claude follo
 when the user runs `/command-name`.
 ```
 
-**Scope values:**
+Framework command example (inside `.claude/commands/kc/`):
 
-| Scope       | Meaning                                                    |
-| ----------- | ---------------------------------------------------------- |
-| `project`   | Installed into target projects. General-purpose workflows. |
-| `framework` | Framework management only. Never copied to projects.       |
+```markdown
+---
+name: command-name
+description: One-line description of what this command does
+scope: framework
+---
+
+Your command prompt here. Invoked as `/kc:command-name`.
+```
 
 **Naming:** kebab-case, start with an action verb (`review`, `commit`, `check-`, `refactor`).
+
+**Description limit:** Must not exceed 400 characters.
 
 **After adding:** Update `README.md` (component listing) and this file if you introduced new conventions.
 
@@ -100,17 +114,24 @@ Structured template Claude follows when trigger keywords are detected in convers
 
 - Trigger keywords must be specific enough to avoid false activations
 - Each skill gets its own subdirectory: `.claude/skills/code-review/SKILL.md`
+- **Description limit:** Must not exceed 400 characters.
 
 ---
 
 ## Adding an Agent
 
-Agents live in `.claude/agents/<name>.md`:
+Agents live in `.claude/agents/<name>.md`. They can be organized into subfolders:
+
+| Path                               | Use for                                                        |
+| ---------------------------------- | -------------------------------------------------------------- |
+| `.claude/agents/<name>.md`         | General-purpose agents for any stack                           |
+| `.claude/agents/core/<name>.md`    | Cross-cutting concerns (review, testing, docs)                 |
+| `.claude/agents/<stack>/<name>.md` | Tech-stack specific agents (e.g. `react/`, `django/`, `rust/`) |
 
 ```markdown
 ---
 name: agent-name
-description: What this specialist does
+description: What this specialist does. Use PROACTIVELY when [condition].
 tools:
   - Read
   - Grep
@@ -124,7 +145,10 @@ You are a specialist in [domain]. Your job is to [specific goal].
 [Behavioral instructions, output format, constraints]
 ```
 
-**Tool access principle:** Default to minimum necessary. Reviewers get `Read/Grep/Glob` only — never `Write` or `Bash`.
+- **Tool access principle:** Default to minimum necessary. Reviewers get `Read/Grep/Glob` only — never `Write` or `Bash`.
+- **Description limit:** Must not exceed 400 characters.
+- **Proactive agents:** Only add `Use PROACTIVELY when [condition]` to agents that would otherwise be skipped — e.g. a reviewer that should run after every feature. Do NOT add it to agents users will always invoke explicitly (test writers, scaffolders). The condition must be specific.
+- **Color:** Keep the following convention, you may create unique shades to differenciate: green for authoring code, blue for review, research or audit, purple for testing.
 
 ---
 
@@ -207,7 +231,7 @@ Installed at `~/.claude/CLAUDE.md`. Keep it:
 
 ## Checklist Before Committing
 
-- [ ] Component in correct location (`.claude/commands/`, `.claude/skills/`, etc.)
+- [ ] Component in correct location (`scope: project` → `.claude/commands/`, `scope: framework` → `.claude/commands/kc/`, skills, agents, hooks in their respective dirs)
 - [ ] `README.md` updated with description
 - [ ] This file updated if new conventions introduced
 - [ ] If hook: syntax-checked (`python -m py_compile`)

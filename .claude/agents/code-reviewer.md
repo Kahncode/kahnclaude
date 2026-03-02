@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Reviews code changes for security vulnerabilities, performance issues, and best practices. Use for any code review, audit, or quality check task.
+description: Reviews code for security vulnerabilities, correctness, performance, and maintainability. Use PROACTIVELY after implementing any feature or fix to catch issues before merge.
 tools: Read, Grep, Glob
 model: sonnet
 color: red
