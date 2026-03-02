@@ -38,7 +38,7 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 | -------------------- | ----- | ------------------------------------------------ |
 | **Slash Commands**   | 19    | On-demand workflows invoked with `/command`      |
 | **Skills**           | 1     | Trigger-activated expertise templates            |
-| **Agents**           | 5     | Specialist subagents with restricted tool access |
+| **Agents**           | 19    | Specialist subagents with restricted tool access |
 | **Hooks**            | 8     | Deterministic enforcement scripts (Python)       |
 | **Project Template** | 1     | `CLAUDE.md` starting point for any project       |
 | **Global Template**  | 1     | `@~/.claude/CLAUDE.md` for cross-project rules   |
@@ -98,8 +98,10 @@ kahnclaude/
 │   │   └── <name>/
 │   │       └── SKILL.md
 │   ├── agents/                  # Specialist subagents
-│   │   ├── <name>.md            # General agents
-│   │   ├── python/              # Python/FastAPI specialists
+│   │   ├── <name>.md            # Universal agents
+│   │   ├── core/                # Cross-cutting specialists
+│   │   ├── python/              # Python specialists
+│   │   ├── web/                 # Web/React specialists
 │   │   └── mobile/              # React Native/Expo specialists
 │   └── hooks/                   # Enforcement scripts (Python only)
 │       └── <name>.py
@@ -167,13 +169,49 @@ Skills activate automatically when Claude detects trigger keywords in conversati
 
 Agents are specialists Claude delegates to automatically. Each has restricted tool access appropriate to its role.
 
-| Agent                              | Tools                         | Specialization                                                                                      |
-| ---------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
-| `code-reviewer`                    | Read, Grep, Glob              | Finds real bugs: security → correctness → performance → maintainability                             |
-| `test-writer`                      | Read, Write, Grep, Glob, Bash | Writes behavior tests with explicit assertions and edge cases                                       |
-| `documenter`                       | Read, Write, Edit, Grep, Glob | Builds ARCHITECTURE.md index, subsystem docs, Mermaid diagrams, and Decisions logs from actual code |
-| `python/fastapi-dev`               | Read, Write, Grep, Glob, Bash | Full-stack FastAPI specialist — builds and reviews endpoints, schemas, auth, and tests; version-aware |
-| `mobile/react-native-expo-dev`     | Read, Write, Grep, Glob, Bash | Senior Expo/React Native specialist; TypeScript-first; checks SDK version before writing any code   |
+### Universal
+
+| Agent | Tools | Specialization |
+| ----- | ----- | -------------- |
+| `code-reviewer` | Read, Grep, Glob | Finds real bugs: security → correctness → performance → maintainability |
+| `test-writer` | Read, Write, Grep, Glob, Bash | Writes behavior tests with explicit assertions and edge cases |
+| `documenter` | Read, Write, Edit, Grep, Glob | Architecture docs, subsystem docs, Mermaid diagrams, Decisions logs, READMEs, API specs, user manuals |
+| `api-dev` | Read, Grep, Glob, Write, WebFetch, WebSearch | Designs REST/GraphQL contracts; produces OpenAPI/GraphQL specs |
+| `backend-dev` | Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch | Polyglot backend implementer; detects stack and ships production-ready features |
+
+### Core (cross-cutting)
+
+| Agent | Tools | Specialization |
+| ----- | ----- | -------------- |
+| `core/code-archaeologist` | Read, Grep, Glob, Bash | Deep codebase explorer; produces 11-section assessment report |
+| `core/performance-optimizer` | Read, Grep, Glob, Bash | Profiles bottlenecks and applies high-impact fixes with before/after metrics |
+| `core/tech-lead-orchestrator` | Read, Grep, Glob, Bash | Orchestrates multi-step tasks by assigning sub-agents; uses Opus 4.6 |
+
+### Python
+
+| Agent | Tools | Specialization |
+| ----- | ----- | -------------- |
+| `python/fastapi-dev` | Read, Write, Grep, Glob, Bash | Full-stack FastAPI specialist — endpoints, schemas, auth, and tests; version-aware |
+| `python/python-dev` | Read, Write, Edit, Bash, Grep, Glob, WebFetch | Modern Python 3.12+ — architecture, packaging, async, type system |
+| `python/security-dev` | Read, Grep, Glob, Bash, WebFetch | Cryptography, OWASP audits, auth flows, compliance |
+| `python/devops-cicd-dev` | Read, Write, Edit, Bash, Grep, Glob, WebFetch | CI/CD pipelines, Docker/K8s, IaC, cloud deployments |
+
+### Web
+
+| Agent | Tools | Specialization |
+| ----- | ----- | -------------- |
+| `web/frontend-dev` | Read, Grep, Glob, Bash, Write, Edit, WebFetch | Universal UI builder; React, Svelte, or vanilla JS/TS |
+| `web/tailwind-css-dev` | Read, Grep, Glob, Bash, Write, Edit, WebFetch | Tailwind CSS v4+; container queries, OKLCH themes, accessibility |
+| `web/react-component-dev` | (all) | React 19 + Next.js App Router; RSC, shadcn/ui, accessible components |
+| `web/react-nextjs-dev` | (all) | Next.js SSR/SSG/ISR, Server Actions, App Router, performance optimization |
+| `web/supabase-dev` | Read, Write, Edit, Grep, Glob, Bash, WebFetch | Supabase + PostgreSQL specialist — auth, RLS, schema design, query optimization, Storage, Realtime, Edge Functions |
+
+### Mobile
+
+| Agent | Tools | Specialization |
+| ----- | ----- | -------------- |
+| `mobile/react-native-expo-dev` | Read, Write, Grep, Glob, Bash | Senior Expo/React Native specialist; TypeScript-first; checks SDK version before writing any code |
+| `mobile/react-native-component-dev` | Read, Write, Grep, Glob, Bash | Reusable RN UI components; component API design, design systems, Reanimated 3, accessibility |
 
 ---
 

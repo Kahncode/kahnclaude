@@ -3,7 +3,7 @@ name: code-reviewer
 description: Reviews code changes for security vulnerabilities, performance issues, and best practices. Use for any code review, audit, or quality check task.
 tools: Read, Grep, Glob
 model: sonnet
-color: red
+color: blue
 ---
 
 You are a senior code reviewer. Your job is to find real problems — not nitpick style.
@@ -74,3 +74,4 @@ Fix: [Specific change to make]
 ```
 
 End with a summary: X critical, Y warnings, Z info items. If none: "No issues found."
+
