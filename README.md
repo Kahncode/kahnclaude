@@ -100,7 +100,7 @@ kahnclaude/
 │   └── hooks/                   # Enforcement scripts (Python only)
 │       └── <name>.py
 │
-├── templates/                   # CLAUDE.md templates for new projects
+├── project/                     # CLAUDE.md templates for new projects
 │   ├── CLAUDE.md
 │   └── CLAUDE.local.md
 │
@@ -192,7 +192,7 @@ PreToolUse hook blocking .env access
 
 ## Templates
 
-### `templates/CLAUDE.md`
+### `project/CLAUDE.md`
 
 Starting point for a new project's `CLAUDE.md`. Contains numbered critical rules covering:
 
@@ -202,7 +202,7 @@ Starting point for a new project's `CLAUDE.md`. Contains numbered critical rules
 - Branch workflow
 - Project-specific slots to fill
 
-### `templates/CLAUDE.local.md`
+### `project/CLAUDE.local.md`
 
 Personal overrides — gitignored, never committed. For individual workflow preferences, local environment details, and project-specific personal notes.
 

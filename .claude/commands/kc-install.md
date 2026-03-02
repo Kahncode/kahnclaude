@@ -14,8 +14,8 @@ Install KahnClaude components into the current working directory.
 4. Copy all files from `skills/` → `.claude/skills/`
 5. Copy all files from `agents/` → `.claude/agents/`
 6. Copy all files from `hooks/` → `.claude/hooks/`
-7. If `CLAUDE.md` does not exist in the project root, copy `templates/CLAUDE.md` → `./CLAUDE.md` and tell the user to customize it
-8. If `CLAUDE.local.md` does not exist, copy `templates/CLAUDE.local.md` → `./CLAUDE.local.md`
+7. If `CLAUDE.md` does not exist in the project root, copy `project/CLAUDE.md` → `./CLAUDE.md` and tell the user to customize it
+8. If `CLAUDE.local.md` does not exist, copy `project/CLAUDE.local.md` → `./CLAUDE.local.md`
 9. Verify `.gitignore` includes `CLAUDE.local.md` and `.env` — add them if missing
 10. Report a summary of what was installed
 

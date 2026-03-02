@@ -29,7 +29,7 @@ Use GitHub Issues. Include:
 - New skills (`.claude/skills/`)
 - New agents (`.claude/agents/`)
 - New hooks (`.claude/hooks/`)
-- Improvements to `global/CLAUDE.md` or `templates/CLAUDE.md`
+- Improvements to `global/CLAUDE.md` or `project/CLAUDE.md`
 - Documentation improvements
 
 ## What's NOT Welcome
@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
 ## Updating Templates
 
-### `templates/CLAUDE.md`
+### `project/CLAUDE.md`
 
 Starting point for a new project's `CLAUDE.md`. When editing:
 
@@ -200,7 +200,7 @@ Starting point for a new project's `CLAUDE.md`. When editing:
 Installed at `~/.claude/CLAUDE.md`. Keep it:
 
 - Security and cross-project standards only
-- Free of project-specific rules (those belong in `templates/CLAUDE.md`)
+- Free of project-specific rules (those belong in `project/CLAUDE.md`)
 - Safe to merge into an existing global config without conflicts
 
 ---
