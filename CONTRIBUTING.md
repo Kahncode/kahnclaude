@@ -26,7 +26,7 @@ Use GitHub Issues. Include:
 ## What's Welcome
 
 - New slash commands (`.claude/commands/`)
-- New skills (`.claude/skills/`)
+- New skills (`.claude/skills/<name>/SKILL.md`)
 - New agents (`.claude/agents/`)
 - New hooks (`.claude/hooks/`)
 - Improvements to `global/CLAUDE.md` or `project/CLAUDE.md`

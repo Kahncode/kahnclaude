@@ -36,10 +36,10 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 
 | Component            | Count | Purpose                                          |
 | -------------------- | ----- | ------------------------------------------------ |
-| **Slash Commands**   | —     | On-demand workflows invoked with `/command`      |
-| **Skills**           | —     | Trigger-activated expertise templates            |
-| **Agents**           | —     | Specialist subagents with restricted tool access |
-| **Hooks**            | —     | Deterministic enforcement scripts (Python)       |
+| **Slash Commands**   | 13    | On-demand workflows invoked with `/command`      |
+| **Skills**           | 1     | Trigger-activated expertise templates            |
+| **Agents**           | 2     | Specialist subagents with restricted tool access |
+| **Hooks**            | 4     | Deterministic enforcement scripts (Python)       |
 | **Project Template** | 1     | `CLAUDE.md` starting point for any project       |
 | **Global Template**  | 1     | `~/.claude/CLAUDE.md` for cross-project rules    |
 
@@ -127,12 +127,21 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 | `/kc-install`        | Install KahnClaude components into the current project                |
 | `/kc-install-global` | Merge global config into `~/.claude/` (smart merge, never overwrites) |
 | `/kc-update`         | Update installed components from the latest framework source          |
+| `/kc-import`         | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
 
 ### Project Commands
 
-| Command             | Scope | What It Does |
-| ------------------- | ----- | ------------ |
-| _(to be populated)_ |       |              |
+| Command            | What It Does                                                              |
+| ------------------ | ------------------------------------------------------------------------- |
+| `/review`          | Review current diff for bugs, security issues, and best practices         |
+| `/commit`          | Generate a conventional commit message and commit staged changes          |
+| `/worktree`        | Create a git worktree + branch for isolated task work                     |
+| `/refactor`        | Refactor a file against CLAUDE.md rules — split, extract, clean up       |
+| `/test-plan`       | Generate a structured test plan document for a feature                    |
+| `/security-check`  | Scan project for secrets, missing .gitignore entries, and unsafe patterns |
+| `/progress`        | Show file counts, test status, recent git activity, and next actions      |
+| `/diagram`         | Generate Mermaid diagrams from code: architecture, api, data, all        |
+| `/architecture`    | Display or create system architecture documentation                       |
 
 ---
 
@@ -140,9 +149,9 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 Skills activate automatically when Claude detects trigger keywords in conversation. No explicit invocation needed.
 
-| Skill               | Triggers | What It Does |
-| ------------------- | -------- | ------------ |
-| _(to be populated)_ |          |              |
+| Skill         | Triggers                                          | What It Does                                              |
+| ------------- | ------------------------------------------------- | --------------------------------------------------------- |
+| `code-review` | review, audit, check code, security review        | Systematic checklist: security, errors, performance, tests, architecture |
 
 ---
 
@@ -150,9 +159,10 @@ Skills activate automatically when Claude detects trigger keywords in conversati
 
 Agents are specialists Claude delegates to automatically. Each has restricted tool access appropriate to its role.
 
-| Agent               | Tools | Specialization |
-| ------------------- | ----- | -------------- |
-| _(to be populated)_ |       |                |
+| Agent           | Tools                         | Specialization                                              |
+| --------------- | ----------------------------- | ----------------------------------------------------------- |
+| `code-reviewer` | Read, Grep, Glob              | Finds real bugs: security → correctness → performance → maintainability |
+| `test-writer`   | Read, Write, Grep, Glob, Bash | Writes behavior tests with explicit assertions and edge cases |
 
 ---
 
@@ -168,9 +178,12 @@ PreToolUse hook blocking .env access
   → Always executes → Exit code 2 → Operation blocked. Period.
 ```
 
-| Hook                | Event | Behavior |
-| ------------------- | ----- | -------- |
-| _(to be populated)_ |       |          |
+| Hook                   | Event        | Behavior                                                        |
+| ---------------------- | ------------ | --------------------------------------------------------------- |
+| `block-secrets`        | PreToolUse   | Blocks Read/Edit on `.env`, SSH keys, credentials, and secret path patterns |
+| `verify-no-secrets`    | Stop         | Warns if staged files contain secrets (AWS keys, GitHub tokens, Stripe keys, PEM) |
+| `check-branch`         | PreToolUse   | Blocks `git commit` on `main`/`master` when `KC_BRANCH_PROTECT=true` or marker file present |
+| `check-env-sync`       | Stop         | Warns if `.env` has keys missing from `.env.example`            |
 
 ### Hook Lifecycle
 
