@@ -38,10 +38,10 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 | -------------------- | ----- | ------------------------------------------------ |
 | **Slash Commands**   | 19    | On-demand workflows invoked with `/command`      |
 | **Skills**           | 1     | Trigger-activated expertise templates            |
-| **Agents**           | 2     | Specialist subagents with restricted tool access |
+| **Agents**           | 5     | Specialist subagents with restricted tool access |
 | **Hooks**            | 8     | Deterministic enforcement scripts (Python)       |
 | **Project Template** | 1     | `CLAUDE.md` starting point for any project       |
-| **Global Template**  | 1     | `@~/.claude/CLAUDE.md` for cross-project rules    |
+| **Global Template**  | 1     | `@~/.claude/CLAUDE.md` for cross-project rules   |
 
 ---
 
@@ -124,32 +124,30 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 ### Framework Commands
 
-| Command               | What It Does                                                          |
-| --------------------- | --------------------------------------------------------------------- |
-| `/kc:install`         | Install KahnClaude components into the current project                |
-| `/kc:install-global`  | Merge global config into `~/.claude/` (smart merge, never overwrites) |
-| `/kc:update`          | Update installed components from the latest framework source          |
-| `/kc:import`          | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
+| Command              | What It Does                                                                      |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `/kc:install`        | Install KahnClaude components into the current project                            |
+| `/kc:install-global` | Merge global config into `~/.claude/` (smart merge, never overwrites)             |
+| `/kc:update`         | Update installed components from the latest framework source                      |
+| `/kc:import`         | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
 
 ### Project Commands
 
-| Command            | What It Does                                                              |
-| ------------------ | ------------------------------------------------------------------------- |
-| `/review`          | Review current diff for bugs, security issues, and best practices         |
-| `/commit`          | Generate a conventional commit message and commit staged changes          |
-| `/worktree`        | Create a git worktree + branch for isolated task work                     |
-| `/refactor`        | Refactor a file against CLAUDE.md rules — split, extract, clean up       |
-| `/test-plan`       | Generate a structured test plan document for a feature                    |
-| `/security-check`  | Scan project for secrets, missing .gitignore entries, and unsafe patterns |
-| `/progress`        | Show file counts, test status, recent git activity, and next actions      |
-| `/diagram`         | Generate Mermaid diagrams from code: architecture, api, data, all        |
-| `/architecture`    | Display or create system architecture documentation                       |
-| `/linear`          | Implement a Linear issue — set In Progress, branch, plan, code, test, PR  |
-| `/jira`            | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR |
-| `/pr`              | Generate a PR title and description from the current branch diff; optionally create via `gh` |
-| `/explain`         | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage |
-| `/answer`          | Research a question using general knowledge, codebase search, Context7 docs, or web search |
-| `/test`            | Generate tests by delegating to the `test-writer` agent (single source of truth) |
+| Command     | What It Does                                                                                   |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| `/review`   | Review current diff for bugs, security issues, and best practices                              |
+| `/commit`   | Generate a conventional commit message and commit staged changes                               |
+| `/worktree` | Create a git worktree + branch for isolated task work                                          |
+| `/refactor` | Refactor a file against CLAUDE.md rules — split, extract, clean up                             |
+| `/progress` | Show file counts, test status, recent git activity, and next actions                           |
+| `/document` | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive |
+| `/learn`    | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes             |
+| `/linear`   | Implement a Linear issue — set In Progress, branch, plan, code, test, PR                       |
+| `/jira`     | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR                  |
+| `/pr`       | Generate a PR title and description from the current branch diff; optionally create via `gh`   |
+| `/explain`  | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage      |
+| `/answer`   | Research a question using general knowledge, codebase search, Context7 docs, or web search     |
+| `/test`     | Generate tests by delegating to the `test-writer` agent (single source of truth)               |
 
 ---
 
@@ -157,9 +155,9 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 Skills activate automatically when Claude detects trigger keywords in conversation. No explicit invocation needed.
 
-| Skill         | Triggers                                          | What It Does                                              |
-| ------------- | ------------------------------------------------- | --------------------------------------------------------- |
-| `code-review` | review, audit, check code, security review        | Systematic checklist: security, errors, performance, tests, architecture |
+| Skill         | Triggers                                   | What It Does                                                             |
+| ------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
+| `code-review` | review, audit, check code, security review | Systematic checklist: security, errors, performance, tests, architecture |
 
 ---
 
@@ -167,10 +165,11 @@ Skills activate automatically when Claude detects trigger keywords in conversati
 
 Agents are specialists Claude delegates to automatically. Each has restricted tool access appropriate to its role.
 
-| Agent           | Tools                         | Specialization                                              |
-| --------------- | ----------------------------- | ----------------------------------------------------------- |
-| `code-reviewer` | Read, Grep, Glob              | Finds real bugs: security → correctness → performance → maintainability |
-| `test-writer`   | Read, Write, Grep, Glob, Bash | Writes behavior tests with explicit assertions and edge cases |
+| Agent           | Tools                         | Specialization                                                                                      |
+| --------------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| `code-reviewer` | Read, Grep, Glob              | Finds real bugs: security → correctness → performance → maintainability                             |
+| `test-writer`   | Read, Write, Grep, Glob, Bash | Writes behavior tests with explicit assertions and edge cases                                       |
+| `documenter`    | Read, Write, Edit, Grep, Glob | Builds ARCHITECTURE.md index, subsystem docs, Mermaid diagrams, and Decisions logs from actual code |
 
 ---
 
@@ -186,25 +185,25 @@ PreToolUse hook blocking .env access
   → Always executes → Exit code 2 → Operation blocked. Period.
 ```
 
-| Hook                        | Event        | Behavior                                                        |
-| --------------------------- | ------------ | --------------------------------------------------------------- |
-| `block-secrets`             | PreToolUse   | Blocks Read/Edit on `.env`, SSH keys, credentials, and secret path patterns |
-| `block-dangerous-commands`  | PreToolUse   | Blocks `rm -rf /`, force-push to main, `chmod 777`, `curl \| sh`, `mkfs`, and secret exfiltration |
-| `verify-no-secrets`         | Stop         | Warns if staged files contain secrets (AWS keys, GitHub tokens, Stripe keys, PEM) |
-| `check-branch`              | PreToolUse   | Blocks `git commit` on `main`/`master` when `KC_BRANCH_PROTECT=true` or marker file present |
-| `check-env-sync`            | Stop         | Warns if `.env` has keys missing from `.env.example`            |
-| `after-edit`                | PostToolUse  | Auto-formats files after edit/write: prettier (JS/TS/JSON/MD/CSS), black+ruff (Python), gofmt (Go), rustfmt (Rust) |
-| `notify`                    | Notification | Sends desktop notifications when Claude needs attention (Windows toast, macOS, Linux, terminal bell fallback) |
-| `lint-on-stop`              | Stop         | Runs linters at end of turn: ruff+mypy (Python), cargo check+clippy (Rust), go vet+staticcheck (Go), npm lint+tsc (Node/TS) |
+| Hook                       | Event        | Behavior                                                                                                                    |
+| -------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `block-secrets`            | PreToolUse   | Blocks Read/Edit on `.env`, SSH keys, credentials, and secret path patterns                                                 |
+| `block-dangerous-commands` | PreToolUse   | Blocks `rm -rf /`, force-push to main, `chmod 777`, `curl \| sh`, `mkfs`, and secret exfiltration                           |
+| `verify-no-secrets`        | Stop         | Warns if staged files contain secrets (AWS keys, GitHub tokens, Stripe keys, PEM)                                           |
+| `check-branch`             | PreToolUse   | Blocks `git commit` on `main`/`master` when `KC_BRANCH_PROTECT=true` or marker file present                                 |
+| `check-env-sync`           | Stop         | Warns if `.env` has keys missing from `.env.example`                                                                        |
+| `after-edit`               | PostToolUse  | Auto-formats files after edit/write: prettier (JS/TS/JSON/MD/CSS), black+ruff (Python), gofmt (Go), rustfmt (Rust)          |
+| `notify`                   | Notification | Sends desktop notifications when Claude needs attention (Windows toast, macOS, Linux, terminal bell fallback)               |
+| `lint-on-stop`             | Stop         | Runs linters at end of turn: ruff+mypy (Python), cargo check+clippy (Rust), go vet+staticcheck (Go), npm lint+tsc (Node/TS) |
 
 ### Hook Lifecycle
 
-| Event          | When It Fires                                   |
-| -------------- | ----------------------------------------------- |
-| `PreToolUse`   | Before Claude reads, writes, or runs a command  |
-| `PostToolUse`  | After Claude writes or edits a file             |
-| `Stop`         | When Claude finishes a turn                     |
-| `Notification` | When Claude sends a notification to the user    |
+| Event          | When It Fires                                  |
+| -------------- | ---------------------------------------------- |
+| `PreToolUse`   | Before Claude reads, writes, or runs a command |
+| `PostToolUse`  | After Claude writes or edits a file            |
+| `Stop`         | When Claude finishes a turn                    |
+| `Notification` | When Claude sends a notification to the user   |
 
 ### Exit Codes
 
@@ -274,13 +273,13 @@ All KahnClaude hooks are Python. No bash. Reasons: cross-platform (Windows, WSL,
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
-| Component | Location                                   | Naming                                        |
-| --------- | ------------------------------------------ | --------------------------------------------- |
-| Command (project)   | `.claude/commands/<name>.md`     | kebab-case action verb                        |
+| Component           | Location                         | Naming                                          |
+| ------------------- | -------------------------------- | ----------------------------------------------- |
+| Command (project)   | `.claude/commands/<name>.md`     | kebab-case action verb                          |
 | Command (framework) | `.claude/commands/kc/<name>.md`  | kebab-case action verb; invoked as `/kc:<name>` |
-| Skill     | `.claude/skills/<name>/SKILL.md` | kebab-case category                           |
-| Agent     | `.claude/agents/<name>.md`       | kebab-case role                               |
-| Hook      | `.claude/hooks/<name>.py`        | `block-`, `check-`, `lint-`, `verify-` prefix |
+| Skill               | `.claude/skills/<name>/SKILL.md` | kebab-case category                             |
+| Agent               | `.claude/agents/<name>.md`       | kebab-case role                                 |
+| Hook                | `.claude/hooks/<name>.py`        | `block-`, `check-`, `lint-`, `verify-` prefix   |
 
 ## Contributing
 
