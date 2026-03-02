@@ -1,5 +1,5 @@
 ---
-name: kc-update
+name: update
 description: Update KahnClaude components in the current project to the latest versions
 scope: framework
 ---

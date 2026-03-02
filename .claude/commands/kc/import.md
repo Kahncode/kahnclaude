@@ -1,5 +1,5 @@
 ---
-name: kc-import
+name: import
 description: Analyze a repository's Claude Code components and selectively integrate them into KahnClaude
 scope: framework
 ---
@@ -33,7 +33,7 @@ Before touching the source repo, record what KahnClaude already has.
 This is the baseline for duplicate detection throughout the plan.
 
 Scan and record:
-- `.claude/commands/*.md` — name, description, scope, what it does
+- `.claude/commands/*.md` and `.claude/commands/kc/*.md` — name, description, scope, what it does
 - `.claude/skills/*/SKILL.md` — name, triggers, what it does
 - `.claude/agents/*.md` — name, tools, specialization
 - `.claude/hooks/*.py` — event, matcher, behavior
@@ -203,7 +203,7 @@ If the user requests modifications: apply them, re-show, re-ask.
 - YAML frontmatter: `name`, `description`, `scope`
   - `scope: project` — general-purpose, will be distributed to projects
   - `scope: framework` — KahnClaude management only, never distributed
-- Target: `.claude/commands/<name>.md`
+- Target: `.claude/commands/<name>.md` (scope: project) or `.claude/commands/kc/<name>.md` (scope: framework, invoked as `/kc:<name>`)
 - Prompt in imperative form
 - Remove hardcoded project paths, project names, stack-specific assumptions
 

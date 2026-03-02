@@ -16,7 +16,7 @@ You use it to **configure** projects, not to run them. Drop it into any existing
 
 ```bash
 # Inside a Claude Code session in your project
-/kc-install
+/kc:install
 ```
 
 Non-destructive — only adds what's missing. Creates `.claude/` with all components.
@@ -25,7 +25,7 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 
 ```bash
 # Inside a Claude Code session (one-time, merges with any existing ~/.claude/)
-/kc-install-global
+/kc:install-global
 ```
 
 > **What NOT to do:** Don't expect a runnable app from this repo. This is the configuration layer that enhances Claude in your projects — it's not a project itself.
@@ -53,12 +53,12 @@ git clone <repo-url> ~/tools/kahnclaude
 
 # 2. Install global config (one-time)
 #    Open Claude Code from anywhere and run:
-/kc-install-global
+/kc:install-global
 
 # 3. In any project, install the Claude layer:
 cd ~/your-project
 claude
-/kc-install
+/kc:install
 
 # 4. Customize CLAUDE.md for your project
 ```
@@ -91,7 +91,9 @@ kahnclaude/
 ├── .claude/                     # All Claude components (framework + distributable)
 │   ├── settings.json            # Hooks wiring for this framework repo
 │   ├── commands/                # Slash commands
-│   │   └── <name>.md            # scope: project → distributed | scope: framework → local
+│   │   ├── <name>.md            # scope: project → distributed to projects
+│   │   └── kc/                  # scope: framework → KahnClaude management only
+│   │       └── <name>.md        # invoked as /kc:<name>
 │   ├── skills/                  # Triggered expertise templates
 │   │   └── <name>/
 │   │       └── SKILL.md
@@ -117,17 +119,17 @@ kahnclaude/
 
 Invoke with `/command-name` inside any Claude Code session. Commands are Markdown files with YAML frontmatter. Two scopes:
 
-- **`scope: project`** — distributed to target projects via `/kc-install`
-- **`scope: framework`** — KahnClaude management only, never distributed
+- **`scope: project`** — distributed to target projects via `/kc:install`; live in `.claude/commands/`
+- **`scope: framework`** — KahnClaude management only, never distributed; live in `.claude/commands/kc/`, invoked as `/kc:<name>`
 
 ### Framework Commands
 
-| Command              | What It Does                                                          |
-| -------------------- | --------------------------------------------------------------------- |
-| `/kc-install`        | Install KahnClaude components into the current project                |
-| `/kc-install-global` | Merge global config into `~/.claude/` (smart merge, never overwrites) |
-| `/kc-update`         | Update installed components from the latest framework source          |
-| `/kc-import`         | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
+| Command               | What It Does                                                          |
+| --------------------- | --------------------------------------------------------------------- |
+| `/kc:install`         | Install KahnClaude components into the current project                |
+| `/kc:install-global`  | Merge global config into `~/.claude/` (smart merge, never overwrites) |
+| `/kc:update`          | Update installed components from the latest framework source          |
+| `/kc:import`          | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
 
 ### Project Commands
 
@@ -261,9 +263,10 @@ All KahnClaude hooks are Python. No bash. Reasons: cross-platform (Windows, WSL,
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
-| Component | Location                         | Naming                                        |
-| --------- | -------------------------------- | --------------------------------------------- |
-| Command   | `.claude/commands/<name>.md`     | kebab-case action verb                        |
+| Component | Location                                   | Naming                                        |
+| --------- | ------------------------------------------ | --------------------------------------------- |
+| Command (project)   | `.claude/commands/<name>.md`     | kebab-case action verb                        |
+| Command (framework) | `.claude/commands/kc/<name>.md`  | kebab-case action verb; invoked as `/kc:<name>` |
 | Skill     | `.claude/skills/<name>/SKILL.md` | kebab-case category                           |
 | Agent     | `.claude/agents/<name>.md`       | kebab-case role                               |
 | Hook      | `.claude/hooks/<name>.py`        | `block-`, `check-`, `lint-`, `verify-` prefix |

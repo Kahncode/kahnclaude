@@ -1,5 +1,5 @@
 ---
-name: kc-install
+name: install
 description: Install KahnClaude components into the current project
 scope: framework
 ---
@@ -10,7 +10,7 @@ Install KahnClaude components into the current working directory.
 
 1. Identify the KahnClaude source directory (ask the user if not already known)
 2. Create `.claude/` subdirectories if they don't exist: `commands/`, `skills/`, `agents/`, `hooks/`
-3. Copy all files from `commands/` → `.claude/commands/` (scope: project only)
+3. Copy command files from `commands/` → `.claude/commands/` (scope: project only; skip the `kc/` subfolder — those are framework-only)
 4. Copy all files from `skills/` → `.claude/skills/`
 5. Copy all files from `agents/` → `.claude/agents/`
 6. Copy all files from `hooks/` → `.claude/hooks/`

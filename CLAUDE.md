@@ -26,6 +26,7 @@ This is the Claude Code configuration for working on the KahnClaude framework it
 | Folder | Purpose |
 |--------|---------|
 | `.claude/commands/` | Slash commands — `scope: project` ones are distributed to projects |
+| `.claude/commands/kc/` | Framework-only commands (`scope: framework`), invoked as `/kc:<name>` |
 | `.claude/skills/` | Skills distributed to projects |
 | `.claude/agents/` | Agents distributed to projects |
 | `.claude/hooks/` | Hook scripts distributed to projects |
@@ -40,7 +41,7 @@ This is the Claude Code configuration for working on the KahnClaude framework it
 
 When adding any component (command, skill, agent, hook), update ALL of:
 
-1. The component file itself in `.claude/commands/`, `.claude/skills/`, `.claude/agents/`, or `.claude/hooks/`
+1. The component file itself in `.claude/commands/` (project) or `.claude/commands/kc/` (framework), `.claude/skills/`, `.claude/agents/`, or `.claude/hooks/`
 2. `README.md` — component listing and description
 3. `CONTRIBUTING.md` — any new conventions introduced
 

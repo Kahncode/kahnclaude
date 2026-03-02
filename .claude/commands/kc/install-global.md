@@ -1,5 +1,5 @@
 ---
-name: kc-install-global
+name: install-global
 description: Install global Claude config from KahnClaude into ~/.claude/
 scope: framework
 ---
