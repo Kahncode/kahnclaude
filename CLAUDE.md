@@ -45,7 +45,7 @@ When adding any component (command, skill, agent, hook), update ALL of:
 2. `README.md` — component listing and description
 3. `CONTRIBUTING.md` — any new conventions introduced
 
-If adding a hook: also wire it in `.claude/settings.json` and document the wiring in `global/settings.json`.
+If adding a hook: also wire it in `@.claude/settings.json` and document the wiring in `@global/settings.json`.
 
 ---
 
@@ -70,6 +70,7 @@ This repo primarily contains Markdown and Python. Follow these conventions:
 - No emojis unless the user explicitly requested them
 - No file > 300 lines
 - `description` fields must not exceed 400 characters
+- Use `@path/to/file` syntax for absolute file path references in `.md` files (e.g. `@src/main.py`, `@.claude/settings.json`); relative or fuzzy references (e.g. `file.ext`, `commands/`) are fine as-is
 - Agents that should auto-trigger must include `Use PROACTIVELY when [specific condition]` in their description — only for agents users would otherwise skip, not for agents users always invoke explicitly
 - Agents may be organized in subfolders: `core/` for cross-cutting concerns, `<stack>/` for tech-specific agents
 

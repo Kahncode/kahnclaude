@@ -37,8 +37,8 @@ Scan and record:
 - `.claude/skills/*/SKILL.md` — name, triggers, what it does
 - `.claude/agents/*.md` — name, tools, specialization
 - `.claude/hooks/*.py` — event, matcher, behavior
-- `.claude/settings.json` — hook wiring
-- `project/CLAUDE.md` and `global/CLAUDE.md` — existing rules and patterns
+- `@.claude/settings.json` — hook wiring
+- `@project/CLAUDE.md` and `@global/CLAUDE.md` — existing rules and patterns
 
 ### Step 3: Source Repository Discovery
 
@@ -226,7 +226,7 @@ If the user requests modifications: apply them, re-show, re-ask.
 - Exit codes: 0=allow, 1=warn, 2=block; print blocking reason to stderr on exit 2
 - Target: `.claude/hooks/<name>.py`
 - Follow the hook template from CONTRIBUTING.md exactly
-- After writing: wire in `.claude/settings.json`, then syntax-check immediately
+- After writing: wire in `@.claude/settings.json`, then syntax-check immediately
 
 **Merge actions**
 - Read the existing KahnClaude file first

@@ -53,7 +53,7 @@ graph TD
 
 ### Where to write:
 
-`docs/ARCHITECTURE.md` — replace or create the `## System Overview` section.
+`@docs/ARCHITECTURE.md` — replace or create the `## System Overview` section.
 
 ---
 
@@ -92,7 +92,7 @@ graph LR
 
 ### Where to write:
 
-`docs/ARCHITECTURE.md` — add or replace `## API Routes` section.
+`@docs/ARCHITECTURE.md` — add or replace `## API Routes` section.
 
 ---
 
@@ -134,7 +134,7 @@ erDiagram
 
 ### Where to write:
 
-`docs/ARCHITECTURE.md` — add or replace `## Data Model` section.
+`@docs/ARCHITECTURE.md` — add or replace `## Data Model` section.
 
 ---
 
@@ -143,6 +143,10 @@ erDiagram
 Run all applicable types in sequence: architecture → api → data.
 
 ---
+
+## File Path References
+
+When referencing files in generated documentation, use `@path/to/file` syntax for absolute paths (e.g. `@src/models/user.ts`). Relative or fuzzy references (e.g. `models/user.ts`) are fine as-is.
 
 ## After Generating
 

@@ -48,6 +48,7 @@ Use GitHub Issues. Include:
 - No file > 300 lines, no function > 50 lines
 - Hooks use stdlib only unless dependency is clearly documented
 - Run `/review` before committing
+- Use `@path/to/file` syntax for absolute file path references in `.md` files (e.g. `@src/main.py`); relative or fuzzy references (e.g. `file.ext`) are fine as-is
 - See `CLAUDE.md` for the full standards
 
 ---
@@ -158,14 +159,14 @@ Hooks live in `.claude/hooks/<name>.py`. **Python only — no bash.**
 
 **Naming conventions:**
 
-| Prefix     | Behavior                                           |
-| ---------- | -------------------------------------------------- |
-| `block-`   | Blocks the operation (exit 2)                      |
-| `check-`   | Checks condition, warns or blocks                  |
-| `lint-`    | Lints after file write (PostToolUse) or at Stop    |
-| `verify-`  | Verifies at turn end (Stop)                        |
-| `after-`   | Runs post-edit formatting (PostToolUse)            |
-| `notify-`  | Sends a desktop/system notification (Notification) |
+| Prefix    | Behavior                                           |
+| --------- | -------------------------------------------------- |
+| `block-`  | Blocks the operation (exit 2)                      |
+| `check-`  | Checks condition, warns or blocks                  |
+| `lint-`   | Lints after file write (PostToolUse) or at Stop    |
+| `verify-` | Verifies at turn end (Stop)                        |
+| `after-`  | Runs post-edit formatting (PostToolUse)            |
+| `notify-` | Sends a desktop/system notification (Notification) |
 
 **Required structure:**
 
@@ -204,8 +205,8 @@ if __name__ == "__main__":
 
 **After adding a hook:**
 
-1. Wire it in `.claude/settings.json`
-2. Document the wiring example in `global/settings.json`
+1. Wire it in `@.claude/settings.json`
+2. Document the wiring example in `@global/settings.json`
 3. Syntax-check: `python -m py_compile .claude/hooks/your-hook.py`
 4. Test with mock stdin: `echo '{"tool_name":"Write","tool_input":{"file_path":".env"}}' | python3 .claude/hooks/your-hook.py`
 
@@ -213,7 +214,7 @@ if __name__ == "__main__":
 
 ## Updating Templates
 
-### `project/CLAUDE.md`
+### `@project/CLAUDE.md`
 
 Starting point for a new project's `CLAUDE.md`. When editing:
 
@@ -221,9 +222,9 @@ Starting point for a new project's `CLAUDE.md`. When editing:
 - Append new rules — never remove without discussion
 - Each rule must explain **why**, not just what
 
-### `global/CLAUDE.md`
+### `@global/CLAUDE.md`
 
-Installed at `~/.claude/CLAUDE.md`. Keep it:
+Installed at `@~/.claude/CLAUDE.md`. Keep it:
 
 - Security and cross-project standards only
 - Free of project-specific rules (those belong in `project/CLAUDE.md`)
@@ -237,7 +238,7 @@ Installed at `~/.claude/CLAUDE.md`. Keep it:
 - [ ] `README.md` updated with description
 - [ ] This file updated if new conventions introduced
 - [ ] If hook: syntax-checked (`python -m py_compile`)
-- [ ] If hook: wired in `.claude/settings.json` and `global/settings.json`
+- [ ] If hook: wired in `@.claude/settings.json` and `@global/settings.json`
 - [ ] No secrets, credentials, or personal data in any file
 
 ---

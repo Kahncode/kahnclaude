@@ -41,7 +41,7 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 | **Agents**           | 2     | Specialist subagents with restricted tool access |
 | **Hooks**            | 8     | Deterministic enforcement scripts (Python)       |
 | **Project Template** | 1     | `CLAUDE.md` starting point for any project       |
-| **Global Template**  | 1     | `~/.claude/CLAUDE.md` for cross-project rules    |
+| **Global Template**  | 1     | `@~/.claude/CLAUDE.md` for cross-project rules    |
 
 ---
 
@@ -218,7 +218,7 @@ PreToolUse hook blocking .env access
 
 ## Templates
 
-### `project/CLAUDE.md`
+### `@project/CLAUDE.md`
 
 Starting point for a new project's `CLAUDE.md`. Contains numbered critical rules covering:
 
@@ -228,17 +228,17 @@ Starting point for a new project's `CLAUDE.md`. Contains numbered critical rules
 - Branch workflow
 - Project-specific slots to fill
 
-### `project/CLAUDE.local.md`
+### `@project/CLAUDE.local.md`
 
 Personal overrides — gitignored, never committed. For individual workflow preferences, local environment details, and project-specific personal notes.
 
-### `global/CLAUDE.md`
+### `@global/CLAUDE.md`
 
-Installed once at `~/.claude/CLAUDE.md`. Applies security rules and coding standards across **every** project. Merged with any existing global config — never overwrites.
+Installed once at `@~/.claude/CLAUDE.md`. Applies security rules and coding standards across **every** project. Merged with any existing global config — never overwrites.
 
-### `global/settings.json`
+### `@global/settings.json`
 
-Installed once at `~/.claude/settings.json`. Wires up global hooks. Merged with existing settings.
+Installed once at `@~/.claude/settings.json`. Wires up global hooks. Merged with existing settings.
 
 ---
 

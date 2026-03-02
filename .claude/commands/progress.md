@@ -10,7 +10,7 @@ Check the actual state of all components and report status.
 
 ## Instructions
 
-1. Read `docs/ARCHITECTURE.md` for project context (if it exists)
+1. Read `@docs/ARCHITECTURE.md` for project context (if it exists)
 2. Detect the project type from files present (see below)
 3. Check source and test file counts
 4. Check recent git activity

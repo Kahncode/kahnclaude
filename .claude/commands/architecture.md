@@ -9,8 +9,8 @@ Display and maintain the current system architecture.
 
 ## Instructions
 
-1. Read `docs/ARCHITECTURE.md` (if it exists)
-2. Read `docs/INFRASTRUCTURE.md` (if it exists)
+1. Read `@docs/ARCHITECTURE.md` (if it exists)
+2. Read `@docs/INFRASTRUCTURE.md` (if it exists)
 3. Display the architecture overview, data flow, and component map
 
 ## If Documentation Exists
@@ -24,7 +24,7 @@ Display:
 
 ## If Documentation Doesn't Exist Yet
 
-Create `docs/ARCHITECTURE.md` with:
+Create `@docs/ARCHITECTURE.md` with:
 
 1. **System Overview** — Mermaid diagram showing components and connections
 2. **Component Responsibilities** — "Does / Does NOT" table for each service
@@ -32,6 +32,10 @@ Create `docs/ARCHITECTURE.md` with:
 4. **Technology Choices** — what was chosen and WHY (this is the most valuable part)
 
 Use `/diagram architecture` to auto-generate the overview from code, then fill in the rationale manually.
+
+## File Path References
+
+When referencing files in the generated documentation, use `@path/to/file` syntax for absolute paths (e.g. `@src/server.ts`, `@config/database.yml`). Relative or fuzzy references (e.g. `server.ts`, `config/`) are fine as-is.
 
 ## Architecture Doc Standards
 

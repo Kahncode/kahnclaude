@@ -19,7 +19,7 @@ If `--dry-run` is passed, report what WOULD change without modifying any files.
 
 1. The target file (every line)
 2. `CLAUDE.md` — current project rules
-3. `docs/ARCHITECTURE.md` — where things belong (if it exists)
+3. `@docs/ARCHITECTURE.md` — where things belong (if it exists)
 
 Also check what imports the target file:
 
