@@ -98,7 +98,9 @@ kahnclaude/
 │   │   └── <name>/
 │   │       └── SKILL.md
 │   ├── agents/                  # Specialist subagents
-│   │   └── <name>.md
+│   │   ├── <name>.md            # General agents
+│   │   ├── python/              # Python/FastAPI specialists
+│   │   └── mobile/              # React Native/Expo specialists
 │   └── hooks/                   # Enforcement scripts (Python only)
 │       └── <name>.py
 │
@@ -165,11 +167,13 @@ Skills activate automatically when Claude detects trigger keywords in conversati
 
 Agents are specialists Claude delegates to automatically. Each has restricted tool access appropriate to its role.
 
-| Agent           | Tools                         | Specialization                                                                                      |
-| --------------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
-| `code-reviewer` | Read, Grep, Glob              | Finds real bugs: security → correctness → performance → maintainability                             |
-| `test-writer`   | Read, Write, Grep, Glob, Bash | Writes behavior tests with explicit assertions and edge cases                                       |
-| `documenter`    | Read, Write, Edit, Grep, Glob | Builds ARCHITECTURE.md index, subsystem docs, Mermaid diagrams, and Decisions logs from actual code |
+| Agent                              | Tools                         | Specialization                                                                                      |
+| ---------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| `code-reviewer`                    | Read, Grep, Glob              | Finds real bugs: security → correctness → performance → maintainability                             |
+| `test-writer`                      | Read, Write, Grep, Glob, Bash | Writes behavior tests with explicit assertions and edge cases                                       |
+| `documenter`                       | Read, Write, Edit, Grep, Glob | Builds ARCHITECTURE.md index, subsystem docs, Mermaid diagrams, and Decisions logs from actual code |
+| `python/fastapi-dev`               | Read, Write, Grep, Glob, Bash | Full-stack FastAPI specialist — builds and reviews endpoints, schemas, auth, and tests; version-aware |
+| `mobile/react-native-expo-dev`     | Read, Write, Grep, Glob, Bash | Senior Expo/React Native specialist; TypeScript-first; checks SDK version before writing any code   |
 
 ---
 
