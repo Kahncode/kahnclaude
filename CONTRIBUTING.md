@@ -158,12 +158,14 @@ Hooks live in `.claude/hooks/<name>.py`. **Python only — no bash.**
 
 **Naming conventions:**
 
-| Prefix    | Behavior                             |
-| --------- | ------------------------------------ |
-| `block-`  | Blocks the operation (exit 2)        |
-| `check-`  | Checks condition, warns or blocks    |
-| `lint-`   | Lints after file write (PostToolUse) |
-| `verify-` | Verifies at turn end (Stop)          |
+| Prefix     | Behavior                                           |
+| ---------- | -------------------------------------------------- |
+| `block-`   | Blocks the operation (exit 2)                      |
+| `check-`   | Checks condition, warns or blocks                  |
+| `lint-`    | Lints after file write (PostToolUse) or at Stop    |
+| `verify-`  | Verifies at turn end (Stop)                        |
+| `after-`   | Runs post-edit formatting (PostToolUse)            |
+| `notify-`  | Sends a desktop/system notification (Notification) |
 
 **Required structure:**
 
@@ -172,8 +174,8 @@ Hooks live in `.claude/hooks/<name>.py`. **Python only — no bash.**
 """
 hook-name.py — Brief description.
 
-Event: PreToolUse | PostToolUse | Stop
-Matcher: Read|Write|Edit|Bash  (PreToolUse/PostToolUse only)
+Event: PreToolUse | PostToolUse | Stop | Notification
+Matcher: Read|Write|Edit|Bash  (PreToolUse/PostToolUse only; use * for Stop/Notification)
 
 Exit codes:
   0 — Allow / no action

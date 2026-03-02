@@ -21,12 +21,22 @@ SENSITIVE_FILENAMES = {
     '.env.production',
     '.env.staging',
     '.env.development',
+    '.env.test',
+    '.secrets',
     'secrets.json',
     'secrets.yaml',
+    'secrets.yml',
+    'secrets.toml',
     'id_rsa',
     'id_ed25519',
     '.npmrc',        # may contain auth tokens
     '.pypirc',       # PyPI auth tokens
+    '.pgpass',       # PostgreSQL passwords
+    '.my.cnf',       # MySQL credentials
+    '.mongorc.js',   # MongoDB credentials
+    '.git-credentials',
+    '.gitconfig',
+    '.yarnrc',       # may contain auth tokens
     'credentials.json',
     'service-account.json',
     '.docker/config.json',
@@ -35,10 +45,24 @@ SENSITIVE_FILENAMES = {
 # Substrings in file paths that indicate sensitive content
 SENSITIVE_PATTERNS = [
     'aws/credentials',
+    'aws/config',
     '.ssh/',
     'private_key',
     'secret_key',
+    'gcloud/credentials.db',
+    '.azure/credentials',
 ]
+
+# File extensions that indicate key material or certificates
+SENSITIVE_EXTENSIONS = {
+    '.p12',
+    '.pfx',
+    '.jks',
+    '.keystore',
+    '.cer',
+    '.pem',
+    '.key',
+}
 
 
 def main() -> None:
@@ -78,6 +102,15 @@ def main() -> None:
                 file=sys.stderr,
             )
             sys.exit(2)
+
+    # Check file extension matches
+    if path.suffix.lower() in SENSITIVE_EXTENSIONS:
+        print(
+            f"BLOCKED: Access to '{file_path}' denied."
+            f" Extension '{path.suffix}' indicates key material or certificate.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
     sys.exit(0)
 

@@ -3,19 +3,6 @@
 > Project instructions for Claude Code. Customize this for your project.
 > Keep team-shared rules here. Put personal preferences in `CLAUDE.local.md`.
 
----
-
-## Quick Reference
-
-| Command | What it does |
-|---------|-------------|
-| `/review` | Code review against project rules |
-| `/commit` | Smart commit with conventional commit message |
-| `/security-check` | Scan for secrets and vulnerabilities |
-| `/refactor <file>` | Audit and refactor a file against all rules |
-
----
-
 ## Critical Rules
 
 ### 0. Never Publish Sensitive Data
@@ -79,9 +66,9 @@ Before assuming something is broken:
 
 <!-- Document your project's ports here -->
 
-| Service | Dev Port | Test Port |
-|---------|----------|-----------|
-| [Service] | [port] | [port] |
+| Service   | Dev Port | Test Port |
+| --------- | -------- | --------- |
+| [Service] | [port]   | [port]    |
 
 ---
 

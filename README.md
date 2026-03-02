@@ -36,10 +36,10 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 
 | Component            | Count | Purpose                                          |
 | -------------------- | ----- | ------------------------------------------------ |
-| **Slash Commands**   | 13    | On-demand workflows invoked with `/command`      |
+| **Slash Commands**   | 19    | On-demand workflows invoked with `/command`      |
 | **Skills**           | 1     | Trigger-activated expertise templates            |
 | **Agents**           | 2     | Specialist subagents with restricted tool access |
-| **Hooks**            | 4     | Deterministic enforcement scripts (Python)       |
+| **Hooks**            | 8     | Deterministic enforcement scripts (Python)       |
 | **Project Template** | 1     | `CLAUDE.md` starting point for any project       |
 | **Global Template**  | 1     | `~/.claude/CLAUDE.md` for cross-project rules    |
 
@@ -144,6 +144,12 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 | `/progress`        | Show file counts, test status, recent git activity, and next actions      |
 | `/diagram`         | Generate Mermaid diagrams from code: architecture, api, data, all        |
 | `/architecture`    | Display or create system architecture documentation                       |
+| `/linear`          | Implement a Linear issue — set In Progress, branch, plan, code, test, PR  |
+| `/jira`            | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR |
+| `/pr`              | Generate a PR title and description from the current branch diff; optionally create via `gh` |
+| `/explain`         | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage |
+| `/answer`          | Research a question using general knowledge, codebase search, Context7 docs, or web search |
+| `/test`            | Generate tests by delegating to the `test-writer` agent (single source of truth) |
 
 ---
 
@@ -180,20 +186,25 @@ PreToolUse hook blocking .env access
   → Always executes → Exit code 2 → Operation blocked. Period.
 ```
 
-| Hook                   | Event        | Behavior                                                        |
-| ---------------------- | ------------ | --------------------------------------------------------------- |
-| `block-secrets`        | PreToolUse   | Blocks Read/Edit on `.env`, SSH keys, credentials, and secret path patterns |
-| `verify-no-secrets`    | Stop         | Warns if staged files contain secrets (AWS keys, GitHub tokens, Stripe keys, PEM) |
-| `check-branch`         | PreToolUse   | Blocks `git commit` on `main`/`master` when `KC_BRANCH_PROTECT=true` or marker file present |
-| `check-env-sync`       | Stop         | Warns if `.env` has keys missing from `.env.example`            |
+| Hook                        | Event        | Behavior                                                        |
+| --------------------------- | ------------ | --------------------------------------------------------------- |
+| `block-secrets`             | PreToolUse   | Blocks Read/Edit on `.env`, SSH keys, credentials, and secret path patterns |
+| `block-dangerous-commands`  | PreToolUse   | Blocks `rm -rf /`, force-push to main, `chmod 777`, `curl \| sh`, `mkfs`, and secret exfiltration |
+| `verify-no-secrets`         | Stop         | Warns if staged files contain secrets (AWS keys, GitHub tokens, Stripe keys, PEM) |
+| `check-branch`              | PreToolUse   | Blocks `git commit` on `main`/`master` when `KC_BRANCH_PROTECT=true` or marker file present |
+| `check-env-sync`            | Stop         | Warns if `.env` has keys missing from `.env.example`            |
+| `after-edit`                | PostToolUse  | Auto-formats files after edit/write: prettier (JS/TS/JSON/MD/CSS), black+ruff (Python), gofmt (Go), rustfmt (Rust) |
+| `notify`                    | Notification | Sends desktop notifications when Claude needs attention (Windows toast, macOS, Linux, terminal bell fallback) |
+| `lint-on-stop`              | Stop         | Runs linters at end of turn: ruff+mypy (Python), cargo check+clippy (Rust), go vet+staticcheck (Go), npm lint+tsc (Node/TS) |
 
 ### Hook Lifecycle
 
-| Event         | When It Fires                                  |
-| ------------- | ---------------------------------------------- |
-| `PreToolUse`  | Before Claude reads, writes, or runs a command |
-| `PostToolUse` | After Claude writes or edits a file            |
-| `Stop`        | When Claude finishes a turn                    |
+| Event          | When It Fires                                   |
+| -------------- | ----------------------------------------------- |
+| `PreToolUse`   | Before Claude reads, writes, or runs a command  |
+| `PostToolUse`  | After Claude writes or edits a file             |
+| `Stop`         | When Claude finishes a turn                     |
+| `Notification` | When Claude sends a notification to the user    |
 
 ### Exit Codes
 

@@ -16,11 +16,25 @@
           {
             "type": "command",
             "command": "python3 .claude/hooks/check-branch.py"
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/block-dangerous-commands.py"
           }
         ]
       }
     ],
-    "PostToolUse": [],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/after-edit.py"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
@@ -35,6 +49,25 @@
           {
             "type": "command",
             "command": "python3 .claude/hooks/check-env-sync.py"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/lint-on-stop.py"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/notify.py"
           }
         ]
       }
