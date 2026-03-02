@@ -42,28 +42,49 @@ Scan and record:
 
 ### Step 3: Source Repository Discovery
 
+> **CRITICAL — READ BEFORE STARTING THIS STEP:**
+> Step 2 scanned KahnClaude (this framework). Step 3 scans the **source repo** — a
+> completely different directory at the path provided in Step 1. Every file read, every
+> path listed, and every artifact recorded in this step MUST come from that source path.
+> **NEVER reference KahnClaude's own `.claude/` directory here.** If you catch yourself
+> listing a path that does not start with the source repo path, stop and correct it.
+
 Do not assume any particular structure. The source repo may organize things very
 differently from KahnClaude or may not use Claude Code at all in a conventional way.
 
-**Broad scan first:**
+**Broad scan first** — all operations rooted at `<source-repo-path>`:
 
-1. List all files in the root directory
-2. Look for any `.claude/` directory — if present, list its full contents recursively
-3. Look for `CLAUDE.md` files at any depth in the repo
-4. Look for any file named `CLAUDE.local.md`, `settings.json` inside `.claude/`, or similar
-5. Scan for Markdown files in any directory that might be commands, skills, or agents —
-   look for YAML frontmatter with fields like `name`, `description`, `triggers`, `tools`, `scope`
-6. Scan for Python, bash, or other scripts that read from stdin and exit with codes 0/1/2
-   (these may be hooks regardless of where they live)
-7. Read the repo's `README.md` and any docs about Claude Code usage
-8. Look for memory-related files: directories named `memory/`, files named `MEMORY.md`,
-   instructions about persistent state in any CLAUDE.md
+1. List all files in `<source-repo-path>/` (root only, not recursive)
+2. If `<source-repo-path>/.claude/` exists, list its full contents recursively
+3. Search for `CLAUDE.md` files at any depth under `<source-repo-path>/`
+4. Search for `CLAUDE.local.md`, `settings.json` inside `.claude/`, or similar config files
+5. Scan for Markdown files anywhere under `<source-repo-path>/` that might be commands,
+   skills, or agents — look for YAML frontmatter with `name`, `description`, `triggers`,
+   `tools`, or `scope` fields
+6. Scan for Python, bash, or other scripts under `<source-repo-path>/` that read from
+   stdin and exit with codes 0/1/2 (these may be hooks regardless of location)
+7. Read `<source-repo-path>/README.md` and any docs about Claude Code usage
+8. Look for memory-related files: `memory/` directories, `MEMORY.md`, or persistent-state
+   instructions in any CLAUDE.md under `<source-repo-path>/`
 
-**For each file found, record:**
+**For each file found, record** — using full absolute paths from the source repo:
 `{ type_guess, actual_path, name_if_any, description_if_any, language, raw_purpose }`
 
 Do not force the source structure to match KahnClaude's layout. Classify what you find
 based on what it actually does, not where it lives.
+
+**After completing the scan**, present the full artifact list and confirm before proceeding.
+Every path shown MUST be from the source repo, not from KahnClaude:
+
+> "I found [N] artifact(s) in `<source-repo-path>`:
+> - `<source-path/to/file>` ([type]) — [one-line description]
+> - ...
+>
+> Are these the artifacts you intended to import? If not, describe what you're looking for
+> and I'll search more broadly."
+
+Wait for confirmation before continuing to Step 4. If the user says the artifacts don't
+match their intent, re-run the discovery with the corrected target or search criteria.
 
 ### Step 4: Feature Synthesis
 
@@ -75,7 +96,7 @@ Feature format:
 ```
 [N] Feature Name
     What it does: <one sentence>
-    Artifacts: <list of source files>
+    Artifacts: <list of source files — paths must be from the source repo, not KahnClaude>
     KahnClaude overlap: none | partial — <existing component> | full duplicate of <component>
 ```
 
