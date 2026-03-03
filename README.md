@@ -36,8 +36,8 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 
 | Component            | Count | Purpose                                          |
 | -------------------- | ----- | ------------------------------------------------ |
-| **Slash Commands**   | 19    | On-demand workflows invoked with `/command`      |
-| **Skills**           | 1     | Trigger-activated expertise templates            |
+| **Slash Commands**   | 21    | On-demand workflows invoked with `/command`      |
+| **Skills**           | 0     | Trigger-activated expertise templates            |
 | **Agents**           | 19    | Specialist subagents with restricted tool access |
 | **Hooks**            | 8     | Deterministic enforcement scripts (Python)       |
 | **Project Template** | 1     | `CLAUDE.md` starting point for any project       |
@@ -130,28 +130,31 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 | Command              | What It Does                                                                      |
 | -------------------- | --------------------------------------------------------------------------------- |
-| `/kc:install`        | Install KahnClaude components into the current project                            |
-| `/kc:install-global` | Merge global config into `~/.claude/` (smart merge, never overwrites)             |
-| `/kc:update`         | Update installed components from the latest framework source                      |
-| `/kc:import`         | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
+| `/kc:install`            | Install KahnClaude components into the current project                            |
+| `/kc:install-global`     | Merge global config into `~/.claude/` (smart merge, never overwrites)             |
+| `/kc:update`             | Update installed components from the latest framework source                      |
+| `/kc:import`             | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
+| `/kc:create-agent-skill` | Create a new agent, skill, or slash command following framework conventions        |
+| `/kc:fix-agent-skill`    | Debug a misbehaving agent or skill — session analysis + convention audit           |
 
 ### Project Commands
 
-| Command     | What It Does                                                                                   |
-| ----------- | ---------------------------------------------------------------------------------------------- |
-| `/review`   | Review current diff for bugs, security issues, and best practices                              |
-| `/commit`   | Generate a conventional commit message and commit staged changes                               |
-| `/worktree` | Create a git worktree + branch for isolated task work                                          |
-| `/refactor` | Refactor a file against CLAUDE.md rules — split, extract, clean up                             |
-| `/progress` | Show file counts, test status, recent git activity, and next actions                           |
-| `/document` | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive |
-| `/learn`    | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes             |
-| `/linear`   | Implement a Linear issue — set In Progress, branch, plan, code, test, PR                       |
-| `/jira`     | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR                  |
-| `/pr`       | Generate a PR title and description from the current branch diff; optionally create via `gh`   |
-| `/explain`  | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage      |
-| `/answer`   | Research a question using general knowledge, codebase search, Context7 docs, or web search     |
-| `/test`     | Generate tests by delegating to the `test-writer` agent (single source of truth)               |
+| Command          | What It Does                                                                                   |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| `/review`        | Review current diff for bugs, security issues, and best practices                             |
+| `/commit`        | Generate a conventional commit message and commit staged changes                              |
+| `/worktree`      | Create a git worktree + branch for isolated task work                                         |
+| `/refactor`      | Refactor a file against CLAUDE.md rules — split, extract, clean up                            |
+| `/progress`      | Show file counts, test status, recent git activity, and next actions                          |
+| `/document`      | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive|
+| `/learn`         | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes            |
+| `/linear`        | Implement a Linear issue — set In Progress, branch, plan, code, test, PR                      |
+| `/jira`          | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR                 |
+| `/pr`            | Generate a PR title and description from the current branch diff; optionally create via `gh`  |
+| `/explain`       | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage     |
+| `/answer`        | Research a question using general knowledge, codebase search, Context7 docs, or web search    |
+| `/test`          | Generate tests by delegating to the `test-writer` agent (single source of truth)              |
+| `/security-check`| Scan for exposed secrets, missing .gitignore entries, and unsafe patterns                     |
 
 ---
 
@@ -159,9 +162,7 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 Skills activate automatically when Claude detects trigger keywords in conversation. No explicit invocation needed.
 
-| Skill         | Triggers                                   | What It Does                                                             |
-| ------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
-| `code-review` | review, audit, check code, security review | Systematic checklist: security, errors, performance, tests, architecture |
+No skills are included yet. Skills activate automatically when Claude detects trigger keywords. Use `/kc:create-agent-skill` to add one.
 
 ---
 
@@ -204,7 +205,7 @@ Agents are specialists Claude delegates to automatically. Each has restricted to
 | `web/tailwind-css-dev` | Read, Grep, Glob, Bash, Write, Edit, WebFetch | Tailwind CSS v4+; container queries, OKLCH themes, accessibility |
 | `web/react-component-dev` | (all) | React 19 + Next.js App Router; RSC, shadcn/ui, accessible components |
 | `web/react-nextjs-dev` | (all) | Next.js SSR/SSG/ISR, Server Actions, App Router, performance optimization |
-| `web/supabase-dev` | Read, Write, Edit, Grep, Glob, Bash, WebFetch | Supabase + PostgreSQL specialist — auth, RLS, schema design, query optimization, Storage, Realtime, Edge Functions |
+| `web/supabase-dev` | Read, Write, Edit, Grep, Glob, Bash, WebFetch | Supabase + PostgreSQL — auth, RLS, schema design, Storage, Realtime, Edge Functions |
 
 ### Mobile
 
