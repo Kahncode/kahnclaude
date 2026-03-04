@@ -26,11 +26,11 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 3. Create `.claude/` subdirectories in the target project if they don't exist: `commands/`, `skills/`, `agents/`, `hooks/`
 
-4. Copy command files from `.claude/commands/` → `<target>/.claude/commands/`
+4. Copy command files from `.claude/commands/` → `<target>/.claude/commands/`, **preserving subfolder structure** (e.g. `commands/kc/create-agent-skill.md` → `<target>/.claude/commands/kc/create-agent-skill.md`). Create any needed subdirectories.
 
-5. Copy all files from `.claude/skills/` → `<target>/.claude/skills/`
+5. Copy all files from `.claude/skills/` → `<target>/.claude/skills/`, **preserving subfolder structure**. Create any needed subdirectories.
 
-6. Copy only the selected agents to `<target>/.claude/agents/`, preserving subfolder structure for tech-stack-specific agents
+6. Copy only the selected agents to `<target>/.claude/agents/`, **preserving subfolder structure** (e.g. `agents/python/fastapi-dev.md` → `<target>/.claude/agents/python/fastapi-dev.md`). Create any needed subdirectories.
 
 7. Copy all files from `.claude/hooks/` → `<target>/.claude/hooks/`
 
