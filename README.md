@@ -61,7 +61,47 @@ claude
 /kc:install
 
 # 4. Customize CLAUDE.md for your project
+
+# 5. Configure MCPs for your tools and stack (see MCP section below)
+
+# 6. Build Claude's knowledge base of your project:
+/document
 ```
+
+> **Step 6:** `/document` creates an `ARCHITECTURE.md` and subsystem docs so Claude understands your codebase from the first session. Run it once after setup. You may document more subsystems using the /document skill. Use `/learn` to update documentation from the current context as you go.
+
+---
+
+## MCP Servers
+
+MCP (Model Context Protocol) servers extend Claude with real-time access to external tools, docs, and services. Add them globally with `claude mcp add -s user ...` or per-project with `claude mcp add ...`.
+
+### Always Recommended
+
+These MCPs are useful in virtually every project. MCPs are project-scoped by default. We recommend installing those globally using `claude mcp add --scope user`.
+
+| MCP            | What It Adds                                                                                  | Install                                                                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Context7**   | Up-to-date library docs and code examples pulled at query time — eliminates hallucinated APIs | `claude mcp add context7 -- npx -y @upstash/context7-mcp@latest`                                                                              |
+| **GitHub**     | Read issues, PRs, and code from any repo without leaving Claude                               | `claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer YOUR_GITHUB_PAT"}}'` |
+| **Filesystem** | Lets Claude read/write files outside the project root (cross-repo work, config management)    | `claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allow`                                                  |
+
+### Project-Type Recommendations
+
+| Project Type                 | Recommended MCPs                                                                                          |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Web / SaaS**               | Playwright (browser automation, E2E testing), Figma (design specs), Notion (product docs), Linear or Jira |
+| **Game Dev (Unreal Engine)** | Unreal Engine MCP (Blueprint/C++ introspection), Perforce MCP (if using P4)                               |
+| **Data / ML**                | PostgreSQL or SQLite MCP (query live data)                                                                |
+| **Mobile**                   | Figma MCP (design handoff), Firebase or Supabase MCP                                                      |
+| **DevOps**                   | Docker MCP, AWS/GCP/Azure MCPs                                                                            |
+
+### Finding More MCPs
+
+- Official catalog: https://code.claude.com/docs/en/mcp
+- Community registry: https://mcpservers.org/
+
+Look for MCPs matching **your specific tools and workflow** — project management (Jira, Linear, Notion), design (Figma), communication (Gmail, Slack), version control (GitHub, Perforce), and tech-stack specific (Supabase, Unreal Engine...). A well-chosen MCP can eliminate entire categories of copy-paste between Claude and your tools.
 
 ---
 
@@ -128,33 +168,33 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 ### Framework Commands
 
-| Command              | What It Does                                                                      |
-| -------------------- | --------------------------------------------------------------------------------- |
+| Command                  | What It Does                                                                      |
+| ------------------------ | --------------------------------------------------------------------------------- |
 | `/kc:install`            | Install KahnClaude components into the current project                            |
 | `/kc:install-global`     | Merge global config into `~/.claude/` (smart merge, never overwrites)             |
 | `/kc:update`             | Update installed components from the latest framework source                      |
 | `/kc:import`             | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
-| `/kc:create-agent-skill` | Create a new agent, skill, or slash command following framework conventions        |
-| `/kc:fix-agent-skill`    | Debug a misbehaving agent or skill — session analysis + convention audit           |
+| `/kc:create-agent-skill` | Create a new agent, skill, or slash command following framework conventions       |
+| `/kc:fix-agent-skill`    | Debug a misbehaving agent or skill — session analysis + convention audit          |
 
 ### Project Commands
 
-| Command          | What It Does                                                                                   |
-| ---------------- | ---------------------------------------------------------------------------------------------- |
-| `/review`        | Review current diff for bugs, security issues, and best practices                             |
-| `/commit`        | Generate a conventional commit message and commit staged changes                              |
-| `/worktree`      | Create a git worktree + branch for isolated task work                                         |
-| `/refactor`      | Refactor a file against CLAUDE.md rules — split, extract, clean up                            |
-| `/progress`      | Show file counts, test status, recent git activity, and next actions                          |
-| `/document`      | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive|
-| `/learn`         | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes            |
-| `/linear`        | Implement a Linear issue — set In Progress, branch, plan, code, test, PR                      |
-| `/jira`          | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR                 |
-| `/pr`            | Generate a PR title and description from the current branch diff; optionally create via `gh`  |
-| `/explain`       | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage     |
-| `/answer`        | Research a question using general knowledge, codebase search, Context7 docs, or web search    |
-| `/test`          | Generate tests by delegating to the `test-writer` agent (single source of truth)              |
-| `/security-check`| Scan for exposed secrets, missing .gitignore entries, and unsafe patterns                     |
+| Command           | What It Does                                                                                   |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| `/review`         | Review current diff for bugs, security issues, and best practices                              |
+| `/commit`         | Generate a conventional commit message and commit staged changes                               |
+| `/worktree`       | Create a git worktree + branch for isolated task work                                          |
+| `/refactor`       | Refactor a file against CLAUDE.md rules — split, extract, clean up                             |
+| `/progress`       | Show file counts, test status, recent git activity, and next actions                           |
+| `/document`       | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive |
+| `/learn`          | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes             |
+| `/linear`         | Implement a Linear issue — set In Progress, branch, plan, code, test, PR                       |
+| `/jira`           | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR                  |
+| `/pr`             | Generate a PR title and description from the current branch diff; optionally create via `gh`   |
+| `/explain`        | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage      |
+| `/answer`         | Research a question using general knowledge, codebase search, Context7 docs, or web search     |
+| `/test`           | Generate tests by delegating to the `test-writer` agent (single source of truth)               |
+| `/security-check` | Scan for exposed secrets, missing .gitignore entries, and unsafe patterns                      |
 
 ---
 
@@ -172,47 +212,47 @@ Agents are specialists Claude delegates to automatically. Each has restricted to
 
 ### Universal
 
-| Agent | Tools | Specialization |
-| ----- | ----- | -------------- |
-| `code-reviewer` | Read, Grep, Glob | Finds real bugs: security → correctness → performance → maintainability |
-| `test-writer` | Read, Write, Grep, Glob, Bash | Writes behavior tests with explicit assertions and edge cases |
-| `documenter` | Read, Write, Edit, Grep, Glob | Architecture docs, subsystem docs, Mermaid diagrams, Decisions logs, READMEs, API specs, user manuals |
-| `api-dev` | Read, Grep, Glob, Write, WebFetch, WebSearch | Designs REST/GraphQL contracts; produces OpenAPI/GraphQL specs |
-| `backend-dev` | Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch | Polyglot backend implementer; detects stack and ships production-ready features |
+| Agent           | Tools                                                    | Specialization                                                                                        |
+| --------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `code-reviewer` | Read, Grep, Glob                                         | Finds real bugs: security → correctness → performance → maintainability                               |
+| `test-writer`   | Read, Write, Grep, Glob, Bash                            | Writes behavior tests with explicit assertions and edge cases                                         |
+| `documenter`    | Read, Write, Edit, Grep, Glob                            | Architecture docs, subsystem docs, Mermaid diagrams, Decisions logs, READMEs, API specs, user manuals |
+| `api-dev`       | Read, Grep, Glob, Write, WebFetch, WebSearch             | Designs REST/GraphQL contracts; produces OpenAPI/GraphQL specs                                        |
+| `backend-dev`   | Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch | Polyglot backend implementer; detects stack and ships production-ready features                       |
 
 ### Core (cross-cutting)
 
-| Agent | Tools | Specialization |
-| ----- | ----- | -------------- |
-| `core/code-archaeologist` | Read, Grep, Glob, Bash | Deep codebase explorer; produces 11-section assessment report |
-| `core/performance-optimizer` | Read, Grep, Glob, Bash | Profiles bottlenecks and applies high-impact fixes with before/after metrics |
-| `core/tech-lead-orchestrator` | Read, Grep, Glob, Bash | Orchestrates multi-step tasks by assigning sub-agents; uses Opus 4.6 |
+| Agent                         | Tools                  | Specialization                                                               |
+| ----------------------------- | ---------------------- | ---------------------------------------------------------------------------- |
+| `core/code-archaeologist`     | Read, Grep, Glob, Bash | Deep codebase explorer; produces 11-section assessment report                |
+| `core/performance-optimizer`  | Read, Grep, Glob, Bash | Profiles bottlenecks and applies high-impact fixes with before/after metrics |
+| `core/tech-lead-orchestrator` | Read, Grep, Glob, Bash | Orchestrates multi-step tasks by assigning sub-agents; uses Opus 4.6         |
 
 ### Python
 
-| Agent | Tools | Specialization |
-| ----- | ----- | -------------- |
-| `python/fastapi-dev` | Read, Write, Grep, Glob, Bash | Full-stack FastAPI specialist — endpoints, schemas, auth, and tests; version-aware |
-| `python/python-dev` | Read, Write, Edit, Bash, Grep, Glob, WebFetch | Modern Python 3.12+ — architecture, packaging, async, type system |
-| `python/security-dev` | Read, Grep, Glob, Bash, WebFetch | Cryptography, OWASP audits, auth flows, compliance |
-| `python/devops-cicd-dev` | Read, Write, Edit, Bash, Grep, Glob, WebFetch | CI/CD pipelines, Docker/K8s, IaC, cloud deployments |
+| Agent                    | Tools                                         | Specialization                                                                     |
+| ------------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `python/fastapi-dev`     | Read, Write, Grep, Glob, Bash                 | Full-stack FastAPI specialist — endpoints, schemas, auth, and tests; version-aware |
+| `python/python-dev`      | Read, Write, Edit, Bash, Grep, Glob, WebFetch | Modern Python 3.12+ — architecture, packaging, async, type system                  |
+| `python/security-dev`    | Read, Grep, Glob, Bash, WebFetch              | Cryptography, OWASP audits, auth flows, compliance                                 |
+| `python/devops-cicd-dev` | Read, Write, Edit, Bash, Grep, Glob, WebFetch | CI/CD pipelines, Docker/K8s, IaC, cloud deployments                                |
 
 ### Web
 
-| Agent | Tools | Specialization |
-| ----- | ----- | -------------- |
-| `web/frontend-dev` | Read, Grep, Glob, Bash, Write, Edit, WebFetch | Universal UI builder; React, Svelte, or vanilla JS/TS |
-| `web/tailwind-css-dev` | Read, Grep, Glob, Bash, Write, Edit, WebFetch | Tailwind CSS v4+; container queries, OKLCH themes, accessibility |
-| `web/react-component-dev` | (all) | React 19 + Next.js App Router; RSC, shadcn/ui, accessible components |
-| `web/react-nextjs-dev` | (all) | Next.js SSR/SSG/ISR, Server Actions, App Router, performance optimization |
-| `web/supabase-dev` | Read, Write, Edit, Grep, Glob, Bash, WebFetch | Supabase + PostgreSQL — auth, RLS, schema design, Storage, Realtime, Edge Functions |
+| Agent                     | Tools                                         | Specialization                                                                      |
+| ------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `web/frontend-dev`        | Read, Grep, Glob, Bash, Write, Edit, WebFetch | Universal UI builder; React, Svelte, or vanilla JS/TS                               |
+| `web/tailwind-css-dev`    | Read, Grep, Glob, Bash, Write, Edit, WebFetch | Tailwind CSS v4+; container queries, OKLCH themes, accessibility                    |
+| `web/react-component-dev` | (all)                                         | React 19 + Next.js App Router; RSC, shadcn/ui, accessible components                |
+| `web/react-nextjs-dev`    | (all)                                         | Next.js SSR/SSG/ISR, Server Actions, App Router, performance optimization           |
+| `web/supabase-dev`        | Read, Write, Edit, Grep, Glob, Bash, WebFetch | Supabase + PostgreSQL — auth, RLS, schema design, Storage, Realtime, Edge Functions |
 
 ### Mobile
 
-| Agent | Tools | Specialization |
-| ----- | ----- | -------------- |
-| `mobile/react-native-expo-dev` | Read, Write, Grep, Glob, Bash | Senior Expo/React Native specialist; TypeScript-first; checks SDK version before writing any code |
-| `mobile/react-native-component-dev` | Read, Write, Grep, Glob, Bash | Reusable RN UI components; component API design, design systems, Reanimated 3, accessibility |
+| Agent                               | Tools                         | Specialization                                                                                    |
+| ----------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| `mobile/react-native-expo-dev`      | Read, Write, Grep, Glob, Bash | Senior Expo/React Native specialist; TypeScript-first; checks SDK version before writing any code |
+| `mobile/react-native-component-dev` | Read, Write, Grep, Glob, Bash | Reusable RN UI components; component API design, design systems, Reanimated 3, accessibility      |
 
 ---
 
