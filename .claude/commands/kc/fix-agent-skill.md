@@ -2,7 +2,7 @@
 name: kc:fix-agent-skill
 description: Debug a misbehaving agent or skill by analyzing the current session, then audit and fix the component file.
 argument-hint: "[agent name, skill name, or path — leave blank to diagnose from session]"
-scope: framework
+scope: project
 allowed-tools: Read, Edit, Glob, Grep
 ---
 
@@ -13,6 +13,7 @@ allowed-tools: Read, Edit, Glob, Grep
 $ARGUMENTS
 
 **Resolve the target:**
+
 - Agent name → find `.claude/agents/**/<name>.md`
 - Skill name → find `.claude/skills/<name>/SKILL.md`
 - Path → use directly
@@ -34,6 +35,7 @@ Identify the file. If ambiguous, ask: "Which agent or skill misbehaved?"
 Read the file and check against KahnClaude conventions.
 
 **Agent checklist:**
+
 - [ ] `name` field — lowercase-with-hyphens
 - [ ] `description` ≤ 400 chars, includes "Use when..." trigger
 - [ ] `model: inherit` present
@@ -41,6 +43,7 @@ Read the file and check against KahnClaude conventions.
 - [ ] Instructions are clear and actionable
 
 **Skill checklist:**
+
 - [ ] `name` matches directory name, lowercase-with-hyphens
 - [ ] `description` ≤ 400 chars, describes what + when
 - [ ] `disable-model-invocation: true` if it has side effects
@@ -65,6 +68,7 @@ Convention Issues:
 ## Phase 3: Apply Fixes
 
 Ask:
+
 ```
 Found [N] issues. How to proceed?
 1. Fix all automatically

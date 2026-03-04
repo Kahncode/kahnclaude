@@ -14,12 +14,15 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 1. Resolve the target project path from the argument (or ask if not provided)
 
-2. **Ask the user about their tech stack** before copying any agents or skills. Perform a quick research in the target project to determine the likely tech stack. Present the available tech-stack-specific agents and generic developer agents, and ask which ones apply to this project. For example:
-   - "Which of these agents do you want to include?"
-   - Generic (applicable to most projects): `code-reviewer`, `test-writer`, `documenter`
-   - Tech-stack specific: list all agents found in subfolders under `.claude/agents/` (e.g. `mobile/react-native-expo-dev`, `python/fastapi-dev`), grouped by subfolder
-   - Make clear that agents not relevant to the project should be excluded — a backend-only project doesn't need a mobile or frontend agent, a game project may not need any web agents at all
-   - Only install the agents the user confirms as relevant
+2. **Ask the user about their tech stack** before copying any agents or skills. Perform a quick research in the target project to determine the likely tech stack, then:
+
+   a. **Always copy `core/` agents without asking** — they are universal. Do not present them as optional.
+
+   b. **Auto-select agents that match detected technologies** — scan all subfolders under `.claude/agents/`, not just the obvious stack folder.
+
+   c. **Present remaining agents grouped by subfolder** — ask the user which to include. Note: `AskUserQuestion` is capped at 4 options per question. When a subfolder group has more than 4 agents, do NOT use the structured UI for that group — instead describe the agents in plain text and ask the user to reply with which ones to include.
+
+   d. Make clear that agents not relevant to the project should be excluded — a backend-only project doesn't need mobile or pure-frontend agents.
 
 3. Create `.claude/` subdirectories in the target project if they don't exist: `commands/`, `skills/`, `agents/`, `hooks/`
 

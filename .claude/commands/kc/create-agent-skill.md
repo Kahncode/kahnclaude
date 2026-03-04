@@ -2,7 +2,7 @@
 name: kc:create-agent-skill
 description: Create a new agent, skill, or slash command in KahnClaude following framework conventions.
 argument-hint: "[describe what you want to create: agent for X, skill for Y, command to Z]"
-scope: framework
+scope: project
 allowed-tools: Read, Write, Glob, Grep, Bash(ls *)
 ---
 
@@ -15,6 +15,7 @@ $ARGUMENTS
 ## Step 1: Determine Component Type
 
 From the argument, identify what to create:
+
 - **Agent** — specialist subagent invoked via the Agent tool (`.claude/agents/`)
 - **Skill** — trigger-activated expertise template (`.claude/skills/<name>/SKILL.md`)
 - **Command** — slash command workflow (`.claude/commands/` or `.claude/commands/kc/`)
@@ -54,6 +55,7 @@ tools: Read, Grep, Glob[, ...]
 ```
 
 Rules:
+
 - `description` ≤ 400 characters, must include "Use when..."
 - No `scope` field on agents
 - Subfolder: `core/` (cross-cutting), `python/`, `web/`, `mobile/`, or root (universal)
@@ -74,6 +76,7 @@ description: "<What it does and when to use it>"
 ```
 
 Rules:
+
 - `description` ≤ 400 characters
 - Add `disable-model-invocation: true` for skills with side effects or that should only run explicitly
 - File ≤ 500 lines
@@ -93,16 +96,19 @@ scope: project   # or: framework
 # <Command Title>
 
 ## $ARGUMENTS handling
+
 ...
 ```
 
 Rules:
+
 - `scope: project` → distributed to target projects
 - `scope: framework` → KahnClaude management only, invoked as `/kc:<name>`
 
 ## Step 4: Update Docs
 
 After creating the component:
+
 1. Add it to the appropriate table in `README.md`
 2. Update counts in the summary table if needed
 
