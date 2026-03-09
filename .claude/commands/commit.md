@@ -14,16 +14,23 @@ argument-hint: [optional commit message override]
 - Current branch: !`git branch --show-current`
 - Recent commits: !`git log --oneline -5`
 
-## Pre-Commit Checks
+## Step 1 — Safety Checks
 
-Before committing:
+Before anything else:
+
 1. Verify `.env` is in `.gitignore`
-2. Verify no sensitive files are staged (`.env`, `secrets.json`, private keys)
-3. If on `main` or `master`: warn the user — suggest creating a feature branch first
+2. Verify no sensitive files are staged (`.env`, `secrets.json`, private keys) — **abort and warn if found**
+3. If on `main` or `master`: warn the user and suggest creating a feature branch first
 
-## Task
+## Step 2 — Pre-Commit Checks (REQUIRED)
 
-Review the staged changes and create a commit.
+Run pre-commit hooks **before** committing:
+
+Invoke `/pre-commit-check` logic to diagnose and fix pre-commit check failure, then re-run hooks until they all pass.
+
+When pre-commit fixes modify files, **stage them before proceeding** (so they're included in the commit). If the user should review them separately, ask first.
+
+## Step 3 — Commit
 
 ### Rules
 
@@ -40,11 +47,12 @@ Use `$ARGUMENTS` as the commit message (still apply conventional format if it fi
 
 ### If no message provided
 
-Generate an appropriate message based on the diff content.
+Generate an appropriate message based on **only the staged changes** (use `git diff --cached` to analyze what will be committed). Do not include information about unstaged changes or files modified by pre-commit fixes that weren't staged.
 
 ### GitHub MCP (if available)
 
 If the GitHub MCP server is connected:
+
 - After a successful commit, offer: "Create a PR for this branch?"
 - If yes: use the MCP to create the PR with a generated title and description
 - If the branch has no upstream yet, push it first
