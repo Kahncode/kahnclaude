@@ -26,7 +26,7 @@ Before anything else:
 
 Run pre-commit hooks **before** committing:
 
-Invoke `/pre-commit-check` logic to diagnose and fix pre-commit check failure, then re-run hooks until they all pass.
+Invoke pre-commit logic to diagnose and fix pre-commit check failure, then re-run hooks until they all pass.
 
 When pre-commit fixes modify files, **stage them before proceeding** (so they're included in the commit). If the user should review them separately, ask first.
 
