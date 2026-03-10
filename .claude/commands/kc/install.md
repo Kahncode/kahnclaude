@@ -36,13 +36,24 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 8. Copy all files from `.claude/hooks/` → `<target>/.claude/hooks/`
 
-9. If `CLAUDE.md` does not exist in the target project root, copy `project/CLAUDE.md` → `<target>/CLAUDE.md` and tell the user to customize it
+9. **Handle CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/tech-stacks/` are used here and never copied to the target):
+
+   a. If `CLAUDE.md` does not exist in the target project:
+   - Run `/kc:generate-claude-md` with the target project path
+   - The command scans the target for tech stack manifests, consults the appropriate guide in `project/tech-stacks/`, asks guided questions, and writes a complete `CLAUDE.md` to `<target>/CLAUDE.md`
+   - Report success with section count to the user
+
+   b. If `CLAUDE.md` already exists in the target project:
+   - Ask the user: "Your project already has a CLAUDE.md. Enhance it with missing sections?"
+   - If yes: run `/kc:generate-claude-md` in enhance mode for the target
+   - If no: skip to step 10
 
 10. If `CLAUDE.local.md` does not exist, copy `project/CLAUDE.local.md` → `<target>/CLAUDE.local.md`
 
 11. Verify `<target>/.gitignore` includes `CLAUDE.local.md` and `.env` — add them if missing
 
 12. **Write the install manifest** to `<target>/.claude/.kahnclaude` as JSON:
+
     ```json
     {
       "version": 1,
@@ -53,6 +64,7 @@ The argument is the path to the project to install into. If omitted, ask the use
       "notes": "<one-line summary of stack detected and agent selections>"
     }
     ```
+
     - `agents` lists all agent paths that were copied (relative to `.claude/agents/`, e.g. `core/tech-lead-orchestrator.md`)
     - `notes` should capture what stack was detected and which optional agent groups the user chose
     - Add `.kahnclaude` to `<target>/.gitignore` if the user prefers not to commit it, but note that committing it allows teammates to know which version of KahnClaude is installed

@@ -212,6 +212,12 @@ if __name__ == "__main__":
 
 ---
 
+## Adding a Tech Stack Guide
+
+CLAUDE.md generation templates and guides live in `project/` — the master template at `project/CLAUDE.md` and per-stack Q&A guides in `project/tech-stacks/<name>.md` (e.g., `unreal.md`). Read `project/tech-stacks/unreal.md` for an example of the expected structure: detection pattern, numbered questions with CLAUDE.md section mappings, and rationale for each question. Guides are Markdown only and are used by `/kc:generate-claude-md` from the KahnClaude source directory; they are never copied to target projects. After adding a guide, update `README.md` to list it.
+
+---
+
 ## Updating Templates
 
 ### `@project/CLAUDE.md`

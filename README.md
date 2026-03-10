@@ -34,14 +34,15 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 
 ## What's Included
 
-| Component            | Count | Purpose                                          |
-| -------------------- | ----- | ------------------------------------------------ |
-| **Slash Commands**   | 21    | On-demand workflows invoked with `/command`      |
-| **Skills**           | 0     | Trigger-activated expertise templates            |
-| **Agents**           | 19    | Specialist subagents with restricted tool access |
-| **Hooks**            | 8     | Deterministic enforcement scripts (Python)       |
-| **Project Template** | 1     | `CLAUDE.md` starting point for any project       |
-| **Global Template**  | 1     | `@~/.claude/CLAUDE.md` for cross-project rules   |
+| Component             | Count | Purpose                                                                   |
+| --------------------- | ----- | ------------------------------------------------------------------------- |
+| **Slash Commands**    | 22    | On-demand workflows invoked with `/command`                               |
+| **Skills**            | 0     | Trigger-activated expertise templates                                     |
+| **Agents**            | 19    | Specialist subagents with restricted tool access                          |
+| **Hooks**             | 8     | Deterministic enforcement scripts (Python)                                |
+| **Project Template**  | 1     | Master `CLAUDE.md` with guide comments (used by `/kc:generate-claude-md`) |
+| **Tech-Stack Guides** | 1+    | Unreal Engine + placeholders for future stacks                            |
+| **Global Template**   | 1     | `@~/.claude/CLAUDE.md` for cross-project rules                            |
 
 ---
 
@@ -147,8 +148,12 @@ kahnclaude/
 │       └── <name>.py
 │
 ├── project/                     # CLAUDE.md templates for new projects
-│   ├── CLAUDE.md
-│   └── CLAUDE.local.md
+│   ├── CLAUDE.md                # Master template with guide comments (used by /kc:generate-claude-md)
+│   ├── CLAUDE.local.md
+│   └── tech-stacks/             # Tech-specific Q&A guides for auto-generation
+│       ├── unreal.md            # Unreal Engine detection + 8 guided questions
+│       ├── react-nextjs.md      # (Placeholder for future implementation)
+│       └── [more stacks...].md
 │
 ├── global/                      # Global ~/.claude/ config templates
 │   ├── CLAUDE.md
@@ -179,22 +184,23 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 ### Project Commands
 
-| Command           | What It Does                                                                                   |
-| ----------------- | ---------------------------------------------------------------------------------------------- |
-| `/review`         | Review current diff for bugs, security issues, and best practices                              |
-| `/commit`         | Generate a conventional commit message and commit staged changes                               |
-| `/worktree`       | Create a git worktree + branch for isolated task work                                          |
-| `/refactor`       | Refactor a file against CLAUDE.md rules — split, extract, clean up                             |
-| `/progress`       | Show file counts, test status, recent git activity, and next actions                           |
-| `/document`       | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive |
-| `/learn`          | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes             |
-| `/linear`         | Implement a Linear issue — set In Progress, branch, plan, code, test, PR                       |
-| `/jira`           | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR                  |
-| `/pr`             | Generate a PR title and description from the current branch diff; optionally create via `gh`   |
-| `/explain`        | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage      |
-| `/answer`         | Research a question using general knowledge, codebase search, Context7 docs, or web search     |
-| `/test`           | Generate tests by delegating to the `test-writer` agent (single source of truth)               |
-| `/security-check` | Scan for exposed secrets, missing .gitignore entries, and unsafe patterns                      |
+| Command                  | What It Does                                                                                   |
+| ------------------------ | ---------------------------------------------------------------------------------------------- |
+| `/kc:generate-claude-md` | Auto-detect tech stack and generate a complete CLAUDE.md; use `--additive` to enhance existing |
+| `/review`                | Review current diff for bugs, security issues, and best practices                              |
+| `/commit`                | Generate a conventional commit message and commit staged changes                               |
+| `/worktree`              | Create a git worktree + branch for isolated task work                                          |
+| `/refactor`              | Refactor a file against CLAUDE.md rules — split, extract, clean up                             |
+| `/progress`              | Show file counts, test status, recent git activity, and next actions                           |
+| `/document`              | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive |
+| `/learn`                 | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes             |
+| `/linear`                | Implement a Linear issue — set In Progress, branch, plan, code, test, PR                       |
+| `/jira`                  | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR                  |
+| `/pr`                    | Generate a PR title and description from the current branch diff; optionally create via `gh`   |
+| `/explain`               | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage      |
+| `/answer`                | Research a question using general knowledge, codebase search, Context7 docs, or web search     |
+| `/test`                  | Generate tests by delegating to the `test-writer` agent (single source of truth)               |
+| `/security-check`        | Scan for exposed secrets, missing .gitignore entries, and unsafe patterns                      |
 
 ---
 
@@ -302,13 +308,25 @@ PreToolUse hook blocking .env access
 
 ### `@project/CLAUDE.md`
 
-Starting point for a new project's `CLAUDE.md`. Contains numbered critical rules covering:
+Master template for auto-generating project-specific `CLAUDE.md` files. Used by `/kc:generate-claude-md` command to:
 
-- Secret management
-- Deployment gates
-- Quality gates (file/function size limits)
-- Branch workflow
-- Project-specific slots to fill
+- Auto-detect tech stack (Unreal, Node.js, Python, Rust, etc.)
+- Load tech-specific Q&A guides (e.g., Unreal Engine)
+- Ask guided questions about project configuration
+- Instantiate template with user answers and auto-detected versions
+- Populate all sections: Project Overview, Critical Rules, Tech Stack Details, Service Ports, etc.
+
+Every section includes `<!-- GUIDE: ... -->` comments explaining purpose, format, and examples so users understand what to put where.
+
+### Tech-Stack Guides: `@project/tech-stacks/`
+
+Specialized Q&A guides loaded by `/kc:generate-claude-md` when a tech stack is detected.
+
+- **`unreal.md`** — Unreal Engine (8 guided questions: version, project type, platforms, C++ vs Blueprint, plugins, content structure, build targets, do's/don'ts)
+- **`react-nextjs.md`** — React / Next.js (placeholder for future; guides in progress)
+- **`[more stacks].md`** — Additional stacks (Django, Rust, C#/.NET) can be added following the same pattern
+
+When `/kc:generate-claude-md` detects a manifest file (`.uproject`, `package.json`, `pyproject.toml`, etc.), it loads the matching guide and asks all questions to build a complete, annotated CLAUDE.md.
 
 ### `@project/CLAUDE.local.md`
 
