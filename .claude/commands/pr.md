@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Generate a pull request title and description from the current branch diff, then optionally create it with gh pr create.
+description: Generate a pull request title and description from the current branch diff, push the branch, and create the PR with gh pr create.
 scope: project
 ---
 
@@ -96,18 +96,9 @@ Examples:
 - `fix(api): handle null response from payment service`
 - `refactor(db): extract query builder into separate module`
 
-### 5. Output
+### 5. Create PR
 
-Provide:
-
-1. Suggested PR title
-2. Full PR description in markdown
-3. Suggested reviewers (if CODEOWNERS exists)
-4. Labels to add (if .github/labels.yml exists)
-
-### 6. Create PR (Optional)
-
-If the user confirms, create the PR. Always derive the target repo from the `origin` remote:
+Always create the PR without asking for confirmation. Derive the target repo from the `origin` remote:
 
 ```bash
 # Get the GitHub repo slug from origin
@@ -119,6 +110,8 @@ git push -u origin HEAD
 # Create PR targeting origin explicitly
 gh pr create --repo "$REPO" --title "..." --body "..."
 ```
+
+Return the PR URL when done.
 
 ## Guidelines
 

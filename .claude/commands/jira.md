@@ -118,7 +118,13 @@ Files changed: N
 Tests added: N
 ```
 
-## Step 7 — Finish
+## Step 7 — Learn
+
+Before committing, capture knowledge from the implementation using `/learn`. This auto-detects changes and updates project documentation (ARCHITECTURE.md, subsystems, etc.) for future reference.
+
+Invoke `/learn` with no arguments — it will inspect staged changes and auto-detect learnings.
+
+## Step 8 — Finish
 
 Ask the user what to do next:
 

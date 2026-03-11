@@ -1,7 +1,7 @@
 ---
-description: Smart commit — generates a conventional commit message from staged changes
+description: Smart commit — runs pre-commit checks, fixes issues, then commits with a conventional message
 scope: project
-allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*)
+allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*), Bash(pre-commit run:*)
 argument-hint: [optional commit message override]
 ---
 
@@ -13,6 +13,13 @@ argument-hint: [optional commit message override]
 - Staged diff summary: !`git diff --cached --stat`
 - Current branch: !`git branch --show-current`
 - Recent commits: !`git log --oneline -5`
+
+## Step 0 — Staged Files Check
+
+Run `git diff --cached --name-only` to check what is staged.
+
+- **If nothing is staged:** Tell the user: "Nothing is staged. Stage the files you want to commit with `git add <files>` and re-run `/commit`." Then **stop immediately** — do not proceed.
+- **If files are staged:** Proceed with exactly those staged files. Do not stage any additional files.
 
 ## Step 1 — Safety Checks
 
@@ -26,7 +33,7 @@ Before anything else:
 
 Run pre-commit hooks **before** committing:
 
-Invoke pre-commit logic to diagnose and fix pre-commit check failure, then re-run hooks until they all pass.
+Invoke `/pre-commit-check` logic to diagnose and fix pre-commit check failure, then re-run hooks until they all pass.
 
 When pre-commit fixes modify files, **stage them before proceeding** (so they're included in the commit). If the user should review them separately, ask first.
 

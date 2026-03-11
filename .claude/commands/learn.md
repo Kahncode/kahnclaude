@@ -46,8 +46,10 @@ After resolving the source:
 
 ## Delegation
 
-Delegate to the `documenter` agent via the Agent tool, passing:
+**ALWAYS** delegate to the `documenter` agent via the Agent tool. Do not handle documentation updates inline — even if other work (code fixes, memory saves) is also requested.
+
+Pass to the agent:
 
 - The resolved diff, commit range, or plain-text fact as context
 - The source type and any SHA(s) for Decisions log entries
-- Instruction: "Update only the docs relevant to what changed. Ask the user before writing significant changes. Append Decisions entries where appropriate."
+- Instruction: "Update only the docs relevant to what changed. Ask the user before writing significant changes. Append Decisions entries where appropriate. Target project files (CLAUDE.md, docs/*.md, README.md) — auto-memory files are not a substitute."

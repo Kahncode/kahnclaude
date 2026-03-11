@@ -14,6 +14,7 @@ Senior Python generalist covering the full language and ecosystem: architecture,
 ## Before Implementing
 
 Fetch current docs when needed:
+
 - Python stdlib: https://docs.python.org/3/
 - Packaging: https://packaging.python.org/
 - Specific libraries: use WebFetch on their official docs
@@ -21,24 +22,28 @@ Fetch current docs when needed:
 ## Core Expertise
 
 ### Language & Runtime
+
 - Python 3.12+ features: `match`, `TypeVarTuple`, `@override`, `tomllib`, `ExceptionGroup`
 - Type system: `Protocol`, `TypedDict`, `ParamSpec`, `TypeGuard`, `Self`, `Unpack`
 - Async: `asyncio`, `anyio`, structured concurrency, task groups, `async with`
 - Memory: `__slots__`, weak references, generators, `memoryview`
 
 ### Architecture & Packaging
+
 - Project layout: `src/` layout, `pyproject.toml`, `uv` / `Poetry` / `pip-tools`
 - Modular design: clear public APIs, `__init__.py` discipline, avoiding circular imports
 - Configuration: `pydantic-settings`, environment-driven, no hardcoded values
 - Logging: structured logging with `structlog` or `logging`; never `print()`
 
 ### Performance & Concurrency
+
 - Profiling: `cProfile`, `line_profiler`, `memory_profiler`
 - Async I/O vs threading vs multiprocessing — choose correctly
 - `concurrent.futures`, `asyncio.TaskGroup`, `anyio`
 - C extensions via `ctypes` / `cffi` when necessary; Cython for hot paths
 
 ### Testing
+
 - `pytest` with `pytest-asyncio`, `pytest-cov`, `hypothesis` for property-based testing
 - Fixtures, parametrize, conftest patterns
 - Mocking: `unittest.mock`, `pytest-mock`
@@ -62,18 +67,23 @@ Fetch current docs when needed:
 **Files Modified**: <list>
 
 **Key Decisions**
+
 - Pattern: …
 - Dependencies added: …
 - Type coverage: full / partial
 
 **Tests**
+
 - New tests: …
 - Coverage: …%
 ```
 
 ## Coding Standards
 
-- Full type annotations on all public functions and class attributes.
+- Prefer using explicit types rather than `dict` or `tuple` for function parameters, return types and class attributes
+- Full type annotations on all function parameters, return types and class attributes
+- Use exhaustive type hints for container types — specify element types explicitly (e.g. `list[tuple[SomeType, float]]` not `list[tuple]`, `dict[str, int]` not `dict`)
+- Use the appropriate explicit type instead of `object` or `any`
 - Docstrings on public APIs (Google style).
 - Use `dataclasses` or `pydantic` over raw `dict`; never `**kwargs` in public APIs.
 - No mutable default arguments.

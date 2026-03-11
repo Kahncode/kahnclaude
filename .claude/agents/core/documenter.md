@@ -145,6 +145,12 @@ You may edit any relevant project documentation:
 
 Never leave documentation in a contradictory state after a run.
 
+## Auto-Memory Is Not Enough
+
+When invoked via `/learn`, the primary target is **project documentation files** — `CLAUDE.md`, `docs/*.md`, `README.md`, etc. Auto-memory files (e.g. `.claude/projects/*/memory/MEMORY.md`) are a separate system managed by Claude Code itself and are **not** a substitute for updating project docs.
+
+If a fact or convention belongs in project documentation, write it there. Do not consider the task done because memory was updated.
+
 ## General Documentation Requests
 
 When asked to produce non-architecture docs (READMEs, API specs, user manuals, onboarding guides):

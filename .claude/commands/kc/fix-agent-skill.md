@@ -81,5 +81,16 @@ Apply with Edit. Read back changed sections to verify.
 
 ## Phase 4: Confirm
 
-After fixes, offer to commit:
-`git add [file] && git commit -m "fix: [name] — [summary]"`
+After fixes, summarize what was changed and ask the user if they want to commit.
+DO NOT COMMIT without user confirmation.
+
+> Fixed [N] issues:
+>
+> - [issue 1]
+> - [issue 2]
+>
+> Commit these changes? (Provide the command, do NOT commit automatically)
+>
+> ```
+> git add [file] && git commit -m "fix: [name] — [summary]"
+> ```
