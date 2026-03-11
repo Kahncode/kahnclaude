@@ -31,7 +31,7 @@ This is the Claude Code configuration for working on the KahnClaude framework it
 | `.claude/agents/` | Agents distributed to projects |
 | `.claude/hooks/` | Hook scripts distributed to projects |
 | `.claude/settings.json` | Hooks wiring for this framework repo |
-| `project/` | CLAUDE.md templates for new projects |
+| `project/` | CLAUDE.md templates and `settings.json` template for new projects |
 | `global/` | Global `~/.claude/` config templates |
 | `inspiration/` | Read-only third-party references |
 

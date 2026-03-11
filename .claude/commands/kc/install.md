@@ -38,9 +38,9 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 9. **Handle settings.json**:
 
-   a. If `<target>/.claude/settings.json` does NOT exist: copy `.claude/settings.json` → `<target>/.claude/settings.json`
+   a. If `<target>/.claude/settings.json` does NOT exist: copy `project/settings.json` → `<target>/.claude/settings.json`
 
-   b. If it already exists: deep-merge — add any `permissions.allow`, `permissions.deny`, and `hooks` entries from `.claude/settings.json` that are not already present. Never remove existing entries. Show the user what will be added and confirm before applying.
+   b. If it already exists: deep-merge — add any `permissions.allow`, `permissions.deny`, and `hooks` entries from `project/settings.json` that are not already present. Never remove existing entries. Show the user what will be added and confirm before applying.
 
 10. **Handle CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/tech-stacks/` are used here and never copied to the target):
 
