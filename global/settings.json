@@ -1,4 +1,32 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(date:*)",
+      "Bash(echo:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(sort:*)",
+      "Bash(grep:*)",
+      "Bash(tr:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git tag:*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(**/secrets/*)",
+      "Read(**/*credential*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -6,7 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/block-secrets.py"
+            "command": "python3 .claude/hooks/block-secrets.py"
           }
         ]
       },
@@ -15,11 +43,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/check-branch.py"
+            "command": "python3 .claude/hooks/check-branch.py"
           },
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/block-dangerous-commands.py"
+            "command": "python3 .claude/hooks/block-dangerous-commands.py"
           }
         ]
       }
@@ -30,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/after-edit.py"
+            "command": "python3 .claude/hooks/after-edit.py"
           }
         ]
       }
@@ -40,7 +68,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/verify-no-secrets.py"
+            "command": "python3 .claude/hooks/verify-no-secrets.py"
           }
         ]
       },
@@ -48,7 +76,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/check-env-sync.py"
+            "command": "python3 .claude/hooks/check-env-sync.py"
           }
         ]
       },
@@ -56,7 +84,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/lint-on-stop.py"
+            "command": "python3 .claude/hooks/lint-on-stop.py"
           }
         ]
       }
@@ -67,7 +95,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/notify.py"
+            "command": "python3 .claude/hooks/notify.py"
           }
         ]
       }

@@ -36,7 +36,13 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 8. Copy all files from `.claude/hooks/` → `<target>/.claude/hooks/`
 
-9. **Handle CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/tech-stacks/` are used here and never copied to the target):
+9. **Handle settings.json**:
+
+   a. If `<target>/.claude/settings.json` does NOT exist: copy `.claude/settings.json` → `<target>/.claude/settings.json`
+
+   b. If it already exists: deep-merge — add any `permissions.allow`, `permissions.deny`, and `hooks` entries from `.claude/settings.json` that are not already present. Never remove existing entries. Show the user what will be added and confirm before applying.
+
+10. **Handle CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/tech-stacks/` are used here and never copied to the target):
 
    a. If `CLAUDE.md` does not exist in the target project:
    - Run `/kc:generate-claude-md` with the target project path
@@ -46,9 +52,7 @@ The argument is the path to the project to install into. If omitted, ask the use
    b. If `CLAUDE.md` already exists in the target project:
    - Ask the user: "Your project already has a CLAUDE.md. Enhance it with missing sections?"
    - If yes: run `/kc:generate-claude-md` in enhance mode for the target
-   - If no: skip to step 10
-
-10. If `CLAUDE.local.md` does not exist, copy `project/CLAUDE.local.md` → `<target>/CLAUDE.local.md`
+   - If no: skip to step 11
 
 11. Verify `<target>/.gitignore` includes `CLAUDE.local.md` and `.env` — add them if missing
 
@@ -76,5 +80,6 @@ The argument is the path to the project to install into. If omitted, ask the use
 - Never overwrite existing files without asking
 - If a component already exists in the target project, show a diff and ask whether to replace, skip, or merge
 - `scope: framework` commands are never copied to target projects
+- `CLAUDE.local.md` is never copied — it is gitignored and personal to each developer
 - Do not copy agents the user did not select — fewer irrelevant files means less context noise for Claude in the target project
 - The `.kahnclaude` manifest is the source of truth for future `kc:update` runs

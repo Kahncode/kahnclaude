@@ -26,6 +26,7 @@ The argument is the path to the target project. If omitted, ask the user for it 
    - `.claude/skills/` files → candidates for `<target>/.claude/skills/`
    - `.claude/agents/` files **that are listed in `manifest.agents`** → candidates for `<target>/.claude/agents/`
    - `.claude/hooks/` files → candidates for `<target>/.claude/hooks/`
+   - `.claude/settings.json` → candidate for `<target>/.claude/settings.json` (**merge only** — never overwrite; add any `permissions.allow`, `permissions.deny`, and `hooks` entries not already present; show diff and confirm before applying)
    - `project/CLAUDE.md` or `project/CLAUDE.local.md` → skip (never overwrite)
 
    Ignore changed files outside these categories (e.g. `global/`, `inspiration/`, `README.md`, `CONTRIBUTING.md`).
