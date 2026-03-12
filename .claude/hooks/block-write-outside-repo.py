@@ -30,8 +30,17 @@ def main() -> None:
     if not project_dir:
         sys.exit(0)  # Can't determine project root; fail open
 
+    resolved = Path(file_path).resolve()
+
+    # Block any writes to .git folders
+    if ".git" in resolved.parts:
+        print(  # noqa: T201
+            f"Write to '{file_path}' is not allowed (.git folder is protected).",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
     try:
-        resolved = Path(file_path).resolve()
         root = Path(project_dir).resolve()
         resolved.relative_to(root)
         # Path is inside repo root — allowed

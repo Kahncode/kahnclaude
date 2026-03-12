@@ -1,7 +1,7 @@
 ---
-description: Smart commit — runs pre-commit checks, fixes issues, then commits with a conventional message
+description: Smart commit — stages nothing extra, commits with a conventional message, stops if pre-commit hooks fail
 scope: project
-allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*), Bash(pre-commit run:*)
+allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*)
 argument-hint: [optional commit message override]
 ---
 
@@ -29,17 +29,9 @@ Before anything else:
 2. Verify no sensitive files are staged (`.env`, `secrets.json`, private keys) — **abort and warn if found**
 3. If on `main` or `master`: warn the user and suggest creating a feature branch first
 
-## Step 2 — Pre-Commit Checks (REQUIRED)
+## Step 2 — Commit
 
-Run pre-commit hooks **before** committing:
-
-Invoke `/pre-commit-check` logic to diagnose and fix pre-commit check failure, then re-run hooks until they all pass.
-
-When pre-commit fixes modify files, **stage them before proceeding** (so they're included in the commit). If the user should review them separately, ask first.
-
-## Step 3 — Commit
-
-### Rules
+### Message rules
 
 1. Use **conventional commit** format: `type(scope): description`
    - Types: feat, fix, docs, style, refactor, test, chore, perf
@@ -54,7 +46,16 @@ Use `$ARGUMENTS` as the commit message (still apply conventional format if it fi
 
 ### If no message provided
 
-Generate an appropriate message based on **only the staged changes** (use `git diff --cached` to analyze what will be committed). Do not include information about unstaged changes or files modified by pre-commit fixes that weren't staged.
+Generate an appropriate message based on **only the staged changes** (use `git diff --cached` to analyze what will be committed).
+
+### Pre-commit hook failures
+
+If the commit attempt triggers pre-commit hooks that fail:
+
+1. Diagnose each failure and fix the affected files
+2. **Do NOT stage any files modified as a result of fixing pre-commit errors**
+3. **Stop here** — report to the user: which hooks failed, what was fixed, and which files were changed
+4. Ask the user to review the fixes and stage them manually before re-running `/commit`
 
 ### GitHub MCP (if available)
 

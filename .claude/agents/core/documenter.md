@@ -77,7 +77,9 @@ Example "Does / Does NOT" table:
 
 ## Decisions Section
 
-Every documentation file may have an append-only **Decisions** section at the bottom.
+**Decisions belong in `docs/` files ONLY** — never in root `CLAUDE.md`. Root CLAUDE.md is for project rules and conventions, not decision history.
+
+Use `docs/decisions.md` as the primary Decisions log, or append Decisions sections to subsystem docs (`docs/<subsystem>.md`) if they are closely tied to that subsystem. Always link the Decisions file from root `CLAUDE.md` under "More context".
 
 A **decision** is a significant choice that is NOT immediately obvious from reading the code — architectural tradeoffs, rejected alternatives, non-obvious rationale, or constraints discovered during development. Do NOT record events such as "file was created", "feature was added", or "documentation was written". If you would not expect a future developer to ask "why did we do it this way?", it is not a decision.
 
@@ -98,7 +100,8 @@ Rules:
 - Use timestamp as the primary identifier; include commit SHA only when explicitly available
 - Only record choices that future developers would genuinely need context for
 - **Never edit past entries** — only append new ones
-- If the Decisions section grows the file beyond 300 lines, extract to `docs/decisions.md` and link from the parent file
+- Always place Decisions in `docs/decisions.md` or topic-specific subsystem docs, never in root `CLAUDE.md`
+- If a subsystem doc's Decisions section grows the file beyond 300 lines, extract to `docs/decisions.md` and link from the subsystem doc
 
 ## High-Level Pass
 
@@ -136,12 +139,14 @@ When asked to document a specific subsystem:
 
 You may edit any relevant project documentation:
 
-- `CLAUDE.md` — project rules, conventions, and architecture constraints
+- `CLAUDE.md` — project rules, conventions, and architecture constraints (NOT Decisions — those go in docs/)
 - `README.md` — project overview, usage, component lists
 - `docs/ARCHITECTURE.md` and subsystem docs
-- `docs/decisions.md` or `docs/architecture-decisions.md` if they exist
+- `docs/decisions.md` — the primary Decisions log (create if it doesn't exist)
 - Progress-tracking files (`docs/PROGRESS.md`, `TODO.md`, feature roadmaps)
 - Any other documentation identified as relevant
+
+**Important:** When writing documentation updates via `/learn`, always place Decisions in `docs/` files, not in root `CLAUDE.md`. Root CLAUDE.md is for conventions and project rules only.
 
 Never leave documentation in a contradictory state after a run.
 
