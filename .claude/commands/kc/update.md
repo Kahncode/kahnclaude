@@ -37,7 +37,11 @@ The argument is the path to the target project. If omitted, ask the user for it 
 
 7. **Show a summary** of candidates: new files, changed files, and any diff files that are not installed (skipped). Ask the user to confirm before applying.
 
-8. **For each changed file that is installed**, show a diff and ask whether to update, skip, or merge. Offer a "confirm all" shortcut if there are many files.
+8. **For each changed file that is installed**, compare the target and KahnClaude versions:
+   - If they are **identical**: explicitly note "No changes" and skip
+   - If they **differ**: show a full diff (using `git diff` or side-by-side comparison) and ask: update, skip, or merge
+   - **Never assume files are unchanged** — always verify by actual comparison before skipping
+   - Offer a "confirm all" shortcut if there are many files with changes
 
 9. **Apply updates**: copy confirmed files from KahnClaude to `<target>`, preserving subfolder structure. Create any needed subdirectories.
 
@@ -54,5 +58,6 @@ The argument is the path to the target project. If omitted, ask the user for it 
 - Never delete files that exist in the target but not in KahnClaude (the project may have custom components)
 - Never overwrite `CLAUDE.md` or `CLAUDE.local.md` (these are project-specific)
 - Only update files that changed since `manifest.commit` — this keeps updates minimal and reviewable
-- Always show diffs before applying changes
+- **Always verify file differences by actual comparison** — never assume files are identical based on reading or skimming. Use `git diff`, `diff`, or explicit line-by-line comparison before concluding "no changes"
+- Always show diffs for files with actual changes before applying updates
 - If `manifest.commit` is not a valid commit in the KahnClaude repo (e.g. after a rebase), warn the user and fall back to comparing all installed files against the current KahnClaude versions
