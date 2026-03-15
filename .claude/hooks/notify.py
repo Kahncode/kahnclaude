@@ -91,10 +91,17 @@ def main() -> None:
         sys.exit(0)
 
     content = data.get("content", "Claude needs your attention")
-    if len(content) > 100:
-        content = content[:100] + "..."
 
-    send_notification("Claude Code", content)
+    # Get folder name from project directory
+    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd())
+    folder_name = os.path.basename(project_dir.rstrip("/\\"))
+
+    # Build message with folder context
+    message = f"[{folder_name}] {content}"
+    if len(message) > 100:
+        message = message[:100] + "..."
+
+    send_notification("Claude Code", message)
     sys.exit(0)
 
 

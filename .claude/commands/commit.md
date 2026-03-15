@@ -25,7 +25,7 @@ Run `git diff --cached --name-only` to check what is staged.
 
 Before anything else:
 
-1. Verify `.env` is in `.gitignore`
+1. If `.gitignore` is modified in this commit, verify `.env` or other secret files are is in `.gitignore`
 2. Verify no sensitive files are staged (`.env`, `secrets.json`, private keys) — **abort and warn if found**
 3. If on `main` or `master`: warn the user and suggest creating a feature branch first
 
