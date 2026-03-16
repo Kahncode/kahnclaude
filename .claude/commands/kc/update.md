@@ -15,10 +15,16 @@ The argument is the path to the target project. If omitted, ask the user for it 
 1. Resolve the target project path from the argument (or ask if not provided).
 
 2. **Read the install manifest** from `<target>/.claude/.kahnclaude`. If it does not exist, tell the user to run `/kc:install <project-path>` first and stop.
+   - **Validate the stored commit**: Run `git rev-parse --verify <manifest.commit>^{commit}` in the KahnClaude directory
+   - If validation fails, attempt recovery:
+     - Run `git log --before="<manifest.updated_at>" --max-count=1 --format=%H` to find the closest commit at/before that timestamp
+     - Ask the user: "Manifest commit `<stored>` is invalid. Last updated `<manifest.updated_at>`. Use closest commit `<inferred-hash>`? [Y/n]"
+     - If yes: use `<inferred-hash>` as the baseline for the diff
+     - If no: error with "Manifest is corrupted. Run `/kc:install <project-path>` to reinitialize."
 
 3. **Compute the diff scope**: run `git diff --name-only <manifest.commit>..HEAD` in the KahnClaude directory to get all files changed since the last install/update. Only files in this diff are candidates — do not touch components that haven't changed.
 
-4. **Get the current commit hash**: run `git rev-parse HEAD` in the KahnClaude directory.
+4. **Get the current commit hash**: run `git rev-parse --verify HEAD^{commit}` in the KahnClaude directory. This expands HEAD to its canonical (full) commit hash and validates it's a real commit. If validation fails, error with "Could not resolve HEAD to a valid commit."
 
 5. **Filter changed files by category** and determine what needs updating:
    - `.claude/commands/` files (excluding `scope: framework` commands) → candidates for `<target>/.claude/commands/`
@@ -46,8 +52,11 @@ The argument is the path to the target project. If omitted, ask the user for it 
 9. **Apply updates**: copy confirmed files from KahnClaude to `<target>`, preserving subfolder structure. Create any needed subdirectories.
 
 10. **Update the manifest** at `<target>/.claude/.kahnclaude`:
-    - Set `commit` to the current KahnClaude commit hash
-    - Set `installed_at` to the current ISO-8601 timestamp
+    - **Before writing**, verify the new commit hash: Run `git rev-parse --verify <new-hash>^{commit}` one more time
+    - If validation fails, abort with error: "Internal error: new commit hash is invalid. Changes aborted."
+    - Set `commit` to the validated canonical commit hash (full 40-char SHA-1)
+    - Set `installed_at` to the original installation timestamp (do not modify)
+    - Set `updated_at` to the current ISO-8601 timestamp (use for future recovery if commit hash becomes invalid)
     - Update `agents` to reflect any newly added agents
     - Append to `notes`: a one-line entry summarizing what was updated (e.g. `"2026-03-10: updated 3 commands, added react agent"`)
 

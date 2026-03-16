@@ -14,7 +14,7 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 1. Resolve the target project path from the argument (or ask if not provided)
 
-2. Get the current KahnClaude git commit hash by running `git rev-parse HEAD` in the KahnClaude source directory. Save this for the manifest.
+2. Get the current KahnClaude git commit hash by running `git rev-parse --verify HEAD^{commit}` in the KahnClaude source directory. This expands to the canonical (full 40-char) hash and validates it's a real commit. Save this for the manifest.
 
 3. **Ask the user about their tech stack** before copying any agents or skills. Perform a quick research in the target project to determine the likely tech stack, then:
 
@@ -62,13 +62,17 @@ The argument is the path to the project to install into. If omitted, ask the use
     {
       "version": 1,
       "source": "<absolute-path-to-kahnclaude>",
-      "commit": "<git-commit-hash>",
+      "commit": "<validated-git-commit-hash>",
       "installed_at": "<ISO-8601-timestamp>",
+      "updated_at": "<ISO-8601-timestamp>",
       "agents": ["<relative-agent-path>", ...],
       "notes": "<one-line summary of stack detected and agent selections>"
     }
     ```
 
+    - `commit` is the canonical commit hash from step 2
+    - `installed_at` is when this manifest was first created
+    - `updated_at` is set equal to `installed_at` at creation time; it will be updated by `/kc:update` and used for recovery if the commit hash becomes invalid
     - `agents` lists all agent paths that were copied (relative to `.claude/agents/`, e.g. `core/tech-lead-orchestrator.md`)
     - `notes` should capture what stack was detected and which optional agent groups the user chose
     - Add `.kahnclaude` to `<target>/.gitignore` if the user prefers not to commit it, but note that committing it allows teammates to know which version of KahnClaude is installed

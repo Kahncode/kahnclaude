@@ -11,11 +11,14 @@ Cross-platform:
   Linux    — notify-send (or PowerShell toast if WSL)
   Fallback — terminal bell
 """
+
 import json
+import os
 import platform
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 
 def send_windows(title: str, message: str) -> None:
@@ -30,23 +33,25 @@ $xml.LoadXml($template)
 $toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
 [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Claude Code').Show($toast)
 """
-    subprocess.run(
-        ["powershell.exe", "-NoProfile", "-Command", ps_script],
+    subprocess.run(  # noqa: S603
+        ["powershell.exe", "-NoProfile", "-Command", ps_script],  # noqa: S607
         capture_output=True,
         timeout=10,
+        check=False,
     )
 
 
 def send_macos(title: str, message: str) -> None:
     script = f'display notification "{message}" with title "{title}" sound name "Glass"'
-    subprocess.run(["osascript", "-e", script], capture_output=True, timeout=10)
+    subprocess.run(["osascript", "-e", script], capture_output=True, timeout=10, check=False)  # noqa: S603, S607
 
 
 def send_linux(title: str, message: str) -> None:
-    subprocess.run(
-        ["notify-send", title, message, "-u", "normal", "-t", "5000"],
+    subprocess.run(  # noqa: S603
+        ["notify-send", title, message, "-u", "normal", "-t", "5000"],  # noqa: S607
         capture_output=True,
         timeout=10,
+        check=False,
     )
 
 
@@ -65,10 +70,9 @@ def send_notification(title: str, message: str) -> None:
         if system == "Linux":
             # Check for WSL — route to Windows toast
             try:
-                with open("/proc/version") as f:
-                    if "microsoft" in f.read().lower():
-                        send_windows(title, message)
-                        return
+                if "microsoft" in Path("/proc/version").read_text().lower():
+                    send_windows(title, message)
+                    return
             except OSError:
                 pass
 
@@ -84,6 +88,9 @@ def send_notification(title: str, message: str) -> None:
     sys.stdout.flush()
 
 
+MAX_MESSAGE_LENGTH = 100
+
+
 def main() -> None:
     try:
         data = json.load(sys.stdin)
@@ -93,13 +100,13 @@ def main() -> None:
     content = data.get("content", "Claude needs your attention")
 
     # Get folder name from project directory
-    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd())
-    folder_name = os.path.basename(project_dir.rstrip("/\\"))
+    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", str(Path.cwd()))
+    folder_name = Path(project_dir).name
 
     # Build message with folder context
     message = f"[{folder_name}] {content}"
-    if len(message) > 100:
-        message = message[:100] + "..."
+    if len(message) > MAX_MESSAGE_LENGTH:
+        message = message[:MAX_MESSAGE_LENGTH] + "..."
 
     send_notification("Claude Code", message)
     sys.exit(0)
