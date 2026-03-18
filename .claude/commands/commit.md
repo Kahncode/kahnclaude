@@ -19,7 +19,7 @@ argument-hint: [optional commit message override]
 Run `git diff --cached --name-only` to check what is staged.
 
 - **If nothing is staged:** Tell the user: "Nothing is staged. Stage the files you want to commit with `git add <files>` and re-run `/commit`." Then **stop immediately** — do not proceed.
-- **If files are staged:** Proceed with exactly those staged files. Do not stage any additional files.
+- **If files are staged:** Commit ONLY those files. **Never run `git add` on any file that was not already staged before `/commit` was invoked** — even if other dirty or untracked files appear in context. Unstaged files are the user's responsibility to stage explicitly.
 
 ## Step 1 — Safety Checks
 
