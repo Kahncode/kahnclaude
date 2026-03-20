@@ -1,16 +1,16 @@
 ---
-description: Review code changes for bugs, security issues, and best practices
+name: review
+description: Review code changes for bugs, security issues, and best practices. Use for code audits, security checks, or quality reviews.
 scope: project
-allowed-tools: Read, Grep, Glob, Bash(git diff:*), Bash(git branch:*)
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 # Code Review
 
-Delegate this task to the `code-reviewer` agent via the Agent tool.
+Warn if on `main` or `master`, then delegate to the `code-reviewer` agent.
 
-Pass the following as context:
+Pass the user's argument (if any) to the agent as context:
 - Current branch: !`git branch --show-current`
-- Unstaged changes: !`git diff HEAD`
-- Staged changes: !`git diff --cached`
+- User argument: (if provided, e.g., `HEAD~3..HEAD` or `bd-73`)
 
-Warn in the output header if the current branch is `main` or `master`.
+The agent determines what to review based on priority (staged → unstaged → argument → branch vs main).

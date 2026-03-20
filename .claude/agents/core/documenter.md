@@ -81,7 +81,20 @@ Example "Does / Does NOT" table:
 
 Use `docs/decisions.md` as the primary Decisions log, or append Decisions sections to subsystem docs (`docs/<subsystem>.md`) if they are closely tied to that subsystem. Always link the Decisions file from root `CLAUDE.md` under "More context".
 
-A **decision** is a significant choice that is NOT immediately obvious from reading the code — architectural tradeoffs, rejected alternatives, non-obvious rationale, or constraints discovered during development. Do NOT record events such as "file was created", "feature was added", or "documentation was written". If you would not expect a future developer to ask "why did we do it this way?", it is not a decision.
+A **decision** is a significant architectural or design choice that a future developer would genuinely ask "why did we do it this way?" about. The bar is high.
+
+**IS a decision:**
+
+- A design principle adopted to solve a class of problems
+- A pattern chosen over a viable alternative
+- A constraint or tradeoff that shaped the architecture
+
+**Is NOT a decision:**
+
+- File moves, renames, or reorganisation (just a refactor — obvious from the diff)
+- Removing unused fields or imports (cleanup)
+- Bug fixes (the fix is in the code; a commit message suffices)
+- Anything already fully explained by reading the code or the updated docs
 
 Format:
 
@@ -92,13 +105,13 @@ Format:
 
 **Commit:** `abc1234` — brief commit message ← omit if not yet committed
 **What:** What was decided.
-**Why:** Rationale, tradeoffs, rejected alternatives, or constraints that led to this choice.
+**Why:** Rationale, tradeoffs, and rejected alternatives that led to this choice.
 ```
 
 Rules:
 
 - Use timestamp as the primary identifier; include commit SHA only when explicitly available
-- Only record choices that future developers would genuinely need context for
+- One entry per distinct architectural choice — do not batch unrelated decisions
 - **Never edit past entries** — only append new ones
 - Always place Decisions in `docs/decisions.md` or topic-specific subsystem docs, never in root `CLAUDE.md`
 - If a subsystem doc's Decisions section grows the file beyond 300 lines, extract to `docs/decisions.md` and link from the subsystem doc

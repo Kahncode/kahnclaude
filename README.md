@@ -201,6 +201,7 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 | `/kc:install-global`     | Merge global config into `~/.claude/` (smart merge, never overwrites)             |
 | `/kc:update`             | Update installed components from the latest framework source                      |
 | `/kc:import`             | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
+| `/kc:harvest`            | Pull improvements back from a target project into KahnClaude (reverse of update) |
 | `/kc:create-agent-skill` | Create a new agent, skill, or slash command following framework conventions       |
 | `/kc:fix-agent-skill`    | Debug a misbehaving agent or skill — session analysis + convention audit          |
 
