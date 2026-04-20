@@ -54,7 +54,7 @@ The argument is the path to the project to install into. If omitted, ask the use
    - If yes: run `/kc:generate-claude-md` in enhance mode for the target
    - If no: skip to step 11
 
-11. Verify `<target>/.gitignore` includes `CLAUDE.local.md` and `.env` — add them if missing
+11. Verify `<target>/.gitignore` includes `CLAUDE.local.md`, `.claude/settings.local.json` and `.env` — add them if missing
 
 12. **Write the install manifest** to `<target>/.claude/.kahnclaude` as JSON:
 
