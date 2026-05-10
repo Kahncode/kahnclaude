@@ -59,9 +59,20 @@ def is_go() -> bool:
     return os.path.isfile("go.mod")
 
 
+def is_unreal() -> bool:
+    import glob
+    return bool(glob.glob("*.uproject"))
+
+
 # -----------------------------------------------------------------------------
 # Per-language lint runs
 # -----------------------------------------------------------------------------
+
+def lint_unreal() -> None:
+    log("Detected Unreal Engine project")
+    if shutil.which("clang-tidy"):
+        run_check("clang-tidy", ["clang-tidy", "--quiet", "Source/**/*.cpp"])
+
 
 def lint_nodejs() -> None:
     log("Detected Node.js project")
@@ -116,6 +127,8 @@ def lint_go() -> None:
 def main() -> None:
     log("Starting lint-on-stop checks")
 
+    if is_unreal():
+        lint_unreal()
     if is_nodejs():
         lint_nodejs()
     if is_python():

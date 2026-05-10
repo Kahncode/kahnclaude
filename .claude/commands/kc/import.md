@@ -104,7 +104,7 @@ Feature categories to consider (not exhaustive):
 - Memory Management (cross-session persistence, auto-memory)
 - Quality Gates (code review, lint-on-write, test generation)
 - Security Enforcement (secrets scanning, file access blocking, dependency audit)
-- Git Workflows (commit messages, PR creation, branch management)
+- VCS Workflows (commit messages, code review, branch/stream management)
 - Agent Delegation (specialist subagents)
 - Documentation (README gen, explanation, inline docs)
 - Technology Support (language-specific or stack-specific components)

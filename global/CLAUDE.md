@@ -9,16 +9,16 @@
 
 ### Never Publish Sensitive Data
 
-- NEVER commit passwords, API keys, tokens, or secrets to git
-- NEVER commit `.env` files — always verify `.env` is in `.gitignore`
+- NEVER commit passwords, API keys, tokens, or secrets to version control
+- NEVER commit `.env` files — always verify `.env` is in `.p4ignore` / `.gitignore`
 - NEVER output secrets in responses, logs, or suggestions
-- Before ANY commit: verify no secrets are staged
+- Before ANY commit or changelist: verify no secrets are staged or opened
 
-### Never Auto-Deploy
+### Never Auto-Submit
 
-- NEVER deploy to production without explicit user confirmation
-- NEVER assume "fix it and deploy" means deploy automatically
-- Always ask: "Do you want me to deploy this now?"
+- NEVER submit to production without explicit user confirmation
+- NEVER assume "fix it and submit" means submit automatically
+- Always ask: "Do you want me to submit this now?"
 
 ### Never Rename Without a Plan
 
@@ -37,9 +37,9 @@ Renaming packages, modules, or key variables mid-project causes cascading failur
 Every new project must have:
 
 - `.env.example` — documented variable names (never values)
-- `.gitignore` — must include `.env`, `CLAUDE.local.md`, secrets
+- `.p4ignore` / `.gitignore` — must include `.env`, `CLAUDE.local.md`, secrets
 - `CLAUDE.md` — project-specific rules
-- `CLAUDE.local.md` — personal overrides (gitignored)
+- `CLAUDE.local.md` — personal overrides (ignored by VCS)
 
 ---
 
@@ -61,7 +61,7 @@ Every new project must have:
 
 - No file > 300 lines — split if larger
 - No function > 50 lines — extract helpers
-- Tests must pass before committing
+- Tests must pass before committing or submitting
 
 ---
 

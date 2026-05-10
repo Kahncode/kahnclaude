@@ -2,15 +2,22 @@
   "permissions": {
     "allow": [
       "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Glob(*)",
+      "Grep(*)",
       "Bash(date:*)",
       "Bash(echo:*)",
       "Bash(cat:*)",
       "Bash(ls:*)",
+      "Bash(cd:*)",
       "Bash(mkdir:*)",
+      "Bash(mv:*)",
       "Bash(wc:*)",
       "Bash(head:*)",
       "Bash(tail:*)",
       "Bash(sort:*)",
+      "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(tr:*)",
       "Bash(git add:*)",
@@ -19,44 +26,47 @@
       "Bash(git log:*)",
       "Bash(git diff:*)",
       "Bash(git tag:*)",
+      "Bash(printf:*)",
+      "Bash(wait:*)",
+      "Bash(dotnet:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(sed:*)",
+      "Bash(p4 edit:*)",
+      "Bash(p4 shelve:*)",
+      "Bash(p4 change:*)",
+      "Bash(p4 login:*)",
+      "Bash(curl:*)",
+      "Bash(Engine/Build/BatchFiles/Build.bat *)",
+      "Bash(Engine/Build/BatchFiles/RunUAT.bat *)",
+      "Bash(Engine/Binaries/Win64/UnrealEditor-Cmd.exe *)",
+      "mcp__perforce__*",
+      "mcp__atlassian__*",
+      "WebFetch(*)",
+      "WebSearch(*)",
       "mcp__context7__*",
       "mcp__claude_ai_Context7__*",
-      "mcp__filesystem__*"
+      "mcp__filesystem__*",
+      "mcp__claude_ai_Atlassian__*"
     ],
     "deny": [
       "Read(.env)",
+      "Read(**/*.env)",
       "Read(**/secrets/*)",
       "Read(**/*credential*)",
       "Read(**/*.pem)",
-      "Read(**/*.key)"
+      "Read(**/*.key)",
+      "Read(**/*.secrets)"
     ]
   },
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Read|Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/block-secrets.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/block-write-outside-repo.py"
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/check-branch.py"
+            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/p4-commands-permission.py"
           },
           {
             "type": "command",
@@ -79,10 +89,6 @@
     "Stop": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/verify-no-secrets.py"
-          },
           {
             "type": "command",
             "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/check-env-sync.py"

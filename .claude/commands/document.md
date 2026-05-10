@@ -22,6 +22,6 @@ Delegate to the `documenter` agent via the Agent tool with this context:
 
 Delegate to the `documenter` agent via the Agent tool with this context:
 
-> Deep-dive into the `$ARGUMENTS` subsystem. Write `docs/<subsystem>.md` covering key concepts, entry points, data flow, Does/Does NOT table, and key file references. Generate Mermaid diagrams appropriate to what exists in the code — no speculation. Then update `docs/ARCHITECTURE.md` to link to the new or updated subsystem file.
+> Deep-dive into the `$ARGUMENTS` subsystem. Write `docs/subsystems/<subsystem>.md` covering key concepts, entry points, data flow, Does/Does NOT table, and key file references. Generate Mermaid diagrams appropriate to what exists in the code — no speculation. Then update `docs/ARCHITECTURE.md` to link to the new or updated subsystem file.
 
 The agent reads the code and decides which diagram types apply. No magic keywords are needed.

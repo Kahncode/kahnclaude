@@ -13,6 +13,11 @@ Refactor the target file following every rule in this project's `CLAUDE.md`.
 
 If `--dry-run` is passed, report what WOULD change without modifying any files.
 
+## Agent Delegation
+
+- **UE5 C++ files** (`.h`, `.cpp` in `Source/`): delegate to the `code-dev` agent (subagent_type: `code-dev`).
+- **Python files** (`.py`): delegate to the `python-dev` agent (subagent_type: `python-dev`).
+
 ## Step 0 — Read Before Touching
 
 **Never refactor blind.** Read these files first:
@@ -96,7 +101,7 @@ Other fixes:
   - Lines 23-25: sequential independent calls → parallelize
   - Lines 200-215: dead code (commented-out old auth) → remove
 
-Blast radius: imported by 3 files (server.py, routes.py, admin.py)
+Blast radius: imported by 3 files
   - Imports will be updated in all affected files
 
 Proceed? (yes / no / modify plan)

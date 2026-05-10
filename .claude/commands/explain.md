@@ -8,6 +8,11 @@ scope: project
 
 Provide a clear, thorough explanation of the specified code.
 
+## Agent Delegation
+
+- **UE5 C++ code** (`.h`, `.cpp` in `Source/`): use the `code-dev` agent (subagent_type: `code-dev`) for explanations involving UE5 macros, UPROPERTY/UFUNCTION, GAS, replication, or UObject lifecycle.
+- **Blueprint assets** (`/Game/...` paths, `.uasset` references, Blueprint class names): use the `blueprint-reviewer` agent (subagent_type: `blueprint-reviewer`) to dump and explain the Blueprint's structure, properties, and configuration.
+
 ## Input
 
 The user will provide one of:

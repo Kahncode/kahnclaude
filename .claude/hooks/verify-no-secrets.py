@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-verify-no-secrets.py — Scan staged git files for accidentally committed secrets.
+verify-no-secrets.py — Scan Perforce opened files for accidentally committed secrets.
 
-Runs when Claude finishes a turn. Catches secrets before they reach a commit.
-Warns (exit 1) on findings — does NOT block (exit 2) since the commit hasn't
-happened yet; the user can review and unstage before committing.
+Runs when Claude finishes a turn. Catches secrets before they reach a submit.
+Warns (exit 1) on findings — does NOT block (exit 2) since the submit hasn't
+happened yet; the user can review and revert before submitting.
 
 Event: Stop
 Matcher: (none — Stop events have no matcher)
@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 
-# Basenames of files that should never be staged
+# Basenames of files that should never be submitted
 SENSITIVE_BASENAMES = {
     '.env',
     '.env.local',
@@ -35,7 +35,7 @@ SENSITIVE_BASENAMES = {
 PRIVATE_KEY_NAMES = {'id_rsa', 'id_ed25519', 'id_ecdsa', 'id_dsa'}
 PRIVATE_KEY_EXTENSIONS = {'.pem', '.key'}
 
-# Regex patterns checked against staged file contents
+# Regex patterns checked against opened file contents
 SECRET_CONTENT_PATTERNS = [
     (re.compile(r'(api[_\-]?key|secret[_\-]?key|password|token)\s*[:=]\s*["\'][A-Za-z0-9+/=_\-]{16,}', re.IGNORECASE), 'POSSIBLE SECRET'),
     (re.compile(r'AKIA[0-9A-Z]{16}'), 'AWS ACCESS KEY'),
@@ -47,38 +47,60 @@ SECRET_CONTENT_PATTERNS = [
 
 
 def run(cmd: list[str]) -> str:
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    return result.stdout.strip()
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+        return result.stdout.strip()
+    except (subprocess.TimeoutExpired, OSError):
+        return ""
+
+
+def get_opened_local_paths() -> list[str]:
+    """Get local paths of all P4 opened files via p4 opened + p4 where."""
+    opened_output = run(['p4', 'opened'])
+    if not opened_output:
+        return []
+
+    depot_files = []
+    for line in opened_output.splitlines():
+        if '#' in line:
+            depot_path = line.split('#')[0].strip()
+            depot_files.append(depot_path)
+
+    if not depot_files:
+        return []
+
+    # Resolve depot paths to local paths
+    local_paths = []
+    where_output = run(['p4', 'where'] + depot_files)
+    if where_output:
+        for line in where_output.splitlines():
+            parts = line.split()
+            if len(parts) >= 3:
+                # p4 where output: depot_path client_path local_path
+                local_paths.append(parts[-1])
+
+    return local_paths
 
 
 def main() -> None:
-    # Only run inside a git repo
-    check = subprocess.run(
-        ['git', 'rev-parse', '--is-inside-work-tree'],
-        capture_output=True,
-    )
-    if check.returncode != 0:
+    local_paths = get_opened_local_paths()
+    if not local_paths:
         sys.exit(0)
 
-    staged_output = run(['git', 'diff', '--cached', '--name-only'])
-    if not staged_output:
-        sys.exit(0)
-
-    staged_files = [f for f in staged_output.splitlines() if f]
     violations: list[str] = []
 
-    for file_str in staged_files:
+    for file_str in local_paths:
         path = Path(file_str)
         name = path.name
 
         # Check sensitive basenames
         if name in SENSITIVE_BASENAMES:
-            violations.append(f"  - SENSITIVE FILE STAGED: {file_str}")
+            violations.append(f"  - SENSITIVE FILE OPENED: {file_str}")
             continue
 
         # Check private key filenames
         if name in PRIVATE_KEY_NAMES or path.suffix in PRIVATE_KEY_EXTENSIONS:
-            violations.append(f"  - PRIVATE KEY FILE STAGED: {file_str}")
+            violations.append(f"  - PRIVATE KEY FILE OPENED: {file_str}")
             continue
 
         # Check file contents for secret patterns
@@ -93,11 +115,11 @@ def main() -> None:
                     break  # one violation per file is enough
 
     if violations:
-        print("WARNING: POTENTIAL SECRETS DETECTED:", file=sys.stderr)
+        print("WARNING: POTENTIAL SECRETS DETECTED IN OPENED FILES:", file=sys.stderr)
         for v in violations:
             print(v, file=sys.stderr)
         print("", file=sys.stderr)
-        print("Review staged files before committing.", file=sys.stderr)
+        print("Review opened files before submitting.", file=sys.stderr)
         sys.exit(1)
 
     sys.exit(0)

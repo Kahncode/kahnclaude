@@ -27,11 +27,14 @@ This is the Claude Code configuration for working on the KahnClaude framework it
 |--------|---------|
 | `.claude/commands/` | Slash commands — `scope: project` ones are distributed to projects |
 | `.claude/commands/kc/` | Framework-only commands (`scope: framework`), invoked as `/kc:<name>` |
-| `.claude/skills/` | Skills distributed to projects |
-| `.claude/agents/` | Agents distributed to projects |
+| `.claude/skills/` | Focused skills (SKILL.md only) — organized by theme (`code/`, `perforce/`, etc.) |
+| `project/docs/standards/` | Shared reference docs (standards, checklists, formats) loaded by agents and skills |
+| `project/scripts/` | Reusable scripts (Python, PowerShell) for editor and build automation |
+| `.claude/agents/` | Agents distributed to projects (subfolder: `core/`) |
 | `.claude/hooks/` | Hook scripts distributed to projects |
 | `.claude/settings.json` | Hooks wiring for this framework repo |
 | `project/` | CLAUDE.md templates and `settings.json` template for new projects |
+| `project/docs/` | Docs distributed to target projects via `/kc:install` (tech-stack guides) |
 | `global/` | Global `~/.claude/` config templates |
 | `inspiration/` | Read-only third-party references |
 
@@ -39,13 +42,15 @@ This is the Claude Code configuration for working on the KahnClaude framework it
 
 ## Adding a New Component
 
-When adding any component (command, skill, agent, hook), update ALL of:
+When adding any component (command, agent, hook), update ALL of:
 
-1. The component file itself in `.claude/commands/` (project) or `.claude/commands/kc/` (framework), `.claude/skills/`, `.claude/agents/`, or `.claude/hooks/`
+1. The component file itself in `.claude/commands/` (project) or `.claude/commands/kc/` (framework), `.claude/agents/`, or `.claude/hooks/`
 2. `README.md` — component listing and description
 3. `CONTRIBUTING.md` — any new conventions introduced
 
 If adding a hook: also wire it in `@.claude/settings.json` and document the wiring in `@global/settings.json`.
+
+If adding coding standards content: add it to the relevant reference doc under `project/docs/standards/` (for review criteria) or embed it in the consuming agent (for single-consumer standards). Update `README.md` if the change adds a new skill.
 
 ---
 
@@ -79,6 +84,13 @@ This repo primarily contains Markdown and Python. Follow these conventions:
 - Exit code semantics: `0` = allow, `2` = block with message, `1` = warn
 - Print blocking reason to `stderr` when exiting with code 2
 - No external dependencies without documentation
+
+---
+
+## References
+
+- [Architecture](docs/ARCHITECTURE.md) — system overview, component map, technology choices, and subsystem links
+- [Decisions Log](docs/decisions.md) — non-trivial technical decisions and rationale
 
 ---
 

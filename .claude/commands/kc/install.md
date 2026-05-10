@@ -20,11 +20,7 @@ The argument is the path to the project to install into. If omitted, ask the use
 
    a. **Always copy `core/` agents without asking** — they are universal. Do not present them as optional.
 
-   b. **Auto-select agents that match detected technologies** — scan all subfolders under `.claude/agents/`, not just the obvious stack folder.
-
-   c. **Present remaining agents grouped by subfolder** — ask the user which to include. Note: `AskUserQuestion` is capped at 4 options per question. When a subfolder group has more than 4 agents, do NOT use the structured UI for that group — instead describe the agents in plain text and ask the user to reply with which ones to include.
-
-   d. Make clear that agents not relevant to the project should be excluded — a backend-only project doesn't need mobile or pure-frontend agents.
+   b. **Present remaining agents grouped by subfolder** — ask the user which to include. Note: `AskUserQuestion` is capped at 4 options per question. When a subfolder group has more than 4 agents, do NOT use the structured UI for that group — instead describe the agents in plain text and ask the user to reply with which ones to include.
 
 4. Create `.claude/` subdirectories in the target project if they don't exist: `commands/`, `skills/`, `agents/`, `hooks/`
 
@@ -36,27 +32,27 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 8. Copy all files from `.claude/hooks/` → `<target>/.claude/hooks/`
 
-9. **Handle settings.json**:
+9. **Copy docs** from `project/docs/` → `<target>/docs/`, preserving subfolder structure. Create any needed subdirectories. Never overwrite existing files without asking.
+
+10. **Copy scripts** from `project/scripts/` → `<target>/scripts/`, preserving subfolder structure. Create any needed subdirectories. Never overwrite existing files without asking.
+
+11. **Handle settings.json**:
 
    a. If `<target>/.claude/settings.json` does NOT exist: copy `project/settings.json` → `<target>/.claude/settings.json`
 
    b. If it already exists: deep-merge — add any `permissions.allow`, `permissions.deny`, and `hooks` entries from `project/settings.json` that are not already present. Never remove existing entries. Show the user what will be added and confirm before applying.
 
-10. **Handle CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/tech-stacks/` are used here and never copied to the target):
+12. **Offer CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/docs/tech-stacks/` are also copied to the target via the docs tree):
 
-   a. If `CLAUDE.md` does not exist in the target project:
-   - Run `/kc:generate-claude-md` with the target project path
-   - The command scans the target for tech stack manifests, consults the appropriate guide in `project/tech-stacks/`, asks guided questions, and writes a complete `CLAUDE.md` to `<target>/CLAUDE.md`
-   - Report success with section count to the user
+   Ask the user: "Would you like to run `/tool:generate-claude-md` on the target project?"
 
-   b. If `CLAUDE.md` already exists in the target project:
-   - Ask the user: "Your project already has a CLAUDE.md. Enhance it with missing sections?"
-   - If yes: run `/kc:generate-claude-md` in enhance mode for the target
-   - If no: skip to step 11
+   - If **yes** and `CLAUDE.md` does not exist: run `/tool:generate-claude-md` with the target project path to scan for tech stack manifests, consult the appropriate guide in `project/docs/tech-stacks/`, ask guided questions, and write a complete `CLAUDE.md` to `<target>/CLAUDE.md`
+   - If **yes** and `CLAUDE.md` already exists: run `/tool:generate-claude-md` in enhance mode for the target to add any missing sections
+   - If **no**: skip to step 13
 
-11. Verify `<target>/.gitignore` includes `CLAUDE.local.md` and `.env` — add them if missing
+13. Verify `<target>/.gitignore` includes `CLAUDE.local.md` and `.env` — add them if missing
 
-12. **Write the install manifest** to `<target>/.claude/.kahnclaude` as JSON:
+14. **Write the install manifest** to `<target>/.claude/.kahnclaude` as JSON:
 
     ```json
     {
@@ -73,11 +69,11 @@ The argument is the path to the project to install into. If omitted, ask the use
     - `commit` is the canonical commit hash from step 2
     - `installed_at` is when this manifest was first created
     - `updated_at` is set equal to `installed_at` at creation time; it will be updated by `/kc:update` and used for recovery if the commit hash becomes invalid
-    - `agents` lists all agent paths that were copied (relative to `.claude/agents/`, e.g. `core/tech-lead-orchestrator.md`)
+    - `agents` lists all agent paths that were copied (relative to `.claude/agents/`, e.g. `core/code-reviewer.md`)
     - `notes` should capture what stack was detected and which optional agent groups the user chose
     - Add `.kahnclaude` to `<target>/.gitignore` if the user prefers not to commit it, but note that committing it allows teammates to know which version of KahnClaude is installed
 
-13. Report a summary of what was installed and what was skipped
+15. Report a summary of what was installed and what was skipped
 
 ## Notes
 

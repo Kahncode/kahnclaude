@@ -17,7 +17,7 @@ Use GitHub Issues. Include:
 
 1. Create a branch from `main` (`git checkout -b feat/your-change`)
 2. Make your changes
-3. Run `/review` in Claude Code on every file you changed
+3. Run `/code:review` in Claude Code on every file you changed
 4. Verify hooks pass syntax check: `python -m py_compile .claude/hooks/*.py`
 5. Commit with conventional format: `feat(commands): add review command`
 
@@ -26,7 +26,6 @@ Use GitHub Issues. Include:
 ## What's Welcome
 
 - New slash commands (`.claude/commands/`)
-- New skills (`.claude/skills/<name>/SKILL.md`)
 - New agents (`.claude/agents/`)
 - New hooks (`.claude/hooks/`)
 - Improvements to `global/CLAUDE.md` or `project/CLAUDE.md`
@@ -47,7 +46,7 @@ Use GitHub Issues. Include:
 - Python strict typing for all hook scripts. NO BASH OR DOS.
 - No file > 300 lines, no function > 50 lines
 - Hooks use stdlib only unless dependency is clearly documented
-- Run `/review` before committing
+- Run `/code:review` before committing
 - Use `@path/to/file` syntax for absolute file path references in `.md` files (e.g. `@src/main.py`); relative or fuzzy references (e.g. `file.ext`) are fine as-is
 - See `CLAUDE.md` for the full standards
 
@@ -97,25 +96,67 @@ Your command prompt here. Invoked as `/kc:command-name`.
 
 ## Adding a Skill
 
-Skills live in `.claude/skills/<name>/SKILL.md`:
+Skills live in `.claude/skills/<theme>/<name>/SKILL.md`. Reference docs and scripts live separately:
+
+```
+.claude/skills/
+  <theme>/                        # Group by theme: code, perforce, swarm, jira, etc.
+    <skill-name>/
+      SKILL.md                    # Skill definition (< 100 lines)
+
+project/docs/standards/
+  <theme>/
+    <skill-name>.md               # Reference doc (criteria, patterns, formats)
+
+project/scripts/
+  <domain>/
+    <script-name>.py|.ps1         # Reusable scripts for editor/build automation
+```
+
+SKILL.md example:
 
 ```markdown
 ---
 name: skill-name
-description: What this skill does
-triggers:
-  - keyword one
-  - keyword two
+description: <Domain> expert. ALWAYS invoke when the user asks about <triggers>. Do not <alternative> directly — use this skill first.
 ---
 
-# Skill: Name
+@docs/standards/<theme>/<skill-name>.md
 
-Structured template Claude follows when trigger keywords are detected in conversation.
+## Instructions
+
+What Claude does when this skill activates.
 ```
 
-- Trigger keywords must be specific enough to avoid false activations
-- Each skill gets its own subdirectory: `.claude/skills/code-review/SKILL.md`
-- **Description limit:** Must not exceed 400 characters.
+### Description Tiers
+
+Skill descriptions use one of three patterns depending on how the skill is invoked:
+
+| Tier | Pattern | When to use |
+|------|---------|-------------|
+| **User-facing** | `<Domain> expert. ALWAYS invoke when the user asks about <triggers>. Do not <alternative> directly — this skill <value>.` | Skills invoked by user prompts |
+| **Orchestrator** | `<Domain> orchestrator. ALWAYS invoke when the user asks to <triggers>. Do not invoke <sub-skills> directly — this skill <routing>.` | Skills that invoke sub-skills |
+| **Sub-skill** | `Sub-skill of <orchestrator>. <What it does>. Invoked by the <orchestrator> orchestrator — do not invoke directly.` | Skills invoked only by orchestrators |
+
+**Why:** Research shows directive descriptions ("ALWAYS invoke... Do not X directly") achieve 100% activation vs ~50% for passive descriptions ("Use when..."). Sub-skills use an anti-directive to prevent false activation from user prompts.
+
+- **Line limit:** SKILL.md must be under 100 lines
+- **Description limit:** Must not exceed 400 characters
+- **Reference docs:** Each skill has a reference doc in `project/docs/standards/<theme>/` with focused criteria, patterns, or formats. Extract from existing coding standards or tech stack guides rather than duplicating. Use `@docs/standards/<theme>/<name>.md` to reference.
+- **Scripts:** Reusable scripts live in `project/scripts/<domain>/`. Reference them with `$KC_PROJECT_ROOT/scripts/<domain>/<script>`.
+- **Theme folders:** Group related skills by theme (`code/`, `perforce/`, `swarm/`, `jira/`, `confluence/`, `planning/`, `unreal/`)
+
+### Review Skills — Relevance Criteria
+
+Review dimension skills (in `code/`) must declare their own relevance criteria. The `code-review` orchestrator checks each dimension's criteria against the diff to decide which to invoke.
+
+```markdown
+## Relevance Criteria
+
+This skill is relevant when the diff contains:
+- [specific patterns, keywords, or structural changes]
+- Use ALWAYS for dimensions that should run on every review
+```
 
 ---
 
@@ -127,7 +168,7 @@ Agents live in `.claude/agents/<name>.md`. They can be organized into subfolders
 | ---------------------------------- | -------------------------------------------------------------- |
 | `.claude/agents/<name>.md`         | General-purpose agents for any stack                           |
 | `.claude/agents/core/<name>.md`    | Cross-cutting concerns (review, testing, docs)                 |
-| `.claude/agents/<stack>/<name>.md` | Tech-stack specific agents (e.g. `react/`, `django/`, `rust/`) |
+| `.claude/agents/core/<name>.md`    | Stack-specific agents that are broadly useful (e.g. UE5, Python) |
 
 ```markdown
 ---
@@ -167,6 +208,7 @@ Hooks live in `.claude/hooks/<name>.py`. **Python only — no bash.**
 | `verify-` | Verifies at turn end (Stop)                        |
 | `after-`  | Runs post-edit formatting (PostToolUse)            |
 | `notify-` | Sends a desktop/system notification (Notification) |
+| `force-`  | Injects context on prompt submit (UserPromptSubmit)|
 
 **Required structure:**
 
@@ -175,8 +217,8 @@ Hooks live in `.claude/hooks/<name>.py`. **Python only — no bash.**
 """
 hook-name.py — Brief description.
 
-Event: PreToolUse | PostToolUse | Stop | Notification
-Matcher: Read|Write|Edit|Bash  (PreToolUse/PostToolUse only; use * for Stop/Notification)
+Event: UserPromptSubmit | PreToolUse | PostToolUse | Stop | Notification
+Matcher: Read|Write|Edit|Bash  (PreToolUse/PostToolUse only; none for UserPromptSubmit/Stop/Notification)
 
 Exit codes:
   0 — Allow / no action
@@ -214,7 +256,34 @@ if __name__ == "__main__":
 
 ## Adding a Tech Stack Guide
 
-CLAUDE.md generation templates and guides live in `project/` — the master template at `project/CLAUDE.md` and per-stack Q&A guides in `project/tech-stacks/<name>.md` (e.g., `unreal.md`). Read `project/tech-stacks/unreal.md` for an example of the expected structure: detection pattern, numbered questions with CLAUDE.md section mappings, and rationale for each question. Guides are Markdown only and are used by `/kc:generate-claude-md` from the KahnClaude source directory; they are never copied to target projects. After adding a guide, update `README.md` to list it.
+Guides live in `project/docs/tech-stacks/<name>.md`. Each guide must include:
+
+1. **HTML comment metadata** in the header for detection and prerequisites:
+   ```
+   <!-- detection: auto|opt-in | signal: <what to look for> | prerequisite: <guide or none> -->
+   <!-- prompt: "<question to ask user>" -->
+   ```
+2. **Setup section** (if env vars needed) — required/optional variable tables
+3. **Compact Questions table** — columns: `#`, `Question`, `Answer Format`, `CLAUDE.md Section`
+4. **Auto-Detection table** — columns: `#`, `Method`
+5. **Operational Reference** — runtime knowledge for Claude (API refs, workflows, tool tables)
+
+Shared boilerplate (all-optional, one-at-a-time, env-vars-in-local) is handled by `/tool:generate-claude-md` — do not repeat it in guides. Read `project/docs/tech-stacks/unreal.md` for a minimal example or `project/docs/tech-stacks/helix_perforce.md` for a full example with setup + reference. Guides are copied to target projects as part of the `project/docs/` tree. After adding a guide, update `README.md` to list it.
+
+---
+
+## Adding Review Criteria or Coding Standards
+
+Coding standards live in `project/docs/standards/` reference docs and agent markdown — not inline in skills.
+
+**Key principle:** Review criteria belong in the relevant `project/docs/standards/<theme>/<name>.md` file. Single-consumer standards belong embedded in their agent file. Multi-consumer standards that don't fit a review dimension should become a new reference doc in `project/docs/standards/`.
+
+When adding standards content:
+
+1. Add review criteria to the appropriate `project/docs/standards/<theme>/<name>.md`
+2. For single-consumer standards, embed directly in the consuming agent
+3. Keep reference docs under 150 lines; agent files under 300 lines
+4. Update `README.md` if a new skill is created
 
 ---
 
