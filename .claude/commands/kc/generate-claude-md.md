@@ -1,7 +1,7 @@
 ---
 name: generate-claude-md
 description: Auto-generate or enhance CLAUDE.md by detecting tech stack and asking guided questions
-scope: framework
+scope: project
 ---
 
 # /tool:generate-claude-md

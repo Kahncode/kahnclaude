@@ -1,7 +1,7 @@
 ---
 name: update
 description: Update KahnClaude components in a target project to the latest versions
-scope: framework
+scope: project
 ---
 
 Push KahnClaude updates to a target project that was previously installed with `/kc:install`.

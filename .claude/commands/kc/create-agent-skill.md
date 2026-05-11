@@ -2,7 +2,7 @@
 name: create-agent-skill
 description: Create a new agent, skill, or slash command in KahnClaude following framework conventions.
 argument-hint: "[describe what you want to create: agent for X, skill for Y, command to Z]"
-scope: framework
+scope: project
 allowed-tools: Read, Write, Glob, Grep, Bash(ls *)
 ---
 

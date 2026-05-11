@@ -2,7 +2,7 @@
 name: fix-agent-skill
 description: Debug a misbehaving agent or skill by analyzing the current session, then audit and fix the component file.
 argument-hint: "[agent name, skill name, or path — leave blank to diagnose from session]"
-scope: framework
+scope: project
 allowed-tools: Read, Edit, Glob, Grep
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: install
 description: Install KahnClaude components into the current project
-scope: framework
+scope: project
 ---
 
 Install KahnClaude components into a target project directory.
