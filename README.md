@@ -16,7 +16,7 @@ You use it to **configure** projects, not to run them. Drop it into any UE5 code
 
 ```bash
 # Inside a Claude Code session in your project
-/kc:install
+/kc:install ~/your-ue5-project
 ```
 
 Non-destructive — only adds what's missing. Creates `.claude/` with all components.
@@ -53,20 +53,21 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 # 1. Clone KahnClaude somewhere permanent
 git clone <repo-url> ~/tools/kahnclaude
 
-# 2. Install global config (one-time)
-#    Open Claude Code from anywhere and run:
-/kc:install-global
-
-# 3. In any UE5 project, install the Claude layer:
-cd ~/your-ue5-project
+# 2. Install KahnClaude in your UE5 project,
+cd ~/tools/kahnclaude
 claude
-/kc:install
+/kc:install your-ue5-project-path
 
-# 4. Customize CLAUDE.md for your project
+# 3. Customize CLAUDE.md for your project
+#   Open Claude Code from your-ue5-project-path
+/generate-claude-md
 
-# 5. Configure MCPs for Perforce, Jira, and your tools (see MCP section below)
+# 4. Configure MCPs for Perforce, Jira, and your tools (see MCP section below)
 
-# 6. Build Claude's knowledge base of your project:
+# 5. Build Claude's knowledge base of your project:
+#   Open Claude Code from your-ue5-project-path
+cd your-ue5-project-path
+claude
 /document
 ```
 
