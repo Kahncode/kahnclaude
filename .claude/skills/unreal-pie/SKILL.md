@@ -36,7 +36,7 @@ Parse `$ARGUMENTS` to determine the action:
 #### Start PIE
 
 ```bash
-python3 "$KC_PROJECT_ROOT/scripts/unreal/pie/pie_start.py"
+python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_start.py"
 ```
 
 - Already running → report current status
@@ -45,7 +45,7 @@ python3 "$KC_PROJECT_ROOT/scripts/unreal/pie/pie_start.py"
 #### Stop PIE
 
 ```bash
-python3 "$KC_PROJECT_ROOT/scripts/unreal/pie/pie_stop.py"
+python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_stop.py"
 ```
 
 - Not running → "No PIE session is running."
@@ -54,7 +54,7 @@ python3 "$KC_PROJECT_ROOT/scripts/unreal/pie/pie_stop.py"
 #### Execute Console Command
 
 ```bash
-python3 "$KC_PROJECT_ROOT/scripts/unreal/pie/pie_exec.py" "$COMMAND"
+python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_exec.py" "$COMMAND"
 ```
 
 - PIE not running → "PIE is not running. Start it first."

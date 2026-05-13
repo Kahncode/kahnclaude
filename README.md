@@ -12,7 +12,7 @@ You use it to **configure** projects, not to run them. Drop it into any UE5 code
 
 ### Two Ways to Use It
 
-**A. Install into an existing project:**
+**A. Install into an existing UE5 project:**
 
 ```bash
 # Inside a Claude Code session in your project

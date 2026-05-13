@@ -34,7 +34,7 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 9. **Copy docs** from `project/docs/` → `<target>/docs/`, preserving subfolder structure. Create any needed subdirectories. Never overwrite existing files without asking.
 
-10. **Copy scripts** from `project/scripts/` → `<target>/scripts/`, preserving subfolder structure. Create any needed subdirectories. Never overwrite existing files without asking.
+10. **Copy scripts** from `project/scripts/` → `<target>/.claude/scripts/`, preserving subfolder structure. Create any needed subdirectories. Never overwrite existing files without asking.
 
 11. **Handle settings.json**:
 

@@ -39,21 +39,36 @@ Inspect the diff and apply each dimension's relevance criteria:
 For each selected dimension, run the resolver script to get the absolute path:
 
 ```bash
-python project/scripts/code-review/resolve_code_review_dimension.py --batch <dim1>,<dim2>,...
+python .claude/scripts/code-review/resolve_code_review_dimension.py --batch <dim1>,<dim2>,...
 ```
 
 Each output line is the absolute path to that dimension's standard file.
 
 ### Step 4 — Invoke Review Agents
-For each selected dimension:
+
+**CRITICAL RULE: One agent per dimension. NEVER combine dimensions into a single agent.**
+
+For each selected dimension, spawn a **separate** `code-reviewer` agent. This is mandatory.
 
 1. Read the standard file from the path resolved in Step 3
-2. Spawn a `code-reviewer` agent via the Agent tool with:
-   - The dimension name
-   - The absolute path to that dimension's standard file
-   - The diff content
+2. For EACH dimension, spawn a distinct `code-reviewer` agent with:
+   - `subagent_type: code-reviewer`
+   - `description: "Code review: <dimension-name>"`
+   - Prompt containing: the dimension name, the standard file content, and the diff
 
-The agent's own instructions contain the review philosophy and output format.
+**Parallelization requirement:** Include ALL dimension agent spawns in a SINGLE message so they run concurrently. If you have 5 dimensions, you must have 5 separate Agent tool invocations in one response — not one agent reviewing 5 dimensions.
+
+**Anti-pattern (WRONG):**
+> "Review CL 150283 for correctness, style, readability, UE5 best practices, and performance."
+
+**Correct pattern:**
+- Agent 1: "Review CL 150283 for **correctness**. [correctness standard] [diff]"
+- Agent 2: "Review CL 150283 for **style**. [style standard] [diff]"
+- Agent 3: "Review CL 150283 for **readability**. [readability standard] [diff]"
+- Agent 4: "Review CL 150283 for **ue-best-practice**. [ue-best-practice standard] [diff]"
+- Agent 5: "Review CL 150283 for **performance**. [performance standard] [diff]"
+
+Each agent receives exactly ONE dimension and its corresponding standard document.
 
 ### Step 5 — Aggregate Results
 Combine all dimension results into a single report. Deduplicate overlapping findings. Sort by severity: CRITICAL first, then WARNING, then INFO.

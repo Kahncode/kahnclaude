@@ -83,7 +83,7 @@ When design values are discussed (tuning parameters, ability stats, data table e
 4. Flag any mismatches between documented design intent and actual asset values
 
 ```bash
-MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/scripts/unreal/unreal-asset-inspections/read_uasset_property.py" "/Game/Path/To/Asset" "property_name"
+MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/unreal-asset-inspections/read_uasset_property.py" "/Game/Path/To/Asset" "property_name"
 ```
 
 ### 5. Design-Code Bridge

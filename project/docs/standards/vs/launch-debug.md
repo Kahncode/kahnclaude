@@ -17,7 +17,7 @@ Platform is almost always `Win64`.
 | `launch-editor-from-vs.ps1` | Full orchestration: opens VS if needed, waits for solution, launches editor |
 | `launch-vs.ps1` | Triggers F5 in an already-running VS instance |
 
-Both scripts live at `$KC_PROJECT_ROOT/scripts/vs/`.
+Both scripts live at `$KC_PROJECT_ROOT/.claude/scripts/vs/`.
 
 ## VS COM/DTE Automation
 

@@ -16,7 +16,11 @@ Use PROACTIVELY when user says `write cl description`, `write changelist descrip
 
 ## Step 1 -- Resolve Changelist
 
-If CL number is in $ARGUMENTS, use it. Otherwise:
+Resolve the CL in this order:
+
+1. **Argument:** If CL number is in $ARGUMENTS, use it directly
+2. **Context:** Scan the conversation for recently mentioned CL numbers (patterns: `CL 12345`, `CL#12345`, `changelist 12345`, `CL:12345`, `review 12345`). If found, confirm with user: "I see CL <number> mentioned — use that?"
+3. **Query P4:** If not found above, run:
 
 ```bash
 p4 changes -s pending -u $P4USER -c $P4CLIENT

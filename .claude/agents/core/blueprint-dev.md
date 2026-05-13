@@ -33,12 +33,12 @@ Understand what the user is asking. The requirement may come from:
 
 For every asset you plan to modify, dump its current properties as a baseline:
 ```bash
-MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/scripts/unreal/unreal-asset-inspections/dump_asset_properties.py" "/Game/Path/To/Asset"
+MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/unreal-asset-inspections/dump_asset_properties.py" "/Game/Path/To/Asset"
 ```
 
 For targeted inspection of specific properties:
 ```bash
-MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/scripts/unreal/unreal-asset-inspections/read_uasset_property.py" "/Game/Path/To/Asset" "property_name"
+MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/unreal-asset-inspections/read_uasset_property.py" "/Game/Path/To/Asset" "property_name"
 ```
 
 **1d. Load standards**
@@ -65,7 +65,7 @@ Present a plan before modifying any assets. Include:
 
 For each property change, run:
 ```bash
-MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/scripts/unreal/unreal-asset-inspections/set_uasset_property.py" "/Game/Path" "property.path" value
+MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/unreal-asset-inspections/set_uasset_property.py" "/Game/Path" "property.path" value
 ```
 
 The script handles:
@@ -115,12 +115,12 @@ Modified `.uasset` files must be tracked in a P4 changelist. Follow `@docs/stand
 After every modification, verify the changes took effect:
 
 ```bash
-MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/scripts/unreal/unreal-asset-inspections/dump_asset_properties.py" "/Game/Path/To/Asset"
+MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/unreal-asset-inspections/dump_asset_properties.py" "/Game/Path/To/Asset"
 ```
 
 Or for targeted verification:
 ```bash
-MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/scripts/unreal/unreal-asset-inspections/read_uasset_property.py" "/Game/Path/To/Asset" "changed_property"
+MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/unreal-asset-inspections/read_uasset_property.py" "/Game/Path/To/Asset" "changed_property"
 ```
 
 Compare before/after values. If a change did not take effect, investigate:

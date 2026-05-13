@@ -30,7 +30,7 @@ description: "Game wiki author. ALWAYS invoke when the user asks to write, creat
    - Instruction to grep the codebase for relevant code (DataTables, DataAssets, GameplayEffects, AttributeSets, config values)
    - Instruction to run asset inspection scripts via Bash for discovered UE5 assets:
      ```
-     MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/scripts/unreal/unreal-asset-inspections/dump_asset_properties.py" "<asset_path>"
+     MSYS_NO_PATHCONV=1 python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/unreal-asset-inspections/dump_asset_properties.py" "<asset_path>"
      ```
    - Reference to @docs/standards/design/game-wiki-writing.md for the required format
    - Instruction to write the result to `docs/wikis/<subsystem>.md`

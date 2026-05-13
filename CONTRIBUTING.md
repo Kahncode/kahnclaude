@@ -143,7 +143,7 @@ Skill descriptions use one of three patterns depending on how the skill is invok
 - **Line limit:** SKILL.md must be under 100 lines
 - **Description limit:** Must not exceed 400 characters
 - **Reference docs:** Each skill has a reference doc in `project/docs/standards/<theme>/` with focused criteria, patterns, or formats. Extract from existing coding standards or tech stack guides rather than duplicating. Use `@docs/standards/<theme>/<name>.md` to reference.
-- **Scripts:** Reusable scripts live in `project/scripts/<domain>/`. Reference them with `$KC_PROJECT_ROOT/scripts/<domain>/<script>`.
+- **Scripts:** Reusable scripts live in `project/scripts/<domain>/` (source). After install, they're at `.claude/scripts/<domain>/`. Reference them with `$KC_PROJECT_ROOT/.claude/scripts/<domain>/<script>`.
 - **Theme folders:** Group related skills by theme (`code/`, `perforce/`, `swarm/`, `jira/`, `confluence/`, `planning/`, `unreal/`)
 
 ### Review Skills — Relevance Criteria

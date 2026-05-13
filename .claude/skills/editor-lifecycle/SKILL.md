@@ -62,13 +62,13 @@ Parse optional arguments from `$ARGUMENTS`: **Configuration** (`DebugGame Editor
 **VS Not Running** — full orchestration (opens VS, waits for solution load, launches editor):
 
 ```bash
-powershell -ExecutionPolicy Bypass -File "$KC_PROJECT_ROOT/scripts/vs/launch-editor-from-vs.ps1" -Configuration "$CONFIGURATION" -Platform "$PLATFORM"
+powershell -ExecutionPolicy Bypass -File "$KC_PROJECT_ROOT/.claude/scripts/vs/launch-editor-from-vs.ps1" -Configuration "$CONFIGURATION" -Platform "$PLATFORM"
 ```
 
 **VS Already Running** — triggers F5 in the existing instance:
 
 ```bash
-powershell -ExecutionPolicy Bypass -File "$KC_PROJECT_ROOT/scripts/vs/launch-vs.ps1" -Configuration "$CONFIGURATION" -Platform "$PLATFORM"
+powershell -ExecutionPolicy Bypass -File "$KC_PROJECT_ROOT/.claude/scripts/vs/launch-vs.ps1" -Configuration "$CONFIGURATION" -Platform "$PLATFORM"
 ```
 
 First launch after a clean build can take 5-15 minutes. The editor runs under the VS debugger, so breakpoints and crash dumps work. RPC_E_CALL_REJECTED retries are handled automatically by the scripts.

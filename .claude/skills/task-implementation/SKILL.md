@@ -56,19 +56,17 @@ If unclear, ask: "Does this involve C++ code, Blueprint assets, or both?"
 For **cpp** or **both**: invoke `/code-review` skill — pass CL#
 For **blueprint** or **both**: delegate to `blueprint-reviewer` agent — pass asset paths
 
-Present all findings to the user.
-
-## 6. Fix Review Feedback Loop
+## 6. Fix Review Findings
 
 If CRITICAL or WARNING findings:
-2. Route findings to appropriate agent for fixing (code-dev for C++, blueprint-dev for Blueprint)
-3. Repeat /code-review or/and /blueprint-review
-4. Repeat until clean or user says stop (max 3 iterations then escalate)
+1. Delegate findings for fixing to `code-dev` agent or `blueprint-dev` agent
+2. Re-run review once (/code-review and/or blueprint-reviewer)
+3. Report remaining findings (if any) — user decides next steps
 
 ## 7. Update review description
 1. Invoke `/perforce-changelist-description`
 
-## 10. Shelve the review
+## 8. Shelve the review
 1. Invoke `/swarm-review-shelve`
 
 ## 9. Done
@@ -90,5 +88,5 @@ Shelved: Yes
 
 - For mixed tasks: C++ track completes before Blueprint track begins
 - Never skip compile (C++) or asset verification (Blueprint)
-- Max 3 fix iterations per track before escalating to user
+- Single fix-review pass per track; user decides if more iterations needed
 - Present review findings before applying fixes

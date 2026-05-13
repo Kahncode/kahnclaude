@@ -19,7 +19,11 @@ Read, Grep, Glob, Bash(p4 shelve:*), Bash(p4 describe:*), Bash(p4 changes:*), Ba
 
 ## Step 1 -- Resolve Active CL
 
-If CL number is in $ARGUMENTS, use it. Otherwise detect the active CL:
+Resolve the CL in this order:
+
+1. **Argument:** If CL number is in $ARGUMENTS, use it directly
+2. **Context:** Scan the conversation for recently mentioned CL numbers (patterns: `CL 12345`, `CL#12345`, `changelist 12345`, `CL:12345`, `review 12345`). If found, confirm with user: "I see CL <number> mentioned — use that?"
+3. **Query P4:** If not found above, detect the active CL:
 
 ```bash
 p4 opened -c default
