@@ -26,7 +26,6 @@ Inspect the diff and apply each dimension's relevance criteria:
 | solid | ALWAYS |
 | ue-best-practice | ALWAYS |
 | robustness | ALWAYS |
-| pragmatism | ALWAYS |
 | debuggability | ALWAYS |
 | architecture | New files, import/include changes, class changes, >50 lines, new public API |
 | performance | Tick/loops, container ops, allocations, DB/network calls, hot paths |
