@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/block-secrets.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/block-secrets.py"
           }
         ]
       },
@@ -52,7 +52,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/block-write-outside-repo.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/block-write-outside-repo.py"
           }
         ]
       },
@@ -61,11 +61,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/p4-commands-permission.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/p4-commands-permission.py"
           },
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/block-dangerous-commands.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/block-dangerous-commands.py"
           }
         ]
       }
@@ -76,7 +76,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/after-edit.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/after-edit.py"
           }
         ]
       }
@@ -86,15 +86,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/verify-no-secrets.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/verify-no-secrets.py"
           },
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/check-env-sync.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/check-env-sync.py"
           },
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/lint-on-stop.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/lint-on-stop.py"
           }
         ]
       }
@@ -105,7 +105,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/hooks/notify.py"
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/notify.py"
           }
         ]
       }

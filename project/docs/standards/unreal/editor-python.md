@@ -31,13 +31,13 @@ Output from `print()` calls appears in both the terminal and the UE log.
 
 ```bash
 # Get current level name
-python3 editor-py.py --code "print(unreal.EditorLevelLibrary.get_editor_world().get_name())"
+py editor-py.py --code "print(unreal.EditorLevelLibrary.get_editor_world().get_name())"
 
 # Run a script file
-python3 editor-py.py --file "D:/my_scripts/create_assets.py"
+py editor-py.py --file "D:/my_scripts/create_assets.py"
 
 # Multi-line inline
-python3 editor-py.py --code "
+py editor-py.py --code "
 import unreal
 actors = unreal.EditorLevelLibrary.get_all_level_actors()
 print(f'Actor count: {len(actors)}')

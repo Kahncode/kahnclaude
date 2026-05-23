@@ -2,7 +2,7 @@
 Set a property on a UE5 .uasset via the Editor's Python Remote Execution protocol.
 
 Usage:
-    python set_uasset_property.py <asset_path> <property_path> <value>
+    py set_uasset_property.py <asset_path> <property_path> <value>
 
     asset_path    - Game-relative path, e.g. /Game/AI/Definitions/Passengers/BD_Passenger_TC
     property_path - Dot-separated property path, e.g. config.patrol_distance

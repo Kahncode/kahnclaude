@@ -2,8 +2,8 @@
 """Execute a console command in the active PIE session.
 
 Usage:
-    KC_UE_ENGINE="/path/to/UnrealEngine" python3 scripts/unreal/pie/pie_exec.py "AddItems chest 1"
-    KC_UE_ENGINE="/path/to/UnrealEngine" python3 scripts/unreal/pie/pie_exec.py "God"
+    KC_UE_ENGINE="/path/to/UnrealEngine" py scripts/unreal/pie/pie_exec.py "AddItems chest 1"
+    KC_UE_ENGINE="/path/to/UnrealEngine" py scripts/unreal/pie/pie_exec.py "God"
 """
 
 import os

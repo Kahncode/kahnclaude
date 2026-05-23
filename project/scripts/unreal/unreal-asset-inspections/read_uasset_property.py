@@ -2,7 +2,7 @@
 Read properties from a UE5 .uasset via the Editor's Python Remote Execution protocol.
 
 Usage:
-    python read_uasset_property.py <asset_path> [property_name]
+    py read_uasset_property.py <asset_path> [property_name]
 
     asset_path   - Game-relative path, e.g. /Game/AI/Definitions/Passengers/BD_Passenger_TC
     property_name - (optional) A specific property to print. If omitted, dumps all properties.

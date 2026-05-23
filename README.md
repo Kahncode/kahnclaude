@@ -1,24 +1,33 @@
 # KahnClaude Unreal Engine
 
-> A Claude Code framework for UE5 + Perforce + Jira game development — commands, agents, hooks, and CLAUDE.md templates for effective AI-assisted Unreal Engine workflows.
+> Stop Claude from running `p4 submit` on your main branch. A battle-tested Claude Code configuration layer for UE5 + Perforce + Jira game development.
 
 ---
 
 ## Table of Contents
 
 - [What Is This?](#what-is-this)
+- [Why KahnClaude?](#why-kahnclaude)
 - [What's Included](#whats-included)
+- [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
+- [Verify Installation](#verify-installation)
 - [Supported Stack](#supported-stack)
 - [Project Structure](#project-structure)
-- [Plugins & MCPs](#plugins--mcps)
-- [Commands — On-Demand Workflows](#commands--on-demand-workflows)
-- [Skills — Focused Workflows](#skills--focused-workflows-14)
-- [Agents — Specialist Subagents](#agents--specialist-subagents-8)
-- [Hooks — Enforcement Over Suggestion](#hooks--enforcement-over-suggestion)
+- [MCP Servers](#mcp-servers)
+- [Plugins](#plugins)
+- [Commands](#commands)
+- [Skills](#skills)
+- [Agents](#agents)
+- [Hooks](#hooks)
 - [Templates](#templates)
+- [Team Setup](#team-setup)
 - [Key Concepts](#key-concepts)
+- [Essential Claude Code Commands](#essential-claude-code-commands)
+- [Migrating from Existing Setup](#migrating-from-existing-setup)
+- [Troubleshooting](#troubleshooting)
 - [Adding Components](#adding-components)
+- [Getting Help](#getting-help)
 - [Contributing](#contributing)
 
 ---
@@ -27,40 +36,60 @@
 
 KahnClaude Unreal Engine is a **Claude Code configuration layer** specialized for Unreal Engine 5 game development with Perforce (Helix Core) for version control and Jira for issue tracking. It provides the infrastructure that makes Claude dramatically more effective: slash commands, specialist agents, enforcement hooks, and CLAUDE.md templates.
 
+**KahnClaude provides:**
+- **Guardrails** — Hooks block dangerous commands before they execute
+- **Workflow integration** — Skills for P4, Swarm, Jira, Confluence out of the box
+- **Team memory** — CLAUDE.md captures lessons learned; mistakes become rules
+- **Specialist delegation** — Agents for code review, Blueprint work, production
+
 ---
 
 ## What's Included
 
 | Component             | Count | Purpose                                                                   |
 | --------------------- | ----- | ------------------------------------------------------------------------- |
-| **Slash Commands**    | 14    | On-demand workflows invoked with `/command` (6 project + 8 framework)             |
-| **Skills**            | 14    | Focused skills with colocated reference docs, auto-triggered + user-invokable     |
+| **Slash Commands**    | 14    | On-demand workflows invoked with `/command` (6 project + 8 framework)     |
+| **Skills**            | 14    | Focused skills with colocated reference docs, auto-triggered + user-invokable |
 | **Agents**            | 8     | Specialist subagents with restricted tool access                          |
 | **Hooks**             | 9     | Deterministic enforcement scripts (Python)                                |
-| **Tech-Stack Guides** | 6     | Compact Q&A + operational reference guides for CLAUDE.md generation (UE5, Perforce, Swarm, Jira, Confluence, Visual Studio) |
+| **Tech-Stack Guides** | 6     | Compact Q&A + operational reference guides for CLAUDE.md generation       |
+
+---
+
+## Prerequisites
+
+| Requirement | Minimum Version | Check Command |
+|-------------|-----------------|---------------|
+| [Claude Code](https://code.claude.com/docs/en/desktop) | 1.0.0+ | `claude --version` |
+| [Git](https://git-scm.com/install/windows) | 2.30+ (for cloning this depot)| `git --version` |
+| [Node.js](https://nodejs.org/en/download) | 18+ (for MCP servers) | `node --version` |
+| (optional) [Perforce CLI](https://www.perforce.com/downloads) | — | `p4 -V` |
+| (optional) [Atlassian](https://www.atlassian.com/) | — | Jira/Confluence access for producer/designer agents |
 
 ---
 
 ## Quick Start
 
-```bash
+### Windows (PowerShell)
+
+```powershell
 # 1. Clone KahnClaude somewhere permanent
-git clone <repo-url> ~/tools/kahnclaude
+git clone <repo-url> C:\tools\kahnclaude
 
-# 2. Install KahnClaude in your UE5 project,
-cd ~/tools/kahnclaude
+# 2. Open Claude Code from your UE5 project directory
+cd C:\Projects\YourUE5Project
 claude
-/kc:install your-ue5-project-path
 
-# Open Claude Code from your-ue5-project-path
+# 3. Install KahnClaude into this project
+/kc:install
 
-# 3. Customize CLAUDE.md for your project
-/generate-claude-md
+# 4. Customize CLAUDE.md for your project
+/kc:generate-claude-md
 
-# 4. Configure Plugins for Perforce, Jira, and your tools (see Plugins & MCPs section below)
+# 5. Configure integrations for Perforce, Jira, etc.
 /plugins
 
-# 5. Build Claude's knowledge base of your project
+# 6. Build Claude's knowledge base of your project
 /document
 ```
 
@@ -109,31 +138,62 @@ kahnclaude/
 
 ---
 
-## Plugins & MCPs
+## Extensions & Integrations
 
-Plugins and MCPs extend Claude Code with additional capabilities. **Plugins** add slash commands, skills, and automation. **MCPs** (Model Context Protocol servers) connect Claude to external tools, docs, and services.
+Extensions connect Claude Code to external tools, documentation, and services. **MCP servers** (Model Context Protocol) provide tool access, while **plugins** add commands and automation.
 
-> **Discovery:** Run `/plugins` to browse and install available plugins and MCPs directly from Claude Code.
+> **Discovery:** Run `/plugins` to browse and install available extensions directly from Claude Code.
 
 ### Always Recommended
 
-These are useful in virtually every project. Install globally for convenience.
+Install globally for convenience — useful in virtually every project.
 
-| Name | Type | What It Adds | Install |
-| ---- | ---- | ------------ | ------- |
-| **Context7** | MCP | Up-to-date library docs and code examples pulled at query time — eliminates hallucinated APIs | `claude mcp add context7 -- npx -y @upstash/context7-mcp@latest` |
-| **GitHub** | MCP | Read issues, PRs, and code from any repo without leaving Claude | `claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer YOUR_GITHUB_PAT"}}'` |
-| **Filesystem** | MCP | Lets Claude read/write files outside the project root (cross-repo work, config management) | `claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allow` |
-| **claude-warden** | Plugin | Permission manager — pre-approves safe bash commands to eliminate repetitive allow/deny prompts | `/plugins` → search "warden" |
-| **skill-creator** | Plugin | Create, edit, and optimize skills with eval-driven development and performance benchmarking | `/plugins` → search "skill-creator" |
+| Name | Type | What It Adds |
+| ---- | ---- | ------------ |
+| **Context7** | MCP | Up-to-date library docs and code examples pulled at query time — eliminates hallucinated APIs |
+| **Filesystem** | MCP | Lets Claude read/write files outside the project root (cross-repo work, config management) |
+| **claude-warden** | Plugin | Permission manager — pre-approves safe bash commands to eliminate repetitive allow/deny prompts |
+| **skill-creator** | Plugin | Create, edit, and optimize skills with eval-driven development and performance benchmarking |
+
+**Installation:**
+
+```bash
+# Context7 — live library documentation
+claude mcp add context7 -- npx -y @upstash/context7-mcp@latest
+
+# Filesystem — access files outside project root
+claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allow
+
+# Plugins — install via /plugins command in Claude Code
+```
+
+### GitHub MCP Setup
+
+Create a Personal Access Token at [github.com/settings/tokens](https://github.com/settings/tokens) with `repo` scope, then:
+
+```bash
+claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer ghp_YOUR_TOKEN_HERE"}}'
+```
+
+> **Note:** Replace `ghp_YOUR_TOKEN_HERE` with your actual GitHub Personal Access Token.
 
 ### Game Dev Recommendations
 
-| Name | Type | What It Adds | Install |
-| ---- | ---- | ------------ | ------- |
-| **Perforce** | MCP | P4 operations (changelists, shelve, diff, sync, streams) without leaving Claude | `claude mcp add perforce -- npx -y mcp-perforce-server@latest` |
-| **Atlassian** | MCP | Confluence, Read/write Jira issues — enables Jira skills and producer agent | Built-in — enable at [claude.ai/settings/connectors](https://claude.ai/settings/connectors) |
-| **UnrealClaude** | MCP | 20+ MCP tools for UE5.7 — actor manipulation, blueprint editing, level management, materials, input systems, and on-demand API docs | UE5 editor plugin — see [UnrealClaude](https://github.com/Natfii/UnrealClaude) |
+| Name | Type | What It Adds |
+| ---- | ---- | ------------ |
+| **Perforce** | MCP | P4 operations (changelists, shelve, diff, sync, streams) without leaving Claude |
+| **Atlassian** | MCP | Read/write Jira issues, Confluence pages — enables Jira skills and producer agent |
+| **UnrealClaude** | MCP | 20+ tools for UE5.7 — actor manipulation, blueprint editing, level management, materials |
+
+**Installation:**
+
+```bash
+# Perforce MCP
+claude mcp add perforce -- npx -y mcp-perforce-server@latest
+
+# Atlassian — built-in, enable at claude.ai/settings/connectors
+# UnrealClaude — UE5 editor plugin, see https://github.com/Natfii/UnrealClaude
+```
 
 ### Finding More
 
@@ -143,14 +203,28 @@ These are useful in virtually every project. Install globally for convenience.
 
 ---
 
-## Commands — On-Demand Workflows
+## Commands
 
-Invoke with `/command-name` inside any Claude Code session. Commands are Markdown files with YAML frontmatter. Two scopes:
+Invoke with `/command-name` inside any Claude Code session. Commands are Markdown files with YAML frontmatter.
 
-- **`scope: project`** — distributed to target projects via `/kc:install`; live in `.claude/commands/`
-- **`scope: framework`** — KahnClaude management only, never distributed; live in `.claude/commands/kc/`, invoked as `/kc:<name>`
+### Project Commands (6)
+
+These are distributed to your project via `/kc:install` — available in any KahnClaude-enabled project.
+
+| Command                    | What It Does                                                                                               |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `/answer`                  | Research a question using general knowledge, codebase search, Context7 docs, or web search                 |
+| `/document`                | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive             |
+| `/explain`                 | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage                  |
+| `/learn`                   | Update docs from a P4 changelist number, CL range, a plain-text fact, or auto-detected opened/pending      |
+| `/progress`                | Show file counts, test status, recent P4 submitted/pending activity, and next actions                      |
+| `/refactor`                | Refactor a file against CLAUDE.md rules — split, extract, clean up                                         |
+
+> **Start with these:** `/document` (build initial knowledge), `/explain` (understand unfamiliar code), `/answer` (research questions)
 
 ### Framework Commands (8)
+
+These are only available in the KahnClaude repository itself — for managing and developing the framework.
 
 | Command                    | What It Does                                                                      |
 | -------------------------- | --------------------------------------------------------------------------------- |
@@ -163,20 +237,9 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 | `/kc:fix-agent-skill`      | Debug a misbehaving agent or skill — session analysis + convention audit          |
 | `/kc:generate-claude-md`   | Auto-detect tech stack (UE5 via `.uproject`) and generate a complete CLAUDE.md    |
 
-### General Commands (6)
-
-| Command                    | What It Does                                                                                               |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `/answer`                  | Research a question using general knowledge, codebase search, Context7 docs, or web search                 |
-| `/document`                | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive             |
-| `/explain`                 | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage                  |
-| `/learn`                   | Update docs from a P4 changelist number, CL range, a plain-text fact, or auto-detected opened/pending     |
-| `/progress`                | Show file counts, test status, recent P4 submitted/pending activity, and next actions                      |
-| `/refactor`                | Refactor a file against CLAUDE.md rules — split, extract, clean up                                         |
-
 ---
 
-## Skills — Focused Workflows (14)
+## Skills
 
 Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Each lives in `.claude/skills/<name>/` with a `SKILL.md`.
 
@@ -197,30 +260,30 @@ Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Eac
 | `/unreal-asset-inspections` | Unreal | Inspect and modify UE5 assets — read/set properties, dump all, find referencers |
 | `/editor-python` | Unreal | Execute arbitrary Python code or script files in the running editor |
 
+> **Start with these:** `/code-review` (review your code), `/perforce-changelist-description` (better CL descriptions), `/task-planning` (plan before coding)
+
 ---
 
-## Agents — Specialist Subagents (8)
+## Agents
 
 Agents are specialists Claude delegates to automatically. Each has restricted tool access appropriate to its role.
 
-### Core (8)
-
-Cross-cutting specialists used across any tech stack.
-
 | Agent                         | Tools                                | Specialization                                                               |
 | ----------------------------- | ------------------------------------ | ---------------------------------------------------------------------------- |
-| `core/blueprint-dev`          | Read, Write, Edit, Grep, Glob, Bash | Blueprint asset specialist — manipulates UE5 Blueprint properties via Python Remote Execution |
-| `core/blueprint-reviewer`     | Read, Grep, Glob, Bash              | Blueprint asset reviewer — inspects properties via Python Remote Execution, read-only |
-| `core/code-dev`               | Read, Write, Edit, Grep, Glob, Bash | UE5 C++ — gathers context, plans, implements with P4 changelist discipline, validates via full build |
-| `core/code-reviewer`          | Read, Grep, Glob, Bash(p4)          | C++/UE5 code reviewer: security, correctness, performance, C++ craft, engine pitfalls, Blueprint boundary |
-| `core/designer`               | Read, Write, Edit, Grep, Glob, Confluence+Jira MCP | Game design specialist — balance decisions, system design, local game wiki generation, Confluence wiki management |
-| `core/documenter`             | Read, Write, Edit, Grep, Glob       | Architecture docs, subsystem docs, Mermaid diagrams, Decisions logs          |
-| `core/producer`               | Read, Grep, Glob, Jira MCP          | Fetches Jira tickets, clarifies technical requirements, identifies cross-team dependencies, gathers estimates, and creates well-structured tickets |
-| `core/python-dev`             | Read, Write, Edit, Bash, Grep, Glob, WebFetch | Modern Python 3.12+ — architecture, packaging, async, type system         |
+| `blueprint-dev`               | Read, Write, Edit, Grep, Glob, Bash  | Blueprint asset specialist — manipulates UE5 Blueprint properties via Python Remote Execution |
+| `blueprint-reviewer`          | Read, Grep, Glob, Bash               | Blueprint asset reviewer — inspects properties via Python Remote Execution, read-only |
+| `code-dev`                    | Read, Write, Edit, Grep, Glob, Bash  | UE5 C++ — gathers context, plans, implements with P4 changelist discipline, validates via full build |
+| `code-reviewer`               | Read, Grep, Glob, Bash(p4)           | C++/UE5 code reviewer: security, correctness, performance, C++ craft, engine pitfalls, Blueprint boundary |
+| `designer`                    | Read, Write, Edit, Grep, Glob, Confluence+Jira MCP | Game design specialist — balance decisions, system design, local game wiki generation, Confluence wiki management |
+| `documenter`                  | Read, Write, Edit, Grep, Glob        | Architecture docs, subsystem docs, Mermaid diagrams, Decisions logs          |
+| `producer`                    | Read, Grep, Glob, Jira MCP           | Fetches Jira tickets, clarifies technical requirements, identifies cross-team dependencies, gathers estimates, and creates well-structured tickets |
+| `python-dev`                  | Read, Write, Edit, Bash, Grep, Glob, WebFetch | Modern Python 3.12+ — architecture, packaging, async, type system         |
+
+> **Note:** Reviewers are read-only (no Write/Edit) to prevent accidental modifications during review.
 
 ---
 
-## Hooks — Enforcement Over Suggestion
+## Hooks
 
 CLAUDE.md rules are suggestions. Hooks are **deterministic** — they always run as Python scripts at specific lifecycle points.
 
@@ -266,9 +329,9 @@ PreToolUse hook blocking .env access
 
 ## Templates
 
-### `@project/CLAUDE.md`
+### `project/CLAUDE.md`
 
-Master template for auto-generating project-specific `CLAUDE.md` files. Used by `/tool:generate-claude-md` command to:
+Master template for auto-generating project-specific `CLAUDE.md` files. Used by `/kc:generate-claude-md` command to:
 
 - Auto-detect tech stack (Unreal Engine via `.uproject`)
 - Load tech-specific Q&A guides
@@ -276,9 +339,9 @@ Master template for auto-generating project-specific `CLAUDE.md` files. Used by 
 - Instantiate template with user answers and auto-detected versions
 - Populate all sections: Project Overview, Critical Rules, Tech Stack Details, Service Ports, etc.
 
-### Tech-Stack Guides: `@project/docs/tech-stacks/`
+### Tech-Stack Guides: `project/docs/tech-stacks/`
 
-Specialized Q&A guides loaded by `/tool:generate-claude-md` when a tech stack is detected.
+Specialized Q&A guides loaded by `/kc:generate-claude-md` when a tech stack is detected.
 
 - **`unreal.md`** — Unreal Engine (9 guided questions: version, project type, setup, platforms, C++ vs Blueprint, plugins, content structure, build targets, do's/don'ts)
 - **`helix_perforce.md`** — Perforce (Helix Core) workspace, streams, changelist conventions, submit policy, operational reference
@@ -291,17 +354,63 @@ Specialized Q&A guides loaded by `/tool:generate-claude-md` when a tech stack is
 
 Coding standards live in `project/docs/standards/` reference docs (for multi-consumer review criteria) and directly in their consuming agent files (for single-consumer standards like documentation and Python). Agents and skills reference these shared docs via `@docs/standards/` paths.
 
-### `@project/CLAUDE.local.md`
+### `project/CLAUDE.local.md`
 
 Personal overrides — ignored by VCS, never committed. For individual workflow preferences, local environment details, and project-specific personal notes.
 
-### `@global/CLAUDE.md`
+### `global/CLAUDE.md`
 
-Installed once at `@~/.claude/CLAUDE.md`. Applies security rules and coding standards across **every** project. Merged with any existing global config — never overwrites.
+Installed once at `~/.claude/CLAUDE.md`. Applies security rules and coding standards across **every** project. Merged with any existing global config — never overwrites.
 
-### `@global/settings.json`
+### `global/settings.json`
 
-Installed once at `@~/.claude/settings.json`. Wires up global hooks. Merged with existing settings.
+Installed once at `~/.claude/settings.json`. Wires up global hooks. Merged with existing settings.
+
+---
+
+## Team Setup
+
+### Shared vs Personal Config
+
+| What | Where | Versioned? | Purpose |
+|------|-------|------------|---------|
+| Project rules | `CLAUDE.md` | Yes | Team-wide conventions, commit to repo |
+| Personal overrides | `CLAUDE.local.md` | No | Individual preferences, never commit |
+| Global rules | `~/.claude/CLAUDE.md` | No | Cross-project rules (security, etc.) |
+
+### Rolling Out to a Team
+
+1. **Lead installs first:** Run `/kc:install` and `/kc:generate-claude-md` in the project
+2. **Commit the generated files:** `CLAUDE.md`, `.claude/` folder (except `settings.local.json`)
+3. **Team members pull:** Everyone gets commands, skills, agents, hooks automatically
+4. **Personal setup:** Each member runs `/kc:install-global` once for global hooks
+5. **Configure MCPs individually:** Atlassian, GitHub tokens are personal credentials
+
+### Keeping Updated
+
+**Windows (PowerShell):**
+```powershell
+# In the KahnClaude repo, pull latest
+cd C:\tools\kahnclaude
+git pull
+
+# In your project, update installed components
+cd C:\Projects\YourUE5Project
+claude
+/kc:update
+```
+
+**macOS / Linux:**
+```bash
+# In the KahnClaude repo, pull latest
+cd ~/tools/kahnclaude
+git pull
+
+# In your project, update installed components
+cd ~/projects/your-ue5-project
+claude
+/kc:update
+```
 
 ---
 
@@ -333,6 +442,152 @@ All KahnClaude hooks are Python. No bash. Reasons: cross-platform (Windows, WSL,
 
 ---
 
+## Essential Claude Code Commands
+
+Built-in commands that ship with Claude Code. Master these before KahnClaude's specialized workflows.
+
+### Start Here — Learn These First
+
+| Command / Key | What It Does | Why It Matters |
+| ------------- | ------------ | -------------- |
+| `/help` | List all available commands | Starting point for discovery |
+| `Esc` + `Esc` | Open rewind menu (`/rewind`) | Your safety net — undo code or conversation |
+| `/context` | Show token consumption | Know when you're running low |
+
+### Commands by Scenario
+
+#### Debugging & Fixing
+
+| Command | What It Does |
+| ------- | ------------ |
+| `/doctor` | Environment diagnostics — first stop for config issues |
+| `Esc` | Stop a runaway response |
+| `/rewind` | Undo changes (choose code-only or conversation-only) |
+
+#### Large-Scale Tasks
+
+| Command / Key | What It Does |
+| ------------- | ------------ |
+| `Shift+Tab` | Enter Plan Mode — strategic planning before coding |
+| `/agents` | Delegate to parallel sub-agents |
+| `/tasks` | Persistent task management (`Ctrl+T` to toggle) |
+
+#### Token Management
+
+| Command | What It Does |
+| ------- | ------------ |
+| `/compact [focus]` | Summarize conversation (e.g., `/compact focus on errors`) |
+| `/context` | Check current token usage |
+| `/clear` | Reset conversation — use between unrelated tasks |
+| `/cost` | Show token spend for current session |
+| `/usage` | Show plan limits and rate status |
+
+#### Learning & Understanding
+
+| Command / Phrase | What It Does |
+| ---------------- | ------------ |
+| `/output-style` | Switch to "learning" mode for detailed explanations |
+| "Grill me on changes" | Request tough review of your work |
+| "Step by step" | Get step-by-step walkthrough |
+
+#### Efficiency
+
+| Command | What It Does |
+| ------- | ------------ |
+| `/insights` | Generate usage report (`~/.claude/usage-data/report.html`) — run monthly |
+| `/init` | Initialize CLAUDE.md and project config |
+| Custom slash commands | Create project-specific workflows |
+
+#### Team Development
+
+| Command | What It Does |
+| ------- | ------------ |
+| `/export` | Export conversation to file or clipboard |
+| Agent Teams | Collaborative work (experimental) |
+| `CLAUDE.md` | Share rules across the team |
+
+### Token Management Checklist
+
+- [ ] Check regularly with `/context`
+- [ ] Let auto-compact handle long sessions (manual: `/compact`)
+- [ ] Use `/clear` when switching tasks
+- [ ] Use `/rewind` to remove unnecessary conversation
+- [ ] `/export` before starting a new session if you need history
+
+### Working with Agents
+
+| Guideline | Why |
+| --------- | --- |
+| Start with 2-3 agents | Learn the workflow before scaling |
+| Clarify roles in `CLAUDE.md` | Agents read your project rules |
+| Maximum 5 running in parallel | Beyond this, coordination overhead dominates |
+| Monitor with `/statusline` | Keep visibility on agent activity |
+| Use `/compact` when chaotic | Regain context clarity |
+
+---
+
+## Migrating from Existing Setup
+
+### Already have a CLAUDE.md?
+
+`/kc:generate-claude-md` will **append** KahnClaude sections to your existing file, not overwrite. Review the merged result and remove duplicates.
+
+### Using another Claude Code framework?
+
+Run `/kc:import` to analyze your existing `.claude/` folder and selectively import compatible components.
+
+### Coming from Git?
+
+KahnClaude is optimized for Perforce, but the core components (commands, agents, hooks) work in any project. The P4-specific skills (`/perforce-changelog`, `/swarm-review-shelve`, etc.) simply won't activate without a P4 workspace.
+
+---
+
+## Troubleshooting
+
+### Skill doesn't trigger when I type the keyword
+
+- Check `claude --settings` to verify skills are loaded
+- Run `/plugins` to see if required MCPs are connected
+- Try explicit invocation: `/skill-name` instead of keywords
+- Ensure the skill files were copied: check `.claude/skills/` exists
+
+### Hooks aren't blocking anything
+
+- Verify hooks are wired: check `.claude/settings.json` for `hooks` array
+- Test hook manually:
+  ```bash
+  echo '{"tool_name":"Read","tool_input":{"file_path":".env"}}' | py .claude/hooks/block-secrets.py
+  ```
+- Check exit code: hook must exit with code 2 to block
+- Ensure Python 3.10+ is in your PATH
+
+### MCP connection fails
+
+- Verify Node.js 18+: `node --version`
+- Check MCP logs: `claude mcp logs <server-name>`
+- Restart Claude Code after adding MCPs
+- For Perforce MCP: ensure `p4` CLI is in your PATH and authenticated
+
+### `/kc:install` says "not a UE5 project"
+
+- Ensure `.uproject` file exists in project root
+- Run from the directory containing the `.uproject` file
+- The command auto-detects UE5 via `.uproject` — other project types work but won't get UE5-specific defaults
+
+### P4 commands fail with "not logged in"
+
+- Run `p4 login` in your terminal before using Claude
+- Check `p4 info` shows valid client workspace
+- Verify `P4CLIENT`, `P4USER`, `P4PORT` environment variables are set
+
+### Blueprint/PIE skills say "editor not running"
+
+- Start Unreal Editor before using these skills
+- Enable Remote Execution Plugin in Editor Preferences
+- Check the Python Remote Execution port (default: 9997) isn't blocked
+
+---
+
 ## Adding Components
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
@@ -344,6 +599,16 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 | Skill               | `.claude/skills/<theme>/<name>/SKILL.md`      | kebab-case, reference doc in `project/docs/standards/` |
 | Agent               | `.claude/agents/<name>.md`                    | kebab-case role                                 |
 | Hook                | `.claude/hooks/<name>.py`                     | `block-`, `check-`, `lint-`, `verify-` prefix   |
+
+---
+
+## Getting Help
+
+- **Issues:** Report bugs and request features on GitHub Issues
+- **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md)
+- **License:** See [LICENSE](LICENSE)
+
+---
 
 ## Contributing
 

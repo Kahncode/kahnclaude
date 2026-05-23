@@ -2,7 +2,7 @@
 Find all assets that reference a given Unreal asset via the Asset Registry.
 
 Usage:
-    python find_asset_referencers.py <asset_path>
+    py find_asset_referencers.py <asset_path>
 
     asset_path - Game-relative path, e.g. /Game/AI/Definitions/Passengers/BD_Passenger_TC
 

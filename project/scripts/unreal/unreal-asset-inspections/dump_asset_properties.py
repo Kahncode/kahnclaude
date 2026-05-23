@@ -2,7 +2,7 @@
 Dump all property values from a loaded UE5 asset via Python Remote Execution.
 
 Usage:
-    python dump_asset_properties.py <asset_path>
+    py dump_asset_properties.py <asset_path>
 
     asset_path - Game-relative path, e.g. /Game/AI/Definitions/Passengers/BD_Passenger_TC
 

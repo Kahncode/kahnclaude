@@ -1,7 +1,7 @@
 ---
 name: editor-python
 description: "Unreal Editor Python executor. ALWAYS invoke when the user asks to run Python in the editor, execute a script in UE, or automate editor tasks via Python. Do not call editor-py.py directly — this skill handles inline code and file dispatch."
-allowed-tools: Bash(python3 *)
+allowed-tools: Bash(py *)
 ---
 
 # Editor Python
@@ -33,12 +33,12 @@ See @docs/standards/unreal/editor-python.md for prerequisites, script interface,
 
 **Inline code:**
 ```bash
-python3 "$KC_PROJECT_ROOT/.claude/scripts/editor/editor-py.py" --code "<code>"
+py "$KC_PROJECT_ROOT/.claude/scripts/editor/editor-py.py" --code "<code>"
 ```
 
 **File:**
 ```bash
-python3 "$KC_PROJECT_ROOT/.claude/scripts/editor/editor-py.py" --file "<path>"
+py "$KC_PROJECT_ROOT/.claude/scripts/editor/editor-py.py" --file "<path>"
 ```
 
 ### 3. Report

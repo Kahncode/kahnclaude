@@ -2,8 +2,8 @@
 """Execute arbitrary Python code in the running Unreal Editor via Remote Execution.
 
 Usage:
-    python3 editor-py.py --code "print(unreal.EditorLevelLibrary.get_editor_world().get_name())"
-    python3 editor-py.py --file "/path/to/script.py"
+    py editor-py.py --code "print(unreal.EditorLevelLibrary.get_editor_world().get_name())"
+    py editor-py.py --file "/path/to/script.py"
 
 Requires KC_UE_ENGINE environment variable to locate the Remote Execution module.
 """

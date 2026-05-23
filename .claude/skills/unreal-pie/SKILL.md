@@ -1,7 +1,7 @@
 ---
 name: unreal-pie
 description: "Play In Editor manager. ALWAYS invoke when the user asks to start PIE, stop PIE, play in editor, or run a console command in PIE. Do not run PIE scripts directly — this skill manages session lifecycle and command execution."
-allowed-tools: Bash(python3 *)
+allowed-tools: Bash(py *)
 ---
 
 # Play In Editor (PIE)
@@ -36,7 +36,7 @@ Parse `$ARGUMENTS` to determine the action:
 #### Start PIE
 
 ```bash
-python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_start.py"
+py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_start.py"
 ```
 
 - Already running → report current status
@@ -45,7 +45,7 @@ python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_start.py"
 #### Stop PIE
 
 ```bash
-python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_stop.py"
+py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_stop.py"
 ```
 
 - Not running → "No PIE session is running."
@@ -54,7 +54,7 @@ python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_stop.py"
 #### Execute Console Command
 
 ```bash
-python3 "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_exec.py" "$COMMAND"
+py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_exec.py" "$COMMAND"
 ```
 
 - PIE not running → "PIE is not running. Start it first."

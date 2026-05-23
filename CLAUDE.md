@@ -98,4 +98,4 @@ This repo primarily contains Markdown and Python. Follow these conventions:
 
 - Work on feature branches — `feat/<name>`, `fix/<name>`, `docs/<name>`
 - Keep commits focused: one logical change per commit
-- Run `python -m py_compile hooks/*.py` to syntax-check hooks before committing
+- Run `py -m py_compile hooks/*.py` to syntax-check hooks before committing
