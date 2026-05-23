@@ -12,7 +12,7 @@ Use PROACTIVELY when user says `fetch swarm comments`, `address review comments`
 ## Reference
 
 - @docs/standards/swarm/swarm-review-comments.md -- Swarm API, comment workflow
-- @project/docs/tech-stacks/helix_swarm.md -- full Swarm API guide
+- @docs/tech-stacks/helix_swarm.md -- full Swarm API guide
 
 ## allowed-tools
 

@@ -44,8 +44,9 @@ Read the files that will be modified or extended. Understand:
 **1d. Load coding standards**
 
 Always load:
-- `@docs/standards/code/review-code-style.md` — naming, formatting, includes, portable types, modern C++, containers, terminology
-- `@docs/standards/code/review-code-ue-best-practice.md` — UObject lifecycle, UPROPERTY/UFUNCTION, GAS, delegates, Cast safety, deprecation
+- `@docs/standards/code/style.md` — naming, formatting, includes, modern C++, containers
+- `@docs/standards/code/correctness.md` — UObject lifecycle, GC safety, bounds checks
+- `@docs/standards/code/interface.md` — UPROPERTY/UFUNCTION, delegates, Blueprint exposure
 
 These reference files are the authoritative standard for this project. Follow them exactly.
 

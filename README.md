@@ -39,8 +39,8 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 | **Slash Commands**    | 14    | On-demand workflows invoked with `/command` (6 project + 8 framework)             |
 | **Skills**            | 14    | Focused skills with colocated reference docs, auto-triggered + user-invokable     |
 | **Agents**            | 8     | Specialist subagents with restricted tool access                          |
-| **Hooks**             | 13    | Deterministic enforcement scripts (Python)                                |
-| **Editor Scripts**    | 13    | PowerShell/Python scripts for VS and UE5 editor automation                |
+| **Hooks**             | 9     | Deterministic enforcement scripts (Python)                                |
+| **Editor Scripts**    | 12    | PowerShell/Python scripts for VS and UE5 editor automation                |
 | **Project Template**  | 1     | Master `CLAUDE.md` with guide comments (used by `/tool:generate-claude-md`) |
 | **Tech-Stack Guides** | 6     | Compact Q&A + operational reference guides for CLAUDE.md generation (UE5, Perforce, Swarm, Jira, Confluence, Visual Studio) |
 | **Global Template**   | 1     | `@~/.claude/CLAUDE.md` for cross-project rules                            |
@@ -141,42 +141,38 @@ kahnclaude/
 │   │   ├── <name>.md            # scope: project → distributed to projects
 │   │   └── kc/                  # Framework + tooling commands, invoked as /kc:<name>
 │   │       └── <name>.md        # scope varies (project or framework)
-│   ├── skills/                  # Focused skills (SKILL.md only, reference docs in project/docs/standards/)
-│   │   ├── code/                # Code review skills (code-review, 7 concerns)
-│   │   ├── perforce/            # resolve-diff, P4 sync, CL description, changelog
-│   │   ├── swarm/               # Swarm review, comments, checkpoint shelve
-│   │   ├── jira/                # Ticket creation/update
-│   │   ├── confluence/          # Page creation/update
-│   │   ├── planning/            # Task clarification
-│   │   ├── unreal/              # Build, log analysis, PIE, asset inspection, editor lifecycle + launch/debug, editor Python
-│   │   └── tools/               # KahnClaude tooling — create/fix skills and agents
+│   ├── skills/                  # Focused skills (flat structure: <skill-name>/SKILL.md)
+│   │   └── <skill-name>/        # e.g., code-review/, unreal-pie/, perforce-changelog/
+│   │       └── SKILL.md
 │   ├── agents/                  # Specialist subagents
 │   │   └── core/                # Cross-cutting specialists (including UE5)
 │   └── hooks/                   # Enforcement scripts (Python only)
 │       └── <name>.py
 │
-├── project/                     # CLAUDE.md templates for new projects
-│   ├── CLAUDE.md                # Master template (used by /tool:generate-claude-md)
-│   ├── CLAUDE.local.md
+├── docs/                        # Project documentation
+│   └── ARCHITECTURE.md          # System overview and subsystem links
+│
+├── project/                     # Templates for new projects (distributed via /kc:install)
+│   ├── CLAUDE.md                # Master template (used by /kc:generate-claude-md)
 │   ├── settings.json
-│   ├── docs/                    # Docs distributed to target projects via /kc:install
+│   ├── docs/                    # Docs distributed to target projects
 │   │   ├── tech-stacks/         # Tech-specific Q&A + operational reference guides
+│   │   │   ├── unreal.md
+│   │   │   ├── helix_perforce.md
+│   │   │   ├── helix_swarm.md
+│   │   │   ├── atlassian_jira.md
+│   │   │   ├── atlassian_confluence.md
+│   │   │   └── visual_studio.md
 │   │   └── standards/           # Shared reference docs (standards, checklists, formats)
 │   └── scripts/                 # Reusable scripts distributed to target projects
-│       ├── unreal/              # UE5 editor automation (unreal-asset-inspections, PIE, compile)
+│       ├── unreal/              # UE5 editor automation (PIE, compile, asset inspection)
 │       └── vs/                  # Visual Studio automation (launch, debug)
-│           ├── unreal.md            # UE5 detection + 9 guided questions
-│           ├── helix_perforce.md    # Perforce workspace + stream config + operational reference
-│           ├── helix_swarm.md       # Swarm code review integration + API reference
-│           ├── atlassian_jira.md    # Jira project setup + operational reference
-│           ├── atlassian_confluence.md  # Confluence publishing + formatting references
-│           └── visual_studio.md     # Visual Studio UE5 integration, COM/DTE automation
 │
 ├── global/                      # Global ~/.claude/ config templates
 │   ├── CLAUDE.md
 │   └── settings.json
 │
-└── inspiration/                 # Third-party reference — NEVER MODIFY
+└── inspiration/                 # Third-party reference — NEVER MODIFY (may be empty)
 ```
 
 ---
@@ -234,7 +230,7 @@ Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Eac
 
 | Skill | What It Does |
 | ----- | ------------ |
-| `/changelog` | Generate changelog from P4 history — filter by code system, user, time range, with Confluence/Jira output |
+| `/perforce-changelog` | Generate changelog from P4 history — filter by code system, user, time range, with Confluence/Jira output |
 | `/perforce-changelist-description` | Generate CL description from diff + Jira ticket, hard-enforces `[TICKET][Summary] Tech #review` format |
 
 ### Swarm Skills (2)
@@ -268,7 +264,7 @@ Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Eac
 | ----- | ------------ |
 | `/unreal-project-compilation` | Build + analyze + fix loop, supports all build targets, shelves on success |
 | `/game-log` | Read + diagnose game logs, auto-detect log file, cross-reference source for file:line |
-| `/pie` | Manage PIE sessions — start, stop, or execute console commands in the running instance |
+| `/unreal-pie` | Manage PIE sessions — start, stop, or execute console commands in the running instance |
 | `/unreal-asset-inspections` | Inspect and modify UE5 assets — read/set properties, dump all, find referencers, find actors |
 | `/editor-python` | Execute arbitrary Python code or script files in the running editor via Remote Execution |
 
@@ -318,7 +314,6 @@ PreToolUse hook blocking .env access
 | `after-edit`                    | PostToolUse  | Auto-formats files after edit/write: clang-format (C++), black+ruff (Python), prettier (JS/JSON/MD)       |
 | `notify`                        | Notification | Sends desktop notifications when Claude needs attention                                                    |
 | `lint-on-stop`                  | Stop         | Runs linters at end of turn: clang-tidy (UE), ruff+mypy (Python), cargo (Rust), go vet (Go)               |
-| `force-skill-eval`              | UserPromptSubmit | Forces Claude to evaluate every public skill YES/NO before responding, achieving ~100% skill activation |
 
 ### Hook Lifecycle
 

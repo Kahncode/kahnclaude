@@ -8,7 +8,7 @@ allowed-tools: Read, Edit, Glob, Grep
 
 # Fix Agent / Skill
 
-@docs/standards/tools/agent-skill-standard.md
+@project/docs/standards/tools/agent-skill-standard.md
 
 ## Target
 

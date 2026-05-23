@@ -11,7 +11,7 @@ Use PROACTIVELY when user says `shelve`, `checkpoint`, `shelve for review`, `cre
 
 ## Reference
 
-- @project/docs/standards/swarm/swarm-review-shelve.md -- shelve commands, CL resolution, Swarm URL patterns
+- @docs/standards/swarm/swarm-review-shelve.md -- shelve commands, CL resolution, Swarm URL patterns
 
 ## allowed-tools
 

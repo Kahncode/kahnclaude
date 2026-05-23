@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash(ls *)
 
 # Create Agent / Skill / Command
 
-@docs/standards/tools/agent-skill-standard.md
+@project/docs/standards/tools/agent-skill-standard.md
 
 ## Target
 
