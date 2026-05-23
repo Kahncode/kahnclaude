@@ -146,17 +146,19 @@ Skill descriptions use one of three patterns depending on how the skill is invok
 - **Scripts:** Reusable scripts live in `project/scripts/<domain>/` (source). After install, they're at `.claude/scripts/<domain>/`. Reference them with `$KC_PROJECT_ROOT/.claude/scripts/<domain>/<script>`.
 - **Theme folders:** Group related skills by theme (`code/`, `perforce/`, `swarm/`, `jira/`, `confluence/`, `planning/`, `unreal/`)
 
-### Review Skills — Relevance Criteria
+### Code Review — Concern-Based Architecture
 
-Review dimension skills (in `code/`) must declare their own relevance criteria. The `code-review` orchestrator checks each dimension's criteria against the diff to decide which to invoke.
+The `/code-review` skill uses 7 concern-based review categories, each with inline criteria in SKILL.md:
 
-```markdown
-## Relevance Criteria
+1. Architecture & Design — SOLID, coupling/cohesion, anti-patterns (ALWAYS)
+2. Logic & Correctness — edge cases, null checks, race conditions (ALWAYS)
+3. Security — input validation, injection, auth (conditional)
+4. Performance — N+1, loops, memory leaks (conditional)
+5. Maintainability — naming, comments, nesting (ALWAYS)
+6. Reuse — existing utilities, over-engineering (conditional)
+7. Standards — interface, networking, UE5 best practices (conditional)
 
-This skill is relevant when the diff contains:
-- [specific patterns, keywords, or structural changes]
-- Use ALWAYS for dimensions that should run on every review
-```
+Standards files in `project/docs/standards/code/` (interface, networking, ue-best-practice) are read by the Standards concern.
 
 ---
 
@@ -276,7 +278,7 @@ Shared boilerplate (all-optional, one-at-a-time, env-vars-in-local) is handled b
 
 Coding standards live in `project/docs/standards/` reference docs and agent markdown — not inline in skills.
 
-**Key principle:** Review criteria belong in the relevant `project/docs/standards/<theme>/<name>.md` file. Single-consumer standards belong embedded in their agent file. Multi-consumer standards that don't fit a review dimension should become a new reference doc in `project/docs/standards/`.
+**Key principle:** Review criteria belong in the relevant `project/docs/standards/<theme>/<name>.md` file. Single-consumer standards belong embedded in their agent file. Multi-consumer standards that don't fit an existing review concern should become a new reference doc in `project/docs/standards/`.
 
 When adding standards content:
 

@@ -1,12 +1,12 @@
 ---
-name: confluence-page
-description: "Confluence page expert. ALWAYS invoke when the user asks to create, update, or publish a Confluence page. Do not call Confluence MCP tools directly — this skill confirms space/parent, drafts content, and publishes with project conventions."
+name: to-confluence-page
+description: "Confluence page expert. ALWAYS invoke when the user asks to create, update, or publish a Confluence page, or to publish a game wiki to Confluence. Do not call Confluence MCP tools directly — this skill confirms space/parent, drafts content, and publishes with project conventions."
 allowed-tools: Read, Grep, Glob, mcp__atlassian__*
 ---
 
 # Create or Update Confluence Pages
 
-Use PROACTIVELY when the user says: `create confluence page`, `update confluence page`, `publish to confluence`.
+Use PROACTIVELY when the user says: `create confluence page`, `update confluence page`, `publish to confluence`, `publish wiki to confluence`, `sync wiki`.
 
 ## Reference
 
@@ -29,6 +29,7 @@ See @docs/standards/confluence/confluence-page.md for spaces, page structure, fo
 
 ### 1. Detect Mode
 
+- If user asks to publish a **game wiki** or **subsystem wiki**: enter **Wiki Mode** (see below)
 - If user provides a page ID or title of an existing page: **update mode**
 - Otherwise: **create mode**
 
@@ -72,6 +73,35 @@ After publishing, recommend a review based on page content:
 - **General content**: no recommendation needed.
 
 This is a recommendation, not mandatory — keep the skill fast for routine updates.
+
+---
+
+## Wiki Mode
+
+When the user asks to publish a **game wiki** or **subsystem wiki** to Confluence:
+
+### W1. Resolve Subsystem
+
+Parse the subsystem name from the user's request.
+
+### W2. Check Local Wiki
+
+Check if `docs/wikis/<subsystem>.md` exists.
+
+- **Does not exist:** Inform the user that no local wiki exists for this subsystem. Ask if they want to create content manually or provide the wiki content.
+- **Exists:** Read the wiki file content. Ask the user: "Publish this wiki as-is, or would you like to make changes first?"
+
+### W3. Publish
+
+Use the wiki content for Step 3 (Draft Content) above, then continue through Steps 4-6.
+
+### Wiki Rules
+
+- The local wiki file (`docs/wikis/<subsystem>.md`) is the source of truth
+- One subsystem per invocation
+- Always confirm with the user before publishing
+
+---
 
 ## Rules
 

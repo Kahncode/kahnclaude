@@ -82,9 +82,8 @@ These are read by all VS scripts at runtime. If any are missing, the script exit
 | Skill | What It Does |
 |-------|-------------|
 | `/unreal-project-compilation` | Build project via VS DTE with UBT fallback, error analysis, and fix loop |
-| `/editor-lifecycle` | Opens VS if needed, sets the build configuration, and launches the editor with F5 (debugger attached) |
 
-Both accept optional `[Configuration] [Platform]` arguments (e.g., `/editor-lifecycle Development Editor Win64`).
+Accepts optional `[Configuration] [Platform]` arguments (e.g., `/unreal-project-compilation Development Editor Win64`).
 
 ### How the COM/DTE Automation Works
 

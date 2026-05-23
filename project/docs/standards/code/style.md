@@ -1,8 +1,10 @@
-# Review Code: Style — Reference
+# Style
+
+Does this code follow project and Epic conventions?
 
 Do not flag personal style preferences — only project/Epic standards.
 
-**Critical rule**: Style must match the NEIGHBOR code style, not just global rules. If the surrounding file uses a consistent pattern, new code must follow that pattern even if it differs from the global standard. Flag only when new code breaks consistency with its immediate context.
+**Critical rule**: Style must match the NEIGHBOR code style, not just global rules. If the surrounding file uses a consistent pattern, new code must follow that pattern even if it differs from the global standard.
 
 ## Epic Naming Conventions
 
@@ -18,6 +20,30 @@ Do not flag personal style preferences — only project/Epic standards.
 | `b` | Boolean variables (`bIsAlive`, `bHasFired`) |
 
 General: PascalCase for types, functions, properties. No `m_` or Hungarian beyond Epic prefixes. `Out` prefix for out-parameters. Macros: `ALL_CAPS_WITH_UNDERSCORES`.
+
+## Naming Clarity
+
+Names must communicate intent without requiring context lookup.
+
+**Flags:**
+- Single-letter variables outside loop indices
+- Abbreviations that aren't universally known (`mgr`, `impl`, `ctx`)
+- Generic names (`data`, `info`, `item`, `value`, `temp`)
+- Names that don't match what the thing does
+
+**Ask:** "Would a new team member understand this name without reading the implementation?"
+
+## Comments
+
+Comments should explain **why**, never **what** (the code shows what).
+
+**Flags:**
+- Stale comments that contradict the code
+- Comments that restate the code (`// increment counter` above `counter++`)
+- Commented-out code blocks (delete or explain why kept)
+- Missing context on non-obvious workarounds
+
+**Ask:** "Does this comment add information the code doesn't already convey?"
 
 ## Code Formatting
 
@@ -91,15 +117,60 @@ Every source file must begin with the copyright header as specified by the team 
 
 ---
 
-## Review Guidelines
+## Unnecessary Complexity [WARNING]
 
-### What to IGNORE
-- Correctness bugs (other dimension)
-- Performance concerns (other dimension)
-- Architecture decisions (other dimension)
-- Pre-existing style violations not in the diff
+**Flags:**
+- Nested conditionals that could be flattened with early returns
+- Boolean logic that could be simplified (`if (x) return true; else return false;`)
+- State machines for linear flows
+- Multiple variables tracking the same state
 
-### Severity Classification
+**Fix:** Extract guard clauses, flatten nesting, use direct returns.
+
+## Clever Code [WARNING]
+
+**Flags:**
+- One-liners that pack multiple operations (ternary chains, compound assignments)
+- Bitwise tricks when arithmetic is clearer
+- Regex when simple string operations work
+- Implicit behavior relying on obscure language features
+
+**Ask:** "Will a new team member understand this immediately?"
+
+## Deep Nesting [WARNING]
+
+**Flags:**
+- More than 3 levels of indentation (excluding class/function scope)
+- Nested loops with nested conditionals
+- Callback pyramids or nested lambdas
+
+**Fix:** Guard clauses for early exit, extract inner blocks to named functions.
+
+## Long Chains [INFO]
+
+**Flags:**
+- More than 4 chained method calls
+- Chains where intermediate values might need inspection
+
+**Fix:** Assign intermediate results to named variables.
+
+## Defensive Overkill [INFO]
+
+Validating invariants that cannot be violated by design.
+
+**Flags:**
+- Null checks after infallible construction
+- Range checks on enum values
+- Type checks after guaranteed cast
+
+**Ask:** "Can this condition actually fail in practice?"
+
+**Fix:** Remove checks that cannot fail. Add checks only at system boundaries.
+
+---
+
+## Severity Classification
+
 - **CRITICAL**: None typical for style
 - **WARNING**: Missing Epic prefix, STL containers in UE code, wrong include order, `.generated.h` not last
 - **INFO**: East const suggestion, `DisplayName`/`ToolTip` suggestions, minor formatting

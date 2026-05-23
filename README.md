@@ -37,7 +37,7 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 | Component             | Count | Purpose                                                                   |
 | --------------------- | ----- | ------------------------------------------------------------------------- |
 | **Slash Commands**    | 14    | On-demand workflows invoked with `/command` (6 project + 8 framework)             |
-| **Skills**            | 33    | Focused skills with colocated reference docs, auto-triggered + user-invokable     |
+| **Skills**            | 14    | Focused skills with colocated reference docs, auto-triggered + user-invokable     |
 | **Agents**            | 8     | Specialist subagents with restricted tool access                          |
 | **Hooks**             | 13    | Deterministic enforcement scripts (Python)                                |
 | **Editor Scripts**    | 13    | PowerShell/Python scripts for VS and UE5 editor automation                |
@@ -75,46 +75,37 @@ claude
 
 ---
 
-## MCP Servers
+## Plugins & MCPs
 
-MCP (Model Context Protocol) servers extend Claude with real-time access to external tools, docs, and services. Add them globally with `claude mcp add -s user ...` or per-project with `claude mcp add ...`.
+Plugins and MCPs extend Claude Code with additional capabilities. **Plugins** add slash commands, skills, and automation. **MCPs** (Model Context Protocol servers) connect Claude to external tools, docs, and services.
+
+> **Discovery:** Run `/plugins` to browse and install available plugins and MCPs directly from Claude Code.
 
 ### Always Recommended
 
-These MCPs are useful in virtually every project. We recommend installing those globally using `claude mcp add --scope user`.
+These are useful in virtually every project. Install globally for convenience.
 
-| MCP            | What It Adds                                                                                  | Install                                                                                                                                       |
-| -------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Context7**   | Up-to-date library docs and code examples pulled at query time — eliminates hallucinated APIs | `claude mcp add context7 -- npx -y @upstash/context7-mcp@latest`                                                                              |
-| **GitHub**     | Read issues, PRs, and code from any repo without leaving Claude                               | `claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer YOUR_GITHUB_PAT"}}'` |
-| **Filesystem** | Lets Claude read/write files outside the project root (cross-repo work, config management)    | `claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allow`                                                  |
+| Name | Type | What It Adds | Install |
+| ---- | ---- | ------------ | ------- |
+| **Context7** | MCP | Up-to-date library docs and code examples pulled at query time — eliminates hallucinated APIs | `claude mcp add context7 -- npx -y @upstash/context7-mcp@latest` |
+| **GitHub** | MCP | Read issues, PRs, and code from any repo without leaving Claude | `claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer YOUR_GITHUB_PAT"}}'` |
+| **Filesystem** | MCP | Lets Claude read/write files outside the project root (cross-repo work, config management) | `claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allow` |
+| **claude-warden** | Plugin | Permission manager — pre-approves safe bash commands to eliminate repetitive allow/deny prompts | `/plugins` → search "warden" |
+| **skill-creator** | Plugin | Create, edit, and optimize skills with eval-driven development and performance benchmarking | `/plugins` → search "skill-creator" |
 
 ### Game Dev Recommendations
 
-| Need           | Recommended MCPs                                                                | Install                                                                                      |
-| -------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **Perforce**       | P4 operations (changelists, shelve, diff, sync, streams) without leaving Claude | `claude mcp add perforce -- npx -y mcp-perforce-server@latest`                               |
-| **Atlassian**      | Confluence, Read/write Jira issues — enables Jira skills and producer agent               | Atlassian MCP Built-in — enable at [claude.ai/settings/connectors](https://claude.ai/settings/connectors) |
-| **UnrealClaude**   | 20+ MCP tools for UE5.7 — actor manipulation, blueprint editing, level management, materials, input systems, and on-demand API docs | UE5 editor plugin with built-in MCP server — see [UnrealClaude](https://github.com/Natfii/UnrealClaude) |
+| Name | Type | What It Adds | Install |
+| ---- | ---- | ------------ | ------- |
+| **Perforce** | MCP | P4 operations (changelists, shelve, diff, sync, streams) without leaving Claude | `claude mcp add perforce -- npx -y mcp-perforce-server@latest` |
+| **Atlassian** | MCP | Confluence, Read/write Jira issues — enables Jira skills and producer agent | Built-in — enable at [claude.ai/settings/connectors](https://claude.ai/settings/connectors) |
+| **UnrealClaude** | MCP | 20+ MCP tools for UE5.7 — actor manipulation, blueprint editing, level management, materials, input systems, and on-demand API docs | UE5 editor plugin — see [UnrealClaude](https://github.com/Natfii/UnrealClaude) |
 
-### Finding More MCPs
+### Finding More
 
-- Official catalog: https://code.claude.com/docs/en/mcp
-- Community registry: https://mcpservers.org/
-
----
-
-## Plugins
-
-Plugins extend Claude Code itself — adding slash commands, skills, and automation at the editor level rather than at the MCP/tool level.
-
-### Always Recommended
-
-| Plugin | What It Adds | Install |
-| ------ | ------------ | ------- |
-| **claude-warden** | Permission manager — pre-approves safe bash commands to eliminate repetitive allow/deny prompts | `/plugin marketplace add banyudu/claude-warden` then `/plugin install warden@claude-warden` |
-
-> **Why warden?** Claude frequently asks permission for routine commands like `p4 opened`, `ls`, `grep`, etc. Warden lets you approve patterns once so they never prompt again, without weakening security for genuinely risky operations.
+- **`/plugins`** — browse and install from within Claude Code
+- Official MCP catalog: https://code.claude.com/docs/en/mcp
+- Community MCP registry: https://mcpservers.org/
 
 ---
 
@@ -151,7 +142,7 @@ kahnclaude/
 │   │   └── kc/                  # Framework + tooling commands, invoked as /kc:<name>
 │   │       └── <name>.md        # scope varies (project or framework)
 │   ├── skills/                  # Focused skills (SKILL.md only, reference docs in project/docs/standards/)
-│   │   ├── code/                # Code review skills (code-review, 10 dimensions)
+│   │   ├── code/                # Code review skills (code-review, 7 concerns)
 │   │   ├── perforce/            # resolve-diff, P4 sync, CL description, changelog
 │   │   ├── swarm/               # Swarm review, comments, checkpoint shelve
 │   │   ├── jira/                # Ticket creation/update
@@ -223,7 +214,7 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 ---
 
-## Skills — Focused Workflows (29)
+## Skills — Focused Workflows (14)
 
 Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Each lives in `.claude/skills/<theme>/<name>/` with a `SKILL.md`. Reference docs are in `project/docs/standards/<theme>/` and scripts in `project/scripts/`.
 
@@ -233,19 +224,17 @@ Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Eac
 | ----- | ------------ |
 | `/task-implementation` | Unified implementation orchestrator — routes C++, Blueprint, or mixed tasks to correct agents, drives implement-verify-review-shelve cycle |
 
-### Code Skills (2)
+### Code Skills (1)
 
 | Skill | What It Does |
 | ----- | ------------ |
-| `/resolve-diff` | Resolve a P4 diff from CL#, file, folder, system name, Swarm URL, or auto-detect |
-| `/code-review` | Smart orchestrator — resolves diff, selects applicable dimensions, re-verifies criticals |
+| `/code-review` | Smart orchestrator — resolves diff, spawns concern-based review agents, re-verifies criticals |
 
-### Perforce Skills (3)
+### Perforce Skills (2)
 
 | Skill | What It Does |
 | ----- | ------------ |
 | `/changelog` | Generate changelog from P4 history — filter by code system, user, time range, with Confluence/Jira output |
-| `/get-latest` | Guided P4 sync — dry-run preview, conflict resolution |
 | `/perforce-changelist-description` | Generate CL description from diff + Jira ticket, hard-enforces `[TICKET][Summary] Tech #review` format |
 
 ### Swarm Skills (2)
@@ -259,23 +248,21 @@ Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Eac
 
 | Skill | What It Does |
 | ----- | ------------ |
-| `/jira-ticket` | Create or update Jira tickets with project conventions, auto-labels `claude_generated` |
+| `/to-jira-issue` | Break a plan into vertical slice issues (tracer bullets), then delegate to producer for ticket creation |
 
-### Design & Confluence Skills (3)
+### Confluence Skills (1)
 
 | Skill | What It Does |
 | ----- | ------------ |
-| `/game-wiki-writing` | Author local game wiki docs with balancing data from UE5 assets, delegates to designer agent |
-| `/confluence-page` | Create or update Confluence pages with project conventions |
-| `/game-wiki-to-confluence` | Publish a local game wiki to Confluence — optionally updates via `/game-wiki-writing` first, then delegates to `/confluence-page` |
+| `/to-confluence-page` | Create, update, or publish Confluence pages including game wiki publishing |
 
 ### Planning Skills (1)
 
 | Skill | What It Does |
 | ----- | ------------ |
-| `/task-clarification` | Clarify a task description → structured Jira-ready breakdown (no Jira access) |
+| `/task-planning` | Clarify requirements, draft implementation plan (code-dev), architecture review (code-reviewer) |
 
-### Unreal Skills (6)
+### Unreal Skills (5)
 
 | Skill | What It Does |
 | ----- | ------------ |
@@ -283,7 +270,6 @@ Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Eac
 | `/game-log` | Read + diagnose game logs, auto-detect log file, cross-reference source for file:line |
 | `/pie` | Manage PIE sessions — start, stop, or execute console commands in the running instance |
 | `/unreal-asset-inspections` | Inspect and modify UE5 assets — read/set properties, dump all, find referencers, find actors |
-| `/editor-lifecycle` | Manage the Unreal Editor process — close, kill, or launch with VS debugger attached |
 | `/editor-python` | Execute arbitrary Python code or script files in the running editor via Remote Execution |
 
 ---

@@ -1,4 +1,6 @@
-# Review Code: Interface — Reference
+# Interface
+
+Is this API well-designed for its consumers?
 
 Think from the **consumer's perspective** (C++ caller, Blueprint user, API consumer).
 
@@ -76,14 +78,8 @@ void GetHealthInfo(UPARAM(DisplayName="Current") float& OutCurrent,
 
 ---
 
-## Review Guidelines
+## Severity Classification
 
-### What to IGNORE
-- Implementation details inside function bodies
-- Correctness of the logic (other dimension)
-- Performance of the implementation (other dimension)
-
-### Severity Classification
 - **CRITICAL**: Blueprint-exposed property that can corrupt state
 - **WARNING**: >4 parameters, overly permissive specifiers, missing `Category` on BP items, hardcoded designer-tunable values
 - **INFO**: `UPARAM` suggestions, `DisplayName`/`ToolTip` additions, tighter access specifiers

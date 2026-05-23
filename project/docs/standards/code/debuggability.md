@@ -1,4 +1,6 @@
-# Review Code: Debuggability — Reference
+# Debuggability
+
+Is this code diagnosable in production?
 
 ## Log Categories
 
@@ -35,6 +37,58 @@ UE_LOG(LogCombat, Warning, TEXT("ApplyDamage: %s received %.1f from %s. Health: 
 // Bad
 UE_LOG(LogTemp, Log, TEXT("damage applied"));
 ```
+
+## Critical Path Logging
+
+Important code paths must have enough logging to diagnose issues without a debugger. Add logs at:
+
+| Path Type | What to Log |
+|-----------|-------------|
+| **Operation entry** | Key inputs, caller context if non-obvious |
+| **Decision branches** | Which branch taken and why (the deciding value) |
+| **State transitions** | Old state → new state, what triggered it |
+| **External calls** | Request sent, response received (or failure) |
+| **Error recovery** | What failed, what fallback was used |
+| **Operation exit** | Outcome, duration for slow operations |
+
+### Minimum Coverage
+
+Every public function in a gameplay-critical system should log at `Verbose` on entry and exit. Decision points that affect game state should log at `Log` or `Display` depending on importance.
+
+```cpp
+// Good: logs the decision path
+void UInventoryComponent::TryAddItem(UItemData* Item)
+{
+    UE_LOG(LogInventory, Verbose, TEXT("TryAddItem: %s to %s"), *Item->GetName(), *GetOwner()->GetName());
+    
+    if (!CanAddItem(Item))
+    {
+        UE_LOG(LogInventory, Log, TEXT("TryAddItem: Rejected %s — inventory full or invalid"), *Item->GetName());
+        return;
+    }
+    
+    Items.Add(Item);
+    UE_LOG(LogInventory, Log, TEXT("TryAddItem: Added %s. Count: %d/%d"), *Item->GetName(), Items.Num(), MaxSlots);
+}
+
+// Bad: no visibility into what happened
+void UInventoryComponent::TryAddItem(UItemData* Item)
+{
+    if (CanAddItem(Item))
+        Items.Add(Item);
+}
+```
+
+### Don't Over-Log
+
+Avoid logging inside tight loops or per-frame ticks at `Log` level — use `VeryVerbose` or add a throttle. Excessive logging impacts performance and buries important messages.
+
+## Error Handling
+
+- Try/catch or error returns around all I/O and external calls
+- Never swallow errors silently — log with enough context to diagnose
+- User-facing error messages must be helpful, not internal stack traces
+- Distinguish expected errors (user-facing) from unexpected errors (logged internally)
 
 ## On-Screen Debug Messages
 
@@ -81,14 +135,8 @@ Prefer `UE_LOGFMT` over `UE_LOG` in new code — named fields are searchable in 
 
 ---
 
-## Review Guidelines
+## Severity Classification
 
-### What to IGNORE
-- Correctness bugs (other dimension)
-- Performance concerns (other dimension)
-- Style and naming (other dimensions)
-
-### Severity Classification
 - **CRITICAL**: None typical for this dimension
 - **WARNING**: `LogTemp` in production, unguarded `AddOnScreenDebugMessage`, raw `assert()`, missing log category
 - **INFO**: Log verbosity suggestions, stat tracking additions, `UE_LOGFMT` opportunities

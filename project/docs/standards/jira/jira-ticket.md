@@ -21,7 +21,15 @@ parent = <INITIATIVE_KEY> AND issuetype = Epic AND status = "In Progress"
 |-------|-----------|
 | Component | `additional_fields: { "components": [{ "name": "<Name>" }] }` |
 | Label | `additional_fields: { "labels": ["claude_generated"] }` |
-| Combined | `additional_fields: { "components": [...], "labels": [...] }` |
+| Sprint | `additional_fields: { "customfield_10020": <sprint_id> }` |
+| Combined | `additional_fields: { "components": [...], "labels": [...], "customfield_10020": ... }` |
+
+### Sprint Detection
+
+To auto-detect the active sprint:
+1. Query: `project = $KEY AND sprint in openSprints()` with `maxResults: 1`, `fields: ["customfield_10020"]`
+2. Extract sprint ID from `customfield_10020[0].id`
+3. If no active sprint found, omit the field (issue goes to backlog)
 
 ## Transitions
 

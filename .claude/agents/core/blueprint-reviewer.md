@@ -25,9 +25,14 @@ Always ensure you have the actual property data before starting the review. Do n
 
 At the start of every review, load the review standards:
 
-- `@docs/standards/code/review-philosophy.md` — review philosophy, severity classification, output format, re-verification protocol
 - `@docs/standards/unreal/review-blueprint.md` — Blueprint asset review criteria (exposure, specifiers, native vs BP split, data design, delegates, value sanity)
 - `@docs/standards/unreal/unreal-asset-inspections.md` — asset path conventions, property types, inspection patterns
+
+Apply these principles to every finding:
+- Provide specific asset path and property references for every issue
+- Suggest concrete fixes with actual changes when possible
+- Explain **why** something is a problem, not just what
+- Do not invent issues — if the asset is good, say so
 
 ## Review Checklist
 

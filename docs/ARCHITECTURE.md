@@ -80,7 +80,7 @@ graph TD
 | Editor scripts | Python + PowerShell | Python for UE5 Remote Execution (asset inspection, PIE); PowerShell for Windows COM/DTE automation (Visual Studio, UE5 editor launch) |
 | Enforcement model | Three layers: .p4ignore > Hooks > CLAUDE.md rules | Hooks are deterministic (exit code 2 = block); CLAUDE.md rules are behavioral suggestions that can be overridden by the LLM under context pressure |
 | Skill activation | Directive descriptions ("ALWAYS invoke when...") | Research showed ~100% activation vs ~50% for passive descriptions ("Use when...") |
-| Skill architecture | Orchestrator + sub-skill pattern | `code-review` orchestrator selects applicable dimensions from 10 sub-skills based on diff content; prevents false activation of sub-skills from user prompts |
+| Skill architecture | Orchestrator + concern-based review | `code-review` orchestrator spawns parallel agents for 7 concern categories (Architecture, Correctness, Security, Performance, Maintainability, Reuse, Standards) based on diff content |
 | Agent tool restriction | Minimum-necessary principle | Reviewers get Read/Grep/Glob only; developers get Write/Edit/Bash; prevents accidental modification during review |
 | Distribution model | `/kc:install` copies files + merges settings | Non-destructive install; manifest tracks source commit for `/kc:update`; global config merges via `/kc:install-global` |
 | Hook lifecycle events | 5 events: UserPromptSubmit, PreToolUse, PostToolUse, Stop, Notification | Maps to Claude Code's native hook system; exit code semantics: 0=allow, 1=warn, 2=block |
@@ -95,14 +95,13 @@ Skills are organized into themes, each with a set of SKILL.md files and correspo
 
 | Theme | Skills | Standards Path | Description |
 |-------|--------|---------------|-------------|
-| **code** | 11 (1 orchestrator + 10 review dimensions) | `@project/docs/standards/code/` | Code review orchestration and 10 dimension-specific review sub-skills |
-| **perforce** | 3 (resolve-diff, get-latest, changelist-description) | `@project/docs/standards/perforce/` | P4 diff resolution, sync workflow, CL description formatting |
+| **code** | 1 (code-review orchestrator) | `@project/docs/standards/code/` | Code review orchestration with 7 concern categories; standards files for interface, networking, UE5 best practices |
+| **perforce** | 2 (changelog, changelist-description) | `@project/docs/standards/perforce/` | Changelog generation and CL description formatting |
 | **swarm** | 2 (review-shelve, review-comments) | `@project/docs/standards/swarm/` | Helix Swarm code review integration |
-| **jira** | 1 (jira-ticket) | `@project/docs/standards/jira/` | Jira issue creation and update |
-| **confluence** | 1 (confluence-page) | `@project/docs/standards/confluence/` | Confluence page creation and update |
-| **planning** | 1 (task-clarification) | `@project/docs/standards/planning/` | Task decomposition into Jira-ready format |
-| **unreal** | 6 (compilation, game-log, PIE, asset-inspections, editor-lifecycle, editor-python) | `@project/docs/standards/unreal/` | UE5 editor automation, build, and diagnostics |
-| **design** | 2 (game-wiki-writing, game-wiki-to-confluence) | `@project/docs/standards/design/` | Game wiki authoring and Confluence publishing |
+| **jira** | 1 (to-jira-issue) | `@project/docs/standards/jira/` | Jira issue creation and update |
+| **confluence** | 1 (to-confluence-page) | `@project/docs/standards/confluence/` | Confluence page creation, update, and game wiki publishing |
+| **planning** | 1 (task-planning) | `@project/docs/standards/planning/` | Requirements clarification, implementation planning, architecture review |
+| **unreal** | 5 (compilation, game-log, PIE, asset-inspections, editor-python) | `@project/docs/standards/unreal/` | UE5 editor automation, build, and diagnostics |
 | **tools** | 4 (skill-creation, agent-creation, skill-improvement, agent-improvement) | `@project/docs/standards/tools/` | KahnClaude meta-tooling for creating and fixing components |
 | **implementation** | 1 (task-implementation) | -- | Unified orchestrator routing to code-dev and blueprint-dev agents |
 

@@ -18,8 +18,51 @@ At the start of every task, load if they exist:
 
 ## Relationship to Skills
 
-- **`task-clarification` skill** — handles the pure-text requirements clarification workflow. When you receive pre-structured input from `task-clarification` (with Context/Task/Acceptance Criteria/Assumptions/Out of Scope sections), skip your own Step 2 clarification and proceed directly to dependency analysis (Step 3).
-- **`jira-ticket` skill** — handles low-level Jira CRUD (field defaults, labels, format conventions). This agent adds the workflow layer on top: requirements clarification, dependency analysis, estimation, and linking.
+- **`task-planning` skill** — handles the requirements clarification and implementation planning workflow. When you receive pre-structured input from `task-planning` (with Context/Task/Acceptance Criteria/Assumptions/Out of Scope sections), skip your own Step 2 clarification and proceed directly to dependency analysis (Step 3).
+- **`to-jira-issue` skill** — breaks plans into vertical slices (tracer bullets), then delegates to this agent for ticket creation. When you receive a structured slice list from `to-jira-issue`, skip your own clarification steps and proceed directly to ticket creation (Step 5).
+
+## Jira Configuration
+
+### Required Environment Variables
+
+| Variable | Fallback |
+|----------|----------|
+| `JIRA_CLOUD_ID` | Ask user for any Atlassian URL, auto-extract |
+| `JIRA_PROJECT_KEY` | Ask user |
+| `JIRA_ASSIGNEE_ACCOUNT_ID` | Auto-detect via `atlassianUserInfo` MCP |
+
+### Optional Environment Variables
+
+| Variable | Default |
+|----------|---------|
+| `JIRA_ACTIVE_EPIC` | _(none)_ — auto-detect via JQL if needed |
+| `JIRA_DEFAULT_ISSUE_TYPE` | `Task` |
+| `JIRA_LABELS` | `["claude_generated"]` |
+| `JIRA_COMPONENTS` | `[]` |
+| `JIRA_CONTENT_FORMAT` | `markdown` |
+| `JIRA_ACTIVE_SPRINT_ID` | Auto-detect via JQL |
+
+### Sprint Detection
+
+Before creating issues, detect the active sprint:
+
+1. Query: `project = $JIRA_PROJECT_KEY AND sprint in openSprints()` with `maxResults: 1`, `fields: ["customfield_10020"]`
+2. Extract sprint ID from `customfield_10020[0].id`
+3. If no active sprint, proceed without sprint assignment
+
+Skip sprint assignment if user says "no sprint" or "backlog".
+
+### Issue Creation Defaults
+
+When creating issues:
+- `project`: `$JIRA_PROJECT_KEY`
+- `issueType`: `$JIRA_DEFAULT_ISSUE_TYPE`
+- `parent`: `$JIRA_ACTIVE_EPIC` (if set)
+- `additional_fields`: `{ "labels": ["claude_generated"], "components": [...], "customfield_10020": <sprint_id> }`
+  - Only include `customfield_10020` if active sprint was detected
+- ALWAYS add `claude_generated` label to created issues
+- Use `responseContentFormat: "markdown"` for all queries
+- Keep `maxResults` low — field filtering is unimplemented (known bug)
 
 ## Intake
 

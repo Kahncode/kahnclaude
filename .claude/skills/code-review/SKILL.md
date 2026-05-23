@@ -1,79 +1,145 @@
 ---
 name: code-review
-description: "Code review orchestrator. ALWAYS invoke when the user asks to review code, a diff, a CL, or a Swarm review. Do not invoke review-code-* sub-skills directly — this skill resolves the diff, selects dimensions, and aggregates findings."
+description: "Code review expert. ALWAYS use when the user says: review, check, look at, critique, audit, or feedback on code/diff/CL/PR/changes. Also triggers on 'what do you think of this code', 'is this okay', 'anything wrong here', Swarm review URLs, or CL numbers. Finds bugs, security issues, performance problems, and style violations."
+allowed-tools: Read, Grep, Glob, Bash(p4 diff:*), Bash(p4 describe:*), Bash(p4 opened:*), Bash(p4 changes:*), Bash(p4 client:*), Agent
 ---
 
 # Code Review — Orchestrator
 
-@docs/standards/code/review-philosophy.md
-
 **Input:** $ARGUMENTS
 
-## Instructions
+## Overview
 
-### Step 1 — Resolve the Diff
-Invoke the `perforce-resolve-diff` skill with `$ARGUMENTS` to obtain the diff content.
+This skill finds real bugs, not style nitpicks. The goal is to catch issues that would cause production problems: crashes, security holes, data corruption, and performance regressions.
 
-### Step 2 — Select Applicable Dimensions
-Inspect the diff and apply each dimension's relevance criteria:
+## Step 1 — Resolve the Diff
 
-| Dimension | Invoke when |
-|-----------|------------|
-| correctness | ALWAYS |
-| style | ALWAYS |
-| readability | ALWAYS |
-| pragmatism | ALWAYS |
-| solid | ALWAYS |
-| ue-best-practice | ALWAYS |
-| robustness | ALWAYS |
-| debuggability | ALWAYS |
-| architecture | New files, import/include changes, class changes, >50 lines, new public API |
-| performance | Tick/loops, container ops, allocations, DB/network calls, hot paths |
-| interface | Public/protected signatures changed/added, headers modified, >3 params |
-| networking | Replicated props, RPCs, GetLifetimeReplicatedProps, HasAuthority, net dormancy |
+Resolve the diff from `$ARGUMENTS` using:
 
-**MANDATORY:** Dimensions marked "ALWAYS" must be invoked on every review — no exceptions. Skip conditional dimensions only if their criteria clearly do not match.
+@docs/standards/perforce/resolve-diff.md
 
-### Step 3 — Resolve Standard File Paths
-For each selected dimension, run the resolver script to get the absolute path:
+| Input type | Resolution |
+|------------|------------|
+| CL number (digits) | `p4 describe -du <CL>` |
+| Swarm URL | Extract review ID, get associated CL |
+| File path | `p4 diff -du <path>` |
+| "pending" or no args | `p4 opened` then latest pending CL |
+| System name | Grep/Glob to find files, diff those |
 
-```bash
-python .claude/scripts/code-review/resolve_code_review_dimension.py --batch <dim1>,<dim2>,...
+**Output:** The unified diff content and list of files changed.
+
+## Step 2 — Gather Context
+
+Before spawning reviewers, gather context they'll need:
+
+1. **Read full files** — not just the diff lines, but the entire functions/classes being modified
+2. **Find callers** — grep for functions that call the modified code
+3. **Check related tests** — are there tests for this code? Do they cover the changes?
+
+This context goes to every reviewer. Better context = fewer false positives.
+
+## Step 3 — Spawn Review Agents
+
+Spawn `code-reviewer` agents for each applicable concern. Include ALL spawns in a SINGLE message (parallel execution).
+
+### Concerns and Skip Rules
+
+| Concern | Skip when | Focus |
+|---------|-----------|-------|
+| **correctness** | Never | Logic errors, edge cases, null derefs, off-by-one |
+| **security** | Docs-only | Input validation, injection, auth, secrets |
+| **performance** | Docs-only | N+1, tick abuse, allocations, caching |
+| **architecture** | Never | SOLID, coupling, size limits, over-engineering |
+| **style** | Never | Epic conventions, naming, include order |
+
+Note: `debuggability` and `interface` from the old concern list are now folded into `architecture`.
+
+### Agent Prompt Format
+
+```
+Review this diff for **{concern}**.
+
+Load criteria from: project/docs/standards/code/{concern}.md
+
+## Context (read these files to understand the change)
+{list of full file paths to read}
+
+## Callers (code that calls into the modified functions)
+{grep results showing callers}
+
+## Diff
+{full unified diff}
+
+Focus ONLY on {concern}. Other agents handle other aspects.
+Verify every finding by reading the actual source file.
 ```
 
-Each output line is the absolute path to that dimension's standard file.
+## Step 4 — Aggregate and Deduplicate
 
-### Step 4 — Invoke Review Agents
+Combine all agent results:
 
-**CRITICAL RULE: One agent per dimension. NEVER combine dimensions into a single agent.**
+1. **Deduplicate** — same file:line + same issue = keep one
+2. **Merge overlapping** — if two agents found the same root cause, combine into one finding
+3. **Sort** — CRITICAL first, then WARNING, then INFO
 
-For each selected dimension, spawn a **separate** `code-reviewer` agent. This is mandatory.
+## Step 5 — Re-Verify All Findings
 
-1. Read the standard file from the path resolved in Step 3
-2. For EACH dimension, spawn a distinct `code-reviewer` agent with:
-   - `subagent_type: code-reviewer`
-   - `description: "Code review: <dimension-name>"`
-   - Prompt containing: the dimension name, the standard file content, and the diff
+For every CRITICAL and WARNING finding:
 
-**Parallelization requirement:** Include ALL dimension agent spawns in a SINGLE message so they run concurrently. If you have 5 dimensions, you must have 5 separate Agent tool invocations in one response — not one agent reviewing 5 dimensions.
+1. Read the actual source file at the cited line (not just the diff)
+2. Verify the surrounding code doesn't already handle the issue
+3. Check if tests exist that would catch this
+4. Remove false positives
 
-**Anti-pattern (WRONG):**
-> "Review CL 150283 for correctness, style, readability, UE5 best practices, and performance."
+This step is mandatory and catches most hallucinated findings.
 
-**Correct pattern:**
-- Agent 1: "Review CL 150283 for **correctness**. [correctness standard] [diff]"
-- Agent 2: "Review CL 150283 for **style**. [style standard] [diff]"
-- Agent 3: "Review CL 150283 for **readability**. [readability standard] [diff]"
-- Agent 4: "Review CL 150283 for **ue-best-practice**. [ue-best-practice standard] [diff]"
-- Agent 5: "Review CL 150283 for **performance**. [performance standard] [diff]"
+## Step 6 — Output
 
-Each agent receives exactly ONE dimension and its corresponding standard document.
+```markdown
+## Code Review: [CL description or file summary]
 
-### Step 5 — Aggregate Results
-Combine all dimension results into a single report. Deduplicate overlapping findings. Sort by severity: CRITICAL first, then WARNING, then INFO.
+### Summary
+[1-2 sentences: overall risk level, most important finding, recommendation]
 
-### Step 6 — Re-Verification Pass
-For every CRITICAL finding, re-read the actual source file at the cited line to confirm the issue exists. Remove false positives. This step is mandatory.
+### CRITICAL (X)
+[Each finding with file:line, issue, why it matters, and specific fix code]
 
-### Step 7 — Final Output
-Present the consolidated report using the standard output format (see reference).
+### WARNING (Y)
+[Each finding with file:line, issue, why it matters, and specific fix code]
+
+### INFO (Z)
+[Improvement suggestions, not blockers]
+
+---
+**Stats:** X critical, Y warnings, Z info across N files.
+**Recommendation:** [BLOCK / APPROVE WITH FIXES / APPROVE]
+```
+
+### Finding Format
+
+Each finding must include:
+
+```
+**[SEVERITY]** file/path.cpp:42
+
+Issue: [What's wrong in one sentence]
+
+Why: [Concrete consequence — what breaks if not fixed]
+
+Fix:
+```cpp
+// Replace this:
+OldCode();
+// With this:
+NewCode();
+```
+```
+
+No vague descriptions. Every fix must be actual code the developer can copy-paste.
+
+## What NOT to Flag
+
+- Pre-existing code that wasn't touched by this change
+- Style preferences not in project standards
+- Speculative "might be slow" without evidence
+- TODOs or future improvements unrelated to the change
