@@ -7,7 +7,6 @@
 ## Table of Contents
 
 - [What Is This?](#what-is-this)
-- [Why KahnClaude?](#why-kahnclaude)
 - [What's Included](#whats-included)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
