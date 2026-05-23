@@ -10,11 +10,10 @@
 - [What's Included](#whats-included)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
-- [Verify Installation](#verify-installation)
 - [Supported Stack](#supported-stack)
 - [Project Structure](#project-structure)
-- [MCP Servers](#mcp-servers)
 - [Plugins](#plugins)
+- [MCP Servers](#mcp-servers)
 - [Commands](#commands)
 - [Skills](#skills)
 - [Agents](#agents)
@@ -137,66 +136,51 @@ kahnclaude/
 
 ---
 
-## Extensions & Integrations
+## Plugins
 
-Extensions connect Claude Code to external tools, documentation, and services. **MCP servers** (Model Context Protocol) provide tool access, while **plugins** add commands and automation.
+Plugins add commands, automation, and workflow enhancements to Claude Code. Browse and install via `/plugins`.
 
-> **Discovery:** Run `/plugins` to browse and install available extensions directly from Claude Code.
+### Recommended
 
-### Always Recommended
+| Name | What It Adds |
+| ---- | ------------ |
+| **Context7** | Up-to-date library docs and code examples pulled at query time — eliminates hallucinated APIs |
+| **skill-creator** | Create, edit, and optimize skills with eval-driven development and performance benchmarking |
+| **Atlassian** | Read/write Jira issues, Confluence pages — enables Jira skills and producer agent |
+| **GitHub** | Create PRs, manage issues, search code, review pull requests — full GitHub workflow integration |
+| **claude-warden** | Permission manager — pre-approves safe bash commands to eliminate repetitive allow/deny prompts |
 
-Install globally for convenience — useful in virtually every project.
+> **Discovery:** Run `/plugins` to browse and install available plugins directly from Claude Code.
 
-| Name | Type | What It Adds |
-| ---- | ---- | ------------ |
-| **Context7** | MCP | Up-to-date library docs and code examples pulled at query time — eliminates hallucinated APIs |
-| **Filesystem** | MCP | Lets Claude read/write files outside the project root (cross-repo work, config management) |
-| **claude-warden** | Plugin | Permission manager — pre-approves safe bash commands to eliminate repetitive allow/deny prompts |
-| **skill-creator** | Plugin | Create, edit, and optimize skills with eval-driven development and performance benchmarking |
+---
 
-**Installation:**
+## MCP Servers
+
+MCP (Model Context Protocol) servers give Claude access to external tools, documentation, and services.
+
+### Recommended
+
+| Name | What It Adds |
+| ---- | ------------ |
+| **Filesystem** | Lets Claude read/write files outside the project root (cross-repo work, config management) |
+| **Perforce** | P4 operations (changelists, shelve, diff, sync, streams) without leaving Claude |
+| **UnrealClaude** | 20+ tools for UE5.7 — actor manipulation, blueprint editing, level management, materials |
 
 ```bash
-# Context7 — live library documentation
-claude mcp add context7 -- npx -y @upstash/context7-mcp@latest
-
 # Filesystem — access files outside project root
 claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allow
-
-# Plugins — install via /plugins command in Claude Code
 ```
-
-### GitHub MCP Setup
-
-Create a Personal Access Token at [github.com/settings/tokens](https://github.com/settings/tokens) with `repo` scope, then:
-
-```bash
-claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer ghp_YOUR_TOKEN_HERE"}}'
-```
-
-> **Note:** Replace `ghp_YOUR_TOKEN_HERE` with your actual GitHub Personal Access Token.
-
-### Game Dev Recommendations
-
-| Name | Type | What It Adds |
-| ---- | ---- | ------------ |
-| **Perforce** | MCP | P4 operations (changelists, shelve, diff, sync, streams) without leaving Claude |
-| **Atlassian** | MCP | Read/write Jira issues, Confluence pages — enables Jira skills and producer agent |
-| **UnrealClaude** | MCP | 20+ tools for UE5.7 — actor manipulation, blueprint editing, level management, materials |
-
-**Installation:**
-
 ```bash
 # Perforce MCP
 claude mcp add perforce -- npx -y mcp-perforce-server@latest
-
-# Atlassian — built-in, enable at claude.ai/settings/connectors
 # UnrealClaude — UE5 editor plugin, see https://github.com/Natfii/UnrealClaude
 ```
+### Verifying Installation
+
+Run `/mcp` to list all installed MCP servers and their connection status.
 
 ### Finding More
 
-- **`/plugins`** — browse and install from within Claude Code
 - Official MCP catalog: https://code.claude.com/docs/en/mcp
 - Community MCP registry: https://mcpservers.org/
 
@@ -260,6 +244,8 @@ Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Eac
 | `/editor-python` | Unreal | Execute arbitrary Python code or script files in the running editor |
 
 > **Start with these:** `/code-review` (review your code), `/perforce-changelist-description` (better CL descriptions), `/task-planning` (plan before coding)
+
+> **Listing:** Run `/skills` to list all available skills and their trigger keywords.
 
 ---
 
@@ -452,6 +438,16 @@ Built-in commands that ship with Claude Code. Master these before KahnClaude's s
 | `/help` | List all available commands | Starting point for discovery |
 | `Esc` + `Esc` | Open rewind menu (`/rewind`) | Your safety net — undo code or conversation |
 | `/context` | Show token consumption | Know when you're running low |
+
+### Listing & Verification
+
+| Command | What It Does |
+| ------- | ------------ |
+| `/skills` | List all available skills and their triggers |
+| `/mcp` | List installed MCP servers and connection status |
+| `/plugins` | Browse and install available plugins |
+| `/agents` | List running agents |
+| `/tasks` | List tracked tasks (`Ctrl+T` to toggle panel) |
 
 ### Commands by Scenario
 
