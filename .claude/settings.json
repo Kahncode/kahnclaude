@@ -36,6 +36,16 @@
       "Bash(p4 shelve:*)",
       "Bash(p4 change:*)",
       "Bash(p4 login:*)",
+      "Bash(p4 describe *)",
+      "Bash(p4 grep *)",
+      "Bash(p4 print *)",
+      "Bash(p4 diff2 *)",
+      "Bash(p4 files *)",
+      "Bash(p4 opened *)",
+      "Bash(p4 changes *)",
+      "Bash(p4 filelog *)",
+      "Bash(p4 where *)",
+      "Bash(Get-ChildItem *)",
       "Bash(curl:*)",
       "mcp__perforce__*",
       "mcp__atlassian__*",
@@ -44,7 +54,9 @@
       "mcp__context7__*",
       "mcp__claude_ai_Context7__*",
       "mcp__filesystem__*",
-      "mcp__claude_ai_Atlassian__*"
+      "mcp__claude_ai_Atlassian__*",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Test-Path *)"
     ],
     "deny": [
       "Read(.env)",
