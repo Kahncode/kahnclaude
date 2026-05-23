@@ -4,31 +4,28 @@
 
 ---
 
+## Table of Contents
+
+- [What Is This?](#what-is-this)
+- [What's Included](#whats-included)
+- [Quick Start](#quick-start)
+- [Supported Stack](#supported-stack)
+- [Project Structure](#project-structure)
+- [Plugins & MCPs](#plugins--mcps)
+- [Commands — On-Demand Workflows](#commands--on-demand-workflows)
+- [Skills — Focused Workflows](#skills--focused-workflows-14)
+- [Agents — Specialist Subagents](#agents--specialist-subagents-8)
+- [Hooks — Enforcement Over Suggestion](#hooks--enforcement-over-suggestion)
+- [Templates](#templates)
+- [Key Concepts](#key-concepts)
+- [Adding Components](#adding-components)
+- [Contributing](#contributing)
+
+---
+
 ## What Is This?
 
 KahnClaude Unreal Engine is a **Claude Code configuration layer** specialized for Unreal Engine 5 game development with Perforce (Helix Core) for version control and Jira for issue tracking. It provides the infrastructure that makes Claude dramatically more effective: slash commands, specialist agents, enforcement hooks, and CLAUDE.md templates.
-
-You use it to **configure** projects, not to run them. Drop it into any UE5 codebase and Claude immediately gains structured workflows for P4 changelists, Swarm code reviews, Jira integration, and UE5 C++ expertise.
-
-### Two Ways to Use It
-
-**A. Install into an existing UE5 project:**
-
-```bash
-# Inside a Claude Code session in your project
-/kc:install ~/your-ue5-project
-```
-
-Non-destructive — only adds what's missing. Creates `.claude/` with all components.
-
-**B. Install global config once:**
-
-```bash
-# Inside a Claude Code session (one-time, merges with any existing ~/.claude/)
-/kc:install-global
-```
-
-> **What NOT to do:** Don't expect a runnable app from this repo. This is the configuration layer that enhances Claude in your UE5 projects — it's not a project itself.
 
 ---
 
@@ -40,10 +37,7 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 | **Skills**            | 14    | Focused skills with colocated reference docs, auto-triggered + user-invokable     |
 | **Agents**            | 8     | Specialist subagents with restricted tool access                          |
 | **Hooks**             | 9     | Deterministic enforcement scripts (Python)                                |
-| **Editor Scripts**    | 12    | PowerShell/Python scripts for VS and UE5 editor automation                |
-| **Project Template**  | 1     | Master `CLAUDE.md` with guide comments (used by `/tool:generate-claude-md`) |
 | **Tech-Stack Guides** | 6     | Compact Q&A + operational reference guides for CLAUDE.md generation (UE5, Perforce, Swarm, Jira, Confluence, Visual Studio) |
-| **Global Template**   | 1     | `@~/.claude/CLAUDE.md` for cross-project rules                            |
 
 ---
 
@@ -58,20 +52,60 @@ cd ~/tools/kahnclaude
 claude
 /kc:install your-ue5-project-path
 
+# Open Claude Code from your-ue5-project-path
+
 # 3. Customize CLAUDE.md for your project
-#   Open Claude Code from your-ue5-project-path
 /generate-claude-md
 
-# 4. Configure MCPs for Perforce, Jira, and your tools (see MCP section below)
+# 4. Configure Plugins for Perforce, Jira, and your tools (see Plugins & MCPs section below)
+/plugins
 
-# 5. Build Claude's knowledge base of your project:
-#   Open Claude Code from your-ue5-project-path
-cd your-ue5-project-path
-claude
+# 5. Build Claude's knowledge base of your project
 /document
 ```
 
 > **Step 6:** `/document` creates an `ARCHITECTURE.md` and subsystem docs so Claude understands your codebase from the first session. Run it once after setup. Use `/learn` to update documentation from the current context as you go.
+
+---
+
+## Supported Stack
+
+KahnClaude is specialized for **UE5 + Perforce + Jira** game development.
+
+| Category            | Supported                                           |
+| ------------------- | --------------------------------------------------- |
+| **Engine**          | Unreal Engine 5 (C++ and Blueprint)                 |
+| **Languages**       | C++ (UE5), Python (hooks/tools)                     |
+| **Version Control** | Perforce (Helix Core) with Streams                  |
+| **Issue Tracking**  | Jira (Atlassian)                                    |
+| **Code Review**     | Helix Swarm                                         |
+| **Environments**    | Windows, WSL2, macOS, Linux                         |
+| **Editors**         | VS Code, Rider, any editor with terminal access     |
+
+---
+
+## Project Structure
+
+```
+kahnclaude/
+├── .claude/                     # All Claude components (framework + distributable)
+│   ├── commands/                # Slash commands
+│   │   └── kc/                  # Framework-only commands, invoked as /kc:<name>
+│   ├── skills/                  # Focused skills (<skill-name>/SKILL.md)
+│   ├── agents/                  # Specialist subagents
+│   │   └── core/                # Cross-cutting specialists (including UE5)
+│   └── hooks/                   # Enforcement scripts (Python only)
+├── docs/                        # Project documentation
+├── project/                     # Templates distributed via /kc:install
+│   ├── docs/
+│   │   ├── tech-stacks/         # Tech-specific Q&A guides (UE5, P4, Swarm, Jira, etc.)
+│   │   └── standards/           # Shared reference docs (standards, checklists)
+│   └── scripts/
+│       ├── unreal/              # UE5 editor automation
+│       └── vs/                  # Visual Studio automation
+├── global/                      # Global ~/.claude/ config templates
+└── inspiration/                 # Third-party reference — read-only
+```
 
 ---
 
@@ -106,74 +140,6 @@ These are useful in virtually every project. Install globally for convenience.
 - **`/plugins`** — browse and install from within Claude Code
 - Official MCP catalog: https://code.claude.com/docs/en/mcp
 - Community MCP registry: https://mcpservers.org/
-
----
-
-## Supported Stack
-
-KahnClaude is specialized for **UE5 + Perforce + Jira** game development.
-
-| Category            | Supported                                           |
-| ------------------- | --------------------------------------------------- |
-| **Engine**          | Unreal Engine 5 (C++ and Blueprint)                 |
-| **Languages**       | C++ (UE5), Python (hooks/tools)                     |
-| **Version Control** | Perforce (Helix Core) with Streams                  |
-| **Issue Tracking**  | Jira (Atlassian)                                    |
-| **Code Review**     | Helix Swarm                                         |
-| **Environments**    | Windows, WSL2, macOS, Linux                         |
-| **Editors**         | VS Code, Rider, any editor with terminal access     |
-
----
-
-## Project Structure
-
-```
-kahnclaude/
-├── README.md
-├── CONTRIBUTING.md
-├── CLAUDE.md                    # This repo's own Claude rules
-├── LICENSE
-├── .gitignore
-│
-├── .claude/                     # All Claude components (framework + distributable)
-│   ├── settings.json            # Hooks wiring for this framework repo
-│   ├── commands/                # Slash commands
-│   │   ├── <name>.md            # scope: project → distributed to projects
-│   │   └── kc/                  # Framework + tooling commands, invoked as /kc:<name>
-│   │       └── <name>.md        # scope varies (project or framework)
-│   ├── skills/                  # Focused skills (flat structure: <skill-name>/SKILL.md)
-│   │   └── <skill-name>/        # e.g., code-review/, unreal-pie/, perforce-changelog/
-│   │       └── SKILL.md
-│   ├── agents/                  # Specialist subagents
-│   │   └── core/                # Cross-cutting specialists (including UE5)
-│   └── hooks/                   # Enforcement scripts (Python only)
-│       └── <name>.py
-│
-├── docs/                        # Project documentation
-│   └── ARCHITECTURE.md          # System overview and subsystem links
-│
-├── project/                     # Templates for new projects (distributed via /kc:install)
-│   ├── CLAUDE.md                # Master template (used by /kc:generate-claude-md)
-│   ├── settings.json
-│   ├── docs/                    # Docs distributed to target projects
-│   │   ├── tech-stacks/         # Tech-specific Q&A + operational reference guides
-│   │   │   ├── unreal.md
-│   │   │   ├── helix_perforce.md
-│   │   │   ├── helix_swarm.md
-│   │   │   ├── atlassian_jira.md
-│   │   │   ├── atlassian_confluence.md
-│   │   │   └── visual_studio.md
-│   │   └── standards/           # Shared reference docs (standards, checklists, formats)
-│   └── scripts/                 # Reusable scripts distributed to target projects
-│       ├── unreal/              # UE5 editor automation (PIE, compile, asset inspection)
-│       └── vs/                  # Visual Studio automation (launch, debug)
-│
-├── global/                      # Global ~/.claude/ config templates
-│   ├── CLAUDE.md
-│   └── settings.json
-│
-└── inspiration/                 # Third-party reference — NEVER MODIFY (may be empty)
-```
 
 ---
 
@@ -212,61 +178,24 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 ## Skills — Focused Workflows (14)
 
-Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Each lives in `.claude/skills/<theme>/<name>/` with a `SKILL.md`. Reference docs are in `project/docs/standards/<theme>/` and scripts in `project/scripts/`.
+Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Each lives in `.claude/skills/<name>/` with a `SKILL.md`.
 
-### Implementation Skills (1)
-
-| Skill | What It Does |
-| ----- | ------------ |
-| `/task-implementation` | Unified implementation orchestrator — routes C++, Blueprint, or mixed tasks to correct agents, drives implement-verify-review-shelve cycle |
-
-### Code Skills (1)
-
-| Skill | What It Does |
-| ----- | ------------ |
-| `/code-review` | Smart orchestrator — resolves diff, spawns concern-based review agents, re-verifies criticals |
-
-### Perforce Skills (2)
-
-| Skill | What It Does |
-| ----- | ------------ |
-| `/perforce-changelog` | Generate changelog from P4 history — filter by code system, user, time range, with Confluence/Jira output |
-| `/perforce-changelist-description` | Generate CL description from diff + Jira ticket, hard-enforces `[TICKET][Summary] Tech #review` format |
-
-### Swarm Skills (2)
-
-| Skill | What It Does |
-| ----- | ------------ |
-| `/swarm-review-shelve` | Write CL description → shelve → report Swarm URL if `#review` present. Reusable by any skill (e.g. unreal-project-compilation on success) |
-| `/swarm-review-comments` | Fetch Swarm review comments, fix one-by-one, reply, re-shelve |
-
-### Jira Skills (1)
-
-| Skill | What It Does |
-| ----- | ------------ |
-| `/to-jira-issue` | Break a plan into vertical slice issues (tracer bullets), then delegate to producer for ticket creation |
-
-### Confluence Skills (1)
-
-| Skill | What It Does |
-| ----- | ------------ |
-| `/to-confluence-page` | Create, update, or publish Confluence pages including game wiki publishing |
-
-### Planning Skills (1)
-
-| Skill | What It Does |
-| ----- | ------------ |
-| `/task-planning` | Clarify requirements, draft implementation plan (code-dev), architecture review (code-reviewer) |
-
-### Unreal Skills (5)
-
-| Skill | What It Does |
-| ----- | ------------ |
-| `/unreal-project-compilation` | Build + analyze + fix loop, supports all build targets, shelves on success |
-| `/game-log` | Read + diagnose game logs, auto-detect log file, cross-reference source for file:line |
-| `/unreal-pie` | Manage PIE sessions — start, stop, or execute console commands in the running instance |
-| `/unreal-asset-inspections` | Inspect and modify UE5 assets — read/set properties, dump all, find referencers, find actors |
-| `/editor-python` | Execute arbitrary Python code or script files in the running editor via Remote Execution |
+| Skill | Category | What It Does |
+| ----- | -------- | ------------ |
+| `/task-implementation` | Implementation | Unified implementation orchestrator — routes C++, Blueprint, or mixed tasks to correct agents |
+| `/code-review` | Code | Smart orchestrator — resolves diff, spawns concern-based review agents, re-verifies criticals |
+| `/perforce-changelog` | Perforce | Generate changelog from P4 history — filter by code system, user, time range |
+| `/perforce-changelist-description` | Perforce | Generate CL description from diff + Jira ticket, enforces `[TICKET][Summary] Tech #review` format |
+| `/swarm-review-shelve` | Swarm | Write CL description → shelve → report Swarm URL if `#review` present |
+| `/swarm-review-comments` | Swarm | Fetch Swarm review comments, fix one-by-one, reply, re-shelve |
+| `/to-jira-issue` | Jira | Break a plan into vertical slice issues, delegate to producer for ticket creation |
+| `/to-confluence-page` | Confluence | Create, update, or publish Confluence pages including game wiki publishing |
+| `/task-planning` | Planning | Clarify requirements, draft implementation plan, architecture review |
+| `/unreal-project-compilation` | Unreal | Build + analyze + fix loop, supports all build targets, shelves on success |
+| `/game-log` | Unreal | Read + diagnose game logs, auto-detect log file, cross-reference source |
+| `/unreal-pie` | Unreal | Manage PIE sessions — start, stop, or execute console commands |
+| `/unreal-asset-inspections` | Unreal | Inspect and modify UE5 assets — read/set properties, dump all, find referencers |
+| `/editor-python` | Unreal | Execute arbitrary Python code or script files in the running editor |
 
 ---
 
