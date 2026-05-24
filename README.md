@@ -263,6 +263,7 @@ Agents are specialists Claude delegates to automatically. Each has restricted to
 | `documenter`                  | Read, Write, Edit, Grep, Glob        | Architecture docs, subsystem docs, Mermaid diagrams, Decisions logs          |
 | `producer`                    | Read, Grep, Glob, Jira MCP           | Fetches Jira tickets, clarifies technical requirements, identifies cross-team dependencies, gathers estimates, and creates well-structured tickets |
 | `python-dev`                  | Read, Write, Edit, Bash, Grep, Glob, WebFetch | Modern Python 3.12+ — architecture, packaging, async, type system         |
+| `unreal-guide`                | Read, Grep, Glob, WebSearch, WebFetch | Answers UE5 questions using official Epic docs and forums, cites sources   |
 
 > **Note:** Reviewers are read-only (no Write/Edit) to prevent accidental modifications during review.
 
