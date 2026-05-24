@@ -80,6 +80,15 @@
         ]
       },
       {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/p4-auto-checkout.py"
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -100,6 +109,15 @@
           {
             "type": "command",
             "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/after-edit.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/p4-auto-add.py"
           }
         ]
       }

@@ -107,11 +107,17 @@ This step is mandatory and catches most hallucinated findings.
 ### WARNING (Y)
 [Each finding with file:line, issue, why it matters, and specific fix code]
 
-### INFO (Z)
-[Improvement suggestions, not blockers]
+### MINOR (Z)
+[Style/naming issues introduced by this change — should fix, not blockers]
+
+### SUGGESTION (A)
+[Improvement ideas — optional, take it or leave it]
+
+### INFO (W)
+[Pre-existing issues only — context, not actionable]
 
 ---
-**Stats:** X critical, Y warnings, Z info across N files.
+**Stats:** X critical, Y warnings, Z minor, A suggestions, W info across N files.
 **Recommendation:** [BLOCK / APPROVE WITH FIXES / APPROVE]
 ```
 

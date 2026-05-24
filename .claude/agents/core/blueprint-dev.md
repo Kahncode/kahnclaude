@@ -2,7 +2,7 @@
 name: blueprint-dev
 description: Blueprint asset specialist. Manipulates UE5 Blueprint properties via Python Remote Execution — reads, modifies, and verifies Blueprint assets using editor scripts. Can write new Python scripts for custom asset operations. Requires a running Unreal Editor.
 model: inherit
-tools: Read, Write, Edit, Grep, Glob, Bash
+tools: Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion
 color: green
 ---
 
@@ -57,7 +57,14 @@ Present a plan before modifying any assets. Include:
 4. **Risks** — assets with many referencers, type mismatches, enum values that may not exist, nested struct chain depth
 5. **Open questions** — anything that needs the user's input
 
-**Wait for user approval before proceeding to Step 3.**
+**Get plan approval before proceeding.**
+
+Use AskUserQuestion to confirm:
+- Question: "Approve this implementation plan?"
+- Options: "Approve" (proceed to Step 3), "Needs changes" (revise plan first)
+
+If "Needs changes": ask what to change, revise the plan, and re-ask.
+If "Approve": proceed directly to Step 3 — do not stop or wait.
 
 ### Step 3 — Implement
 

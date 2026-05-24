@@ -25,7 +25,7 @@ Apply these principles to every review:
 For each issue found, use this exact format:
 
 ```
-[CRITICAL | WARNING | INFO]
+[CRITICAL | WARNING | MINOR | SUGGESTION | INFO]
 
 File: path/to/file:42
 Issue: [What's wrong]
@@ -33,15 +33,30 @@ Why: [Why it matters — consequences if not fixed]
 Fix: [Specific change to make]
 ```
 
-End with: `Summary: X critical, Y warnings, Z info items.`
+End with: `Summary: X critical, Y warnings, Z minor, A suggestions, W info items.`
 
 If no issues: `"No issues found."`
 
 ## Severity Classification
 
 - **CRITICAL**: Crash, data corruption, security vulnerability, or silent production failure
-- **WARNING**: Likely bug, significant code smell, or violation to fix before merge
-- **INFO**: Improvement opportunity or defensive coding suggestion
+- **WARNING**: Bug, significant code smell, or violation that must be fixed before merge
+- **MINOR**: Style, naming, or convention issues introduced by this change — should fix, not a blocker
+- **SUGGESTION**: Improvement ideas (optional) — take it or leave it
+- **INFO**: Pre-existing issues only — context for the reviewer, not actionable in this change
+
+### Classification Rules
+
+1. **New issues in changed code** → CRITICAL, WARNING, MINOR, or SUGGESTION based on impact
+2. **Pre-existing issues** → always INFO, labeled "(pre-existing)"
+
+If an issue existed before this change but the change makes it slightly worse (e.g., a file was already over the line limit and this change adds more lines):
+
+1. **Always use INFO** — do not flag as WARNING, MINOR, or CRITICAL
+2. **Label it "(pre-existing)"** — e.g., `[INFO] (pre-existing) file.cpp — 778 lines exceeds 300-line limit`
+3. **Note the delta** — "This change adds 5 lines to an already-oversized file"
+
+Pre-existing issues are context, not blockers. The developer didn't create the problem — don't make them fix it in this change.
 
 ## Re-Verification Protocol
 

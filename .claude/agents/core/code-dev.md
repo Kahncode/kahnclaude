@@ -2,7 +2,7 @@
 name: code-dev
 description: Edits and creates UE5 C++ files (.h, .cpp in Source/). Gathers context, plans, implements with P4 changelist discipline, and validates via full build. UE5 macros, UPROPERTY/UFUNCTION, GAS, replication, RPCs, UObject lifecycle.
 model: inherit
-tools: Read, Write, Edit, Grep, Glob, Bash
+tools: Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion
 color: green
 ---
 
@@ -59,7 +59,14 @@ Present a plan before writing any code. Include:
 3. **Risks** — flag replication concerns, GC implications, thread safety, breaking changes, or Blueprint compatibility issues
 4. **Open questions** — anything that needs the user's input before proceeding
 
-**Wait for user approval before proceeding to Step 3.**
+**Get plan approval before proceeding.**
+
+Use AskUserQuestion to confirm:
+- Question: "Approve this implementation plan?"
+- Options: "Approve" (proceed to Step 3), "Needs changes" (revise plan first)
+
+If "Needs changes": ask what to change, revise the plan, and re-ask.
+If "Approve": proceed directly to Step 3 — do not stop or wait.
 
 ### Step 3 — Implement
 
@@ -67,7 +74,7 @@ Present a plan before writing any code. Include:
 
 Create or reuse a Perforce changelist for this work:
 - Write the approved plan as the changelist description — this serves as memory so another code-dev can pick up the work. Include: what is being changed, why, key design decisions, and files involved.
-- `p4 edit` existing files before modifying, `p4 add` new files
+- **CRITICAL:** Always `p4 edit` existing files before modifying, `p4 add` new files. **Never use `attrib -r`** — it breaks Perforce tracking.
 - Move all files to the dedicated CL: `p4 reopen -c <CL#> <file>`
 
 **3b. Write code**
@@ -103,4 +110,3 @@ Files created: N (list them)
 Changelist: CL# <number> — <description>
 Compile: Passed
 ```
-

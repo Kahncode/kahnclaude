@@ -67,7 +67,7 @@ If unclear, ask: "Does this involve C++ code, Blueprint assets, or both?"
 
 **If `PLAN_APPROVED = false`:**
 1. Delegate to `code-dev` agent via Agent tool — pass the full requirement
-2. Wait for code-dev to present a plan and receive user approval before it proceeds
+2. code-dev will present a plan and ask the user for approval via AskUserQuestion, then implement
 
 Proceed to Stage 4 if both, else proceed to Stage 5.
 
@@ -83,7 +83,7 @@ Proceed to Stage 4 if both, else proceed to Stage 5.
 
 **If `PLAN_APPROVED = false`:**
 1. Delegate to `blueprint-dev` agent via Agent tool — pass the full requirement (and CL# from C++ track if both)
-2. Wait for blueprint-dev to present a plan and receive user approval before it proceeds
+2. blueprint-dev will present a plan and ask the user for approval via AskUserQuestion, then implement
 3. After blueprint-dev completes, invoke `/unreal-asset-inspections` to verify properties
 4. If verification fails: pass discrepancies back to blueprint-dev, re-verify (max 3 iterations)
 
@@ -94,16 +94,23 @@ Proceed to Stage 5.
 For **cpp** or **both**: invoke `/code-review` skill — pass CL#
 For **blueprint** or **both**: delegate to `blueprint-reviewer` agent — pass asset paths
 
-If CRITICAL or WARNING findings exist, proceed to Stage 6. Else skip to Stage 7.
+**Severity meanings:**
+- CRITICAL/WARNING: Must fix before merge
+- MINOR: Style/naming issues — should fix, not blockers
+- SUGGESTION: Improvement ideas — optional
+- INFO: Pre-existing issues — context only, ignore
+
+If CRITICAL or WARNING findings exist, proceed to Stage 6. If only MINOR, ask user if they want to fix or proceed. Else skip to Stage 7.
 
 ## 6. Fix Review Findings
 
-1. Report the findings to the user with severity counts
-2. Delegate findings for fixing to `code-dev` agent or `blueprint-dev` agent (use `PLAN_APPROVED = true` skip instructions — these fixes are pre-approved)
-3. Re-run review once (/code-review and/or blueprint-reviewer)
+1. Report the findings to the user with severity counts (CRITICAL, WARNING, MINOR, INFO)
+2. Delegate CRITICAL and WARNING findings for fixing to `code-dev` agent or `blueprint-dev` agent (use `PLAN_APPROVED = true` skip instructions — these fixes are pre-approved)
+3. For MINOR findings: ask user if they want to fix these too, or proceed without
+4. Re-run review once (/code-review and/or blueprint-reviewer)
 
 **After re-review, check remaining findings:**
-- **No CRITICAL or WARNING remaining:** Proceed to Stage 7
+- **No CRITICAL or WARNING remaining:** Proceed to Stage 7 (MINOR and INFO are acceptable)
 - **CRITICAL or WARNING still present:** Ask the user:
   > "Review found [N CRITICAL, M WARNING] remaining after fixes. Options:
   > 1. Apply another round of fixes (specify which)
@@ -138,7 +145,7 @@ Assets modified: N (list /Game/... paths)
 Changelist: CL# <number>
 Build: Passed (if C++)
 Verification: Passed (if Blueprint)
-Review: <X critical, Y warnings, Z info>
+Review: <X critical, Y warnings, Z minor, A suggestions, W info>
 Shelved: Yes
 ```
 
