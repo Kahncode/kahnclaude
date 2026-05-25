@@ -56,14 +56,14 @@ Indicators of complexity:
 
 ### 5. Plan Implementation (Standard/Complex Only)
 
-Spawn `code-dev` with the structured requirements.
+Spawn `code-planner` with the structured requirements.
 
 Include in the prompt:
 - The structured output you drafted
 - File paths identified during exploration
 - Specific questions about implementation approach
 
-If code-dev surfaces new scope questions, return to Step 3.
+If code-planner surfaces new scope questions, return to Step 3.
 
 ### 6. Architecture Review (Complex Only)
 

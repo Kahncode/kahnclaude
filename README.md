@@ -47,9 +47,9 @@ KahnClaude Unreal Engine is a **Claude Code configuration layer** specialized fo
 | Component             | Count | Purpose                                                                   |
 | --------------------- | ----- | ------------------------------------------------------------------------- |
 | **Slash Commands**    | 14    | On-demand workflows invoked with `/command` (6 project + 8 framework)     |
-| **Skills**            | 14    | Focused skills with colocated reference docs, auto-triggered + user-invokable |
-| **Agents**            | 8     | Specialist subagents with restricted tool access                          |
-| **Hooks**             | 9     | Deterministic enforcement scripts (Python)                                |
+| **Skills**            | 15    | Focused skills with colocated reference docs, auto-triggered + user-invokable |
+| **Agents**            | 11    | Specialist subagents with restricted tool access                          |
+| **Hooks**             | 11    | Deterministic enforcement scripts (Python)                                |
 | **Tech-Stack Guides** | 6     | Compact Q&A + operational reference guides for CLAUDE.md generation       |
 
 ---
@@ -255,9 +255,11 @@ Agents are specialists Claude delegates to automatically. Each has restricted to
 
 | Agent                         | Tools                                | Specialization                                                               |
 | ----------------------------- | ------------------------------------ | ---------------------------------------------------------------------------- |
-| `blueprint-dev`               | Read, Write, Edit, Grep, Glob, Bash  | Blueprint asset specialist — manipulates UE5 Blueprint properties via Python Remote Execution |
+| `blueprint-dev`               | Read, Write, Edit, Grep, Glob, Bash  | Blueprint asset specialist — implements pre-approved plans via Python Remote Execution |
+| `blueprint-planner`           | Read, Grep, Glob, Bash               | Blueprint planning agent — inspects assets and produces implementation plans, read-only |
 | `blueprint-reviewer`          | Read, Grep, Glob, Bash               | Blueprint asset reviewer — inspects properties via Python Remote Execution, read-only |
-| `code-dev`                    | Read, Write, Edit, Grep, Glob, Bash  | UE5 C++ — gathers context, plans, implements with P4 changelist discipline, validates via full build |
+| `code-dev`                    | Read, Write, Edit, Grep, Glob, Bash  | UE5 C++ — implements pre-approved plans with P4 changelist discipline, validates via full build |
+| `code-planner`                | Read, Grep, Glob, Bash               | UE5 C++ planning agent — gathers context and produces implementation plans, read-only |
 | `code-reviewer`               | Read, Grep, Glob, Bash(p4)           | C++/UE5 code reviewer: security, correctness, performance, C++ craft, engine pitfalls, Blueprint boundary |
 | `designer`                    | Read, Write, Edit, Grep, Glob, Confluence+Jira MCP | Game design specialist — balance decisions, system design, local game wiki generation, Confluence wiki management |
 | `documenter`                  | Read, Write, Edit, Grep, Glob        | Architecture docs, subsystem docs, Mermaid diagrams, Decisions logs          |
@@ -292,6 +294,8 @@ PreToolUse hook blocking .env access
 | `after-edit`                    | PostToolUse  | Auto-formats files after edit/write: clang-format (C++), black+ruff (Python), prettier (JS/JSON/MD)       |
 | `notify`                        | Notification | Sends desktop notifications when Claude needs attention                                                    |
 | `lint-on-stop`                  | Stop         | Runs linters at end of turn: clang-tidy (UE), ruff+mypy (Python), cargo (Rust), go vet (Go)               |
+| `p4-auto-checkout`              | PreToolUse   | Auto-runs `p4 edit` before code-dev/blueprint-dev agents modify files                                      |
+| `p4-auto-add`                   | PostToolUse  | Auto-runs `p4 add` after code-dev/blueprint-dev agents create new files                                    |
 
 ### Hook Lifecycle
 

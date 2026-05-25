@@ -45,17 +45,7 @@ If no ticket is found, ask the user for one. Every CL MUST have a Jira ticket.
 
 ## Step 4 -- Generate Description
 
-**MANDATORY FORMAT -- no exceptions:**
-
-```
-[TICKET][Non-technical summary] Technical description #review
-```
-
-Rules:
-- `[TICKET]` -- Jira ID in brackets, e.g., `[PROJ-1234]`
-- `[Non-tech summary]` -- plain language a producer/designer understands. NO code identifiers, file paths, acronyms, or jargon
-- Tech description -- explains WHAT changed and WHY (reasoning, not just listing)
-- `#review` -- MANDATORY tag at the end. Non-negotiable.
+Generate the changelist description. @docs/standards/perforce/perforce-changelist-description.md
 
 ## Step 5 -- Apply the Description
 
@@ -66,10 +56,3 @@ p4 change -o <CL#> | sed "s/\t<enter description here>/<description>/" | p4 chan
 ```
 
 Or use `p4 change -o` to get the spec, replace the description field, and pipe back via `p4 change -i`.
-
-## Validation
-
-| Severity | Condition |
-|----------|-----------|
-| BLOCK | Missing ticket, missing non-tech summary, missing `#review` |
-| WARNING | Non-tech summary has jargon, tech description lacks reasoning |

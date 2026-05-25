@@ -1,22 +1,17 @@
-# Changelog Reference
+# Patch Notes Reference
 
-## Commit-Type Classification
+## Classification
 
-Classify each CL by scanning the description for these keywords:
-
-| Type | Keywords |
-|------|----------|
-| **feat** | add, implement, new, create |
-| **fix** | fix, bug, patch, resolve, hotfix |
-| **refactor** | refactor, cleanup, extract, reorganize |
-| **perf** | optimize, performance, cache, speed |
-| **docs** | doc, readme, comment |
-| **test** | test, spec, coverage |
-| **chore** | everything else |
+| Category | Use when... | Skip when... |
+|----------|-------------|--------------|
+| **Features** | New capability players can use or experience | — |
+| **Improvements** | Enhancement to existing feature, balance, QoL | — |
+| **Fixes** | Bug fix players could have encountered | — |
+| _(skip)_ | — | Pure refactor, test-only, CI/build, no gameplay effect |
 
 ## CodeSystem Path Mappings
 
-When filtering by CodeSystem, match these path patterns in the CL file list:
+Filter CLs by matching these path patterns:
 
 | System | Path Patterns |
 |--------|--------------|
@@ -26,39 +21,41 @@ When filtering by CodeSystem, match these path patterns in the CL file list:
 | Inventory | `Source/**/Inventory/`, `Source/**/Item/` |
 | UI | `Source/**/UI/`, `Source/**/HUD/`, `Source/**/Widget/` |
 
-Also match the system name (case-insensitive) against CL description text as a fallback.
+Also match system name (case-insensitive) in CL description.
+
+## Transformation Examples
+
+| Technical CL | Player-facing |
+|--------------|---------------|
+| "Fix AI patrol logic not respecting threat radius" | "Cops no longer attack players defending themselves" |
+| "Add 10m spawn exclusion zone around pawns" | "We now avoid spawning bots too close to players (10m)" |
+| "Reduce Gunner HP 80→60 in Dungeon_A, disable sprint" | "Lowered the difficulty of Gunners in Dungeon_A" |
+| "Implement play-dead detection in AIController" | "Playing dead will cause Rats to lose interest in you" |
+| "Add corner clearance to pathfinding" | "Bots no longer collide with walls when turning corners" |
+| "Hook up God PA system to bot waves events" | "Added God announcement to bot wave events" |
 
 ## Output Format
 
 ```markdown
-# Changelog — <User> (<StartDate> to <EndDate>)
+# Patch Notes — <Date Range>
 
 ## Features
-- **<Module>**: <Summary> (CL#12345) — YYYY-MM-DD
+- <New thing players can do>
 
-## Bug Fixes
-- **<Module>**: <Summary> (CL#12346) — YYYY-MM-DD
+## Improvements
+- <Enhancement>
 
-## Refactors
-- **<Module>**: <Summary> (CL#12348) — YYYY-MM-DD
-
-## Performance
-- **<Module>**: <Summary> (CL#12349) — YYYY-MM-DD
-
-## Other
-- <Summary> (CL#12350) — YYYY-MM-DD
-
----
-Total: N changelists | Date range: YYYY-MM-DD to YYYY-MM-DD
+## Fixes
+- Fixed <bug>
 ```
 
-Omit sections with no entries.
+Omit empty sections. No CL numbers (too technical for players).
 
 ## Output Routing
 
 | Option | Tool | Notes |
 |--------|------|-------|
-| Done | _(none)_ | Display in conversation only |
-| Save | Write | Write to `CHANGELOG.md` in project root |
-| Confluence | `mcp__claude_ai_Atlassian__createConfluencePage` | Requires Confluence MCP configured |
-| Jira comment | `mcp__claude_ai_Atlassian__addCommentToJiraIssue` | Ask for issue key first |
+| Done | _(none)_ | Display in conversation |
+| Save | Write | Write to `PATCH_NOTES.md` |
+| Confluence | `mcp__atlassian__createConfluencePage` | Requires Confluence MCP |
+| Jira comment | `mcp__atlassian__addCommentToJiraIssue` | Ask for issue key |

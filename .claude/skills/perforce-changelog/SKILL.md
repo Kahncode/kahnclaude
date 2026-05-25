@@ -1,43 +1,26 @@
 ---
 name: perforce-changelog
-description: "Perforce changelog generator. ALWAYS invoke when the user asks for a changelog, commit history, or recent changes summary. Do not run p4 changes directly — this skill classifies by type, groups by module, and routes to Confluence/Jira."
-allowed-tools: Bash(p4 *), Read, Grep, Glob, mcp__claude_ai_Atlassian__createConfluencePage, mcp__claude_ai_Atlassian__addCommentToJiraIssue, AskUserQuestion
+description: "Perforce changelog → player-facing patch notes. ALWAYS invoke when the user asks for a changelog, patch notes, release notes, or recent changes summary. Transforms technical CL descriptions into conversational player-friendly language."
+allowed-tools: Bash(p4 *), Read, Grep, Glob, mcp__atlassian__createConfluencePage, mcp__atlassian__addCommentToJiraIssue, AskUserQuestion
 ---
 
-# P4 Changelog
+# P4 Changelog → Patch Notes
 
 **Input:** $ARGUMENTS
 
-## Tech-Stack Context
-
-Load if it exists in the project:
-- `@docs/tech-stacks/helix_perforce.md` — P4 CLI workflow, changelist conventions, stream paths
-
-## Reference
-
-See @docs/standards/perforce/changelog.md for commit-type classification, CodeSystem path mappings, and output format.
-
-## Required Environment Variables
-
-| Variable | Purpose |
-|----------|---------|
-| `P4USER` | Perforce username (fallback: `p4 set P4USER` or `p4 info`) |
-| `P4CLIENT` | Perforce workspace |
+Generates **player-facing patch notes** from Perforce history. Transforms technical CL descriptions into conversational language focused on gameplay impact.
 
 ## Flow
 
 ### 1. Parse Arguments
 
-Parse up to 3 optional arguments from `$ARGUMENTS`:
+Optional arguments from `$ARGUMENTS`:
 
-1. **days** — Number of days to look back (default: 7)
-2. **user** — P4 username (default: current user via `p4 set P4USER` or `p4 info`)
-3. **CodeSystem** — Module name filter (e.g. "AI system", "Weapons"). If omitted: all systems.
-
-Examples:
-- `7` — last 7 days, current user, all systems
-- `30 jsmith` — last 30 days, user jsmith, all systems
-- `30 jsmith "inventory system"` — last 30 days, user jsmith, inventory system
+| Arg | Default | Example |
+|-----|---------|---------|
+| days | 7 | `14` |
+| user | current P4 user | `jsmith` |
+| system | all | `"AI system"` |
 
 ### 2. Fetch Changelists
 
@@ -45,26 +28,53 @@ Examples:
 p4 changes -s submitted -u <user> -l @<YYYY/MM/DD>,@now
 ```
 
-Calculate start date: today minus `days` in `YYYY/MM/DD` format.
+For each CL, get details with `p4 describe -s <CL>`.
 
-If **CodeSystem** is provided, fetch file lists per CL and filter by relevant paths (see reference.md for mappings), or match the system name against CL description text.
+### 3. Filter and Transform
 
-### 3. Classify and Group
+For each CL:
 
-For each CL, extract: CL number, date, description (first line = summary), files changed (`p4 describe -s <CL>`).
+1. **Skip internal-only changes** — pure refactors, test-only, CI/build, code cleanup with no gameplay effect
+2. **Classify** into: Features | Improvements | Fixes
+3. **Rewrite** the description into player-facing language
 
-Classify by conventional commit type using description keywords (see reference.md). Group by module/component based on the primary path changed.
+#### Classification Rules
 
-### 4. Generate Changelog
+| Category | Use when... |
+|----------|-------------|
+| **Features** | New capability players can use or experience (new system, new content, new mode) |
+| **Improvements** | Enhancement to existing feature (balance, UX, polish, quality-of-life) |
+| **Fixes** | Bug fix that players could have encountered |
 
-Format as markdown with sections: Features, Bug Fixes, Refactors, Performance, Docs, Tests, Other. Include CL numbers and dates. Add a total/date-range summary line.
+#### Rewriting Rules
+
+Transform technical descriptions into player-facing language.
+
+### 4. Generate Patch Notes
+
+```markdown
+# Patch Notes — <Date Range>
+
+## Features
+- <New thing players can do>
+
+## Improvements
+- <Enhancement to existing feature>
+- <Another improvement>
+
+## Fixes
+- Fixed <bug description>
+- Fixed <another bug>
+```
+
+Omit empty sections. No CL numbers in the output (too technical).
 
 ### 5. Output Routing
 
-Present the changelog, then ask:
+Present the patch notes, then ask:
 
-> What would you like to do with this changelog?
+> What would you like to do with these patch notes?
 > 1. **Done** — just show it here
-> 2. **Save** — write to `CHANGELOG.md` in the project
+> 2. **Save** — write to `PATCH_NOTES.md`
 > 3. **Confluence** — post as a Confluence page
 > 4. **Jira comment** — add as a comment on a Jira issue

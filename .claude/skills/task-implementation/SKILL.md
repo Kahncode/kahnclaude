@@ -2,7 +2,7 @@
 name: task-implementation
 description: "Unified implementation orchestrator. ALWAYS invoke when the user asks to implement, build, or modify C++ code, Blueprint assets, or both. Do not invoke sub-agents directly — this skill routes to the correct agents and drives the full implement-verify-review-shelve cycle."
 disable-model-invocation: true
-allowed-tools: Agent, Read, Grep, Glob, Skill, ToolSearch, mcp__atlassian__*
+allowed-tools: Agent, Read, Grep, Glob, Skill, ToolSearch, AskUserQuestion, mcp__atlassian__*
 ---
 
 # Unified Implementation Workflow
@@ -60,32 +60,38 @@ If unclear, ask: "Does this involve C++ code, Blueprint assets, or both?"
 ## 3. C++ Track (if cpp or both)
 
 **If `PLAN_APPROVED = true`:**
-1. Delegate to `code-dev` agent via Agent tool with this prompt:
-   > "The following task has an APPROVED implementation plan. Skip Step 2 (Plan) entirely — do NOT present a plan or wait for approval. Proceed directly to Step 1 (Gather Context), then Step 3 (Implement), then Step 4 (Validate).
-   > 
-   > [Include: Task title, Context, Scope, Acceptance Criteria, Plan table]"
+1. Delegate to `code-dev` agent with the approved plan
 
 **If `PLAN_APPROVED = false`:**
-1. Delegate to `code-dev` agent via Agent tool — pass the full requirement
-2. code-dev will present a plan and ask the user for approval via AskUserQuestion, then implement
+1. Spawn `code-planner` agent — pass the full requirement
+2. Receive plan from code-planner
+3. Present the plan to the user in the main context
+4. Ask user via AskUserQuestion:
+   - Question: "Approve this implementation plan?"
+   - Options: "Approve", "Needs changes"
+5. If "Needs changes": re-spawn `code-planner` with user feedback, repeat from step 2
+6. If "Approve": delegate to `code-dev` agent with the approved plan
 
 Proceed to Stage 4 if both, else proceed to Stage 5.
 
 ## 4. Blueprint Track (if blueprint or both)
 
 **If `PLAN_APPROVED = true`:**
-1. Delegate to `blueprint-dev` agent via Agent tool with this prompt:
-   > "The following task has an APPROVED implementation plan. Skip Step 2 (Plan) entirely — do NOT present a plan or wait for approval. Proceed directly to Step 1 (Gather Context), then Step 3 (Implement), then Step 4 (Verify).
-   > 
-   > [Include: Task title, Context, Scope, Acceptance Criteria, Plan table, CL# from C++ track if both]"
+1. Delegate to `blueprint-dev` agent with the approved plan (include CL# from C++ track if both)
 2. After blueprint-dev completes, invoke `/unreal-asset-inspections` to verify properties
 3. If verification fails: pass discrepancies back to blueprint-dev, re-verify (max 3 iterations)
 
 **If `PLAN_APPROVED = false`:**
-1. Delegate to `blueprint-dev` agent via Agent tool — pass the full requirement (and CL# from C++ track if both)
-2. blueprint-dev will present a plan and ask the user for approval via AskUserQuestion, then implement
-3. After blueprint-dev completes, invoke `/unreal-asset-inspections` to verify properties
-4. If verification fails: pass discrepancies back to blueprint-dev, re-verify (max 3 iterations)
+1. Spawn `blueprint-planner` agent — pass the full requirement (include CL# from C++ track if both)
+2. Receive plan from blueprint-planner
+3. Present the plan to the user in the main context
+4. Ask user via AskUserQuestion:
+   - Question: "Approve this implementation plan?"
+   - Options: "Approve", "Needs changes"
+5. If "Needs changes": re-spawn `blueprint-planner` with user feedback, repeat from step 2
+6. If "Approve": delegate to `blueprint-dev` agent with the approved plan
+7. After blueprint-dev completes, invoke `/unreal-asset-inspections` to verify properties
+8. If verification fails: pass discrepancies back to blueprint-dev, re-verify (max 3 iterations)
 
 Proceed to Stage 5.
 
