@@ -30,7 +30,7 @@
       "Bash(wait:*)",
       "Bash(dotnet:*)",
       "Bash(python:*)",
-      "Bash(python3:*)",
+      "Bash(py:*)",
       "Bash(sed:*)",
       "Bash(p4 edit:*)",
       "Bash(p4 shelve:*)",
