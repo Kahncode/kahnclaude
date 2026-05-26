@@ -119,8 +119,11 @@ Use this minimal format. Every line must be actionable.
 
 Present the structured output directly. Don't ask "does this look right?" — if wrong, user will say so.
 
-Offer routing: "Ready to implement, create a Jira ticket, or adjust something?"
+Offer routing:
+
+> "Plan ready. Next step?
+> - `/task-implementation` — implement this plan
+> - `/to-jira-issue` — create a Jira ticket first"
 
 - **Implement** — hand off to `/task-implementation` with the approved output
-- **Create Jira ticket** — hand off to `producer` agent with the approved output
-- **Adjust** — iterate on the output
+- **Jira ticket** — hand off to `/to-jira-issue` with the approved output

@@ -136,6 +136,10 @@ After the producer completes, summarize:
 **Sprint:** [sprint name or "Backlog"]
 ```
 
+After presenting the created issue(s), offer:
+
+> "Ticket created. Ready to implement? Use `/task-implementation` to start the build-verify-review cycle."
+
 ## Rules
 
 - Never create issues without user confirmation
