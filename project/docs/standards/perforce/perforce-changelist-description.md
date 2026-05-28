@@ -28,21 +28,9 @@ Changes:
 | Changes list | Yes | Bullet list of what was done. Technical terms OK here. |
 | `#review` | Yes | Triggers Swarm notification. Must be on its own line at the end. |
 
-### Header Line
-
-- `[TICKET]` -- Jira ID in brackets, e.g., `[PROJ-1234]`
-- `[Non-tech summary]` -- plain language a producer/designer understands
-
 ## Non-Technical Summary Quality Rules
 
 The summary must describe the BENEFIT, not the implementation. Ask: "If a producer asked 'what does this do?' — what would I say?"
-
-Reframe technical changes:
-- "Show wave event in debug views" → "Easier debugging of AI behavior"
-- "Add getters for crouch state" → "Better visibility into bot movement issues"
-- "Serialize fields in FRepData" → "Debug info works in multiplayer"
-
-NO code identifiers, file paths, acronyms, or jargon.
 
 ### Reframe to Benefits
 
@@ -100,7 +88,6 @@ Changes:
 | Severity | Condition |
 |----------|-----------|
 | **BLOCK** | Missing ticket, ticket does not exist, missing non-tech summary, missing `#review` |
-| **BLOCK** | Single paragraph (no line breaks) |
 | **BLOCK** | Single paragraph (no line breaks) — must use structured format |
 | **WARNING** | Non-tech summary describes implementation instead of benefit |
 | **WARNING** | Missing problem/context sentence before Changes list |
@@ -115,12 +102,7 @@ Changes:
 
 ## Setting the Description via CLI
 
-```bash
-# Get the change spec, modify description, pipe back
-p4 change -o <CL#> | <modify description> | p4 change -i
-```
-
-The `p4 change -i` command reads a change specification from stdin and updates the changelist.
+Use `p4 change -i` with a HEREDOC. Description lines must be tab-indented.
 
 ## Stream Discipline
 
