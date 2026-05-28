@@ -1,7 +1,7 @@
 ---
 name: task-planning
 description: "Task planner. ALWAYS invoke when the user says: plan task, clarify requirements, break down ticket, structure this, scope this work, what needs to happen, turn this into a Jira ticket. Also invoke for raw/unstructured requests that need scoping before implementation. Do not delegate to code-dev or producer without first structuring the requirements."
-allowed-tools: Read, Grep, Glob, Agent
+allowed-tools: Read, Grep, Glob, Agent, EnterPlanMode, ExitPlanMode
 ---
 
 # Task Planning
@@ -13,6 +13,10 @@ Takes raw, unstructured task descriptions and produces structured, actionable br
 See @docs/standards/planning/task-clarification.md for acceptance criteria patterns and ambiguity checklist.
 
 ## Flow
+
+### 0. Enter Plan Mode
+
+**ALWAYS start by calling EnterPlanMode.** This enables the formal planning system with a dedicated plan file and user approval gate. Write all plan content to the plan file specified in the system message, not as chat output.
 
 ### 1. Analyze Raw Input
 
@@ -54,7 +58,7 @@ Indicators of complexity:
 - Cross-module dependencies
 - Replication or networking changes
 
-### 5. Plan Implementation (Standard/Complex Only)
+### 5. Plan Implementation (Standard/Complex Code Only)
 
 Spawn `code-planner` with the structured requirements.
 
@@ -75,55 +79,68 @@ Only for tasks touching:
 
 Spawn `code-reviewer` with dimension "architecture" and the implementation plan. Incorporate critical findings before presenting to user.
 
-### 7. Produce Structured Output
+### 7. Write the Plan
 
-Use this minimal format. Every line must be actionable.
+Write the plan to the plan file. Use this format — be thorough since this is the user's approval checkpoint.
 
-**For trivial tasks:**
+```markdown
+# [Task Title]
 
-```
-## [Task Title]
-**Do:** [What to change]
-**Done when:** [Single testable criterion]
-```
+## Context
+[Why this matters — 2-3 sentences connecting to project goals]
 
-**For standard/complex tasks:**
+## Scope
+**In scope:**
+- [Specific item 1]
+- [Specific item 2]
 
-```
-## [Task Title]
+**Out of scope:**
+- [Explicitly excluded item]
 
-**Context:** [1 sentence — why this matters]
+## Investigation Summary
+[What you found exploring the codebase — relevant files, patterns, constraints]
 
-**Scope:**
-- In: [What's included]
-- Out: [What's explicitly excluded]
+## Implementation Plan
 
-**Acceptance Criteria:**
-- [ ] [Specific, testable — 3-5 items max]
+### Phase 1: [Name]
+| Step | File | Change | Why |
+|------|------|--------|-----|
+| 1 | path/to/file.h | Add X method declaration | Enables Y |
+| 2 | path/to/file.cpp | Implement X | Core logic |
 
-**Plan:** (if non-trivial)
-| File | Change |
-|------|--------|
-| path/to/file.h | Add X method |
-| path/to/file.cpp | Implement X |
+### Phase 2: [Name] (if applicable)
+| Step | File | Change | Why |
+|------|------|--------|-----|
+| ... | ... | ... | ... |
 
-**Risks:** [Only if real risks exist — omit if none]
+## Acceptance Criteria
+- [ ] [Specific, testable criterion 1]
+- [ ] [Specific, testable criterion 2]
+- [ ] [Specific, testable criterion 3]
+
+## Risks & Mitigations
+| Risk | Likelihood | Mitigation |
+|------|------------|------------|
+| [Only genuine risks] | Low/Med/High | [How to handle] |
+
+## Open Questions (if any)
+- [Questions requiring user input before implementation]
+
+## Estimate
+[T-shirt size: XS/S/M/L/XL with brief justification]
 ```
 
 **Rules:**
-- No "Assumptions" section — state facts or ask questions instead
-- Max 5 acceptance criteria — if more, the task should be split
+- Every file change needs a "Why" — forces you to justify each modification
+- Max 5 acceptance criteria — if more, split the task
 - Risks only for genuine concerns, not boilerplate
+- Estimate helps user decide if scope is right
 
-### 8. Present and Offer Next Steps
+### 8. Request Approval
 
-Present the structured output directly. Don't ask "does this look right?" — if wrong, user will say so.
+Call **ExitPlanMode** to submit the plan for user approval. Do NOT ask "does this look right?" in chat — the plan mode UI handles approval.
 
-Offer routing:
-
-> "Plan ready. Next step?
-> - `/task-implementation` — implement this plan
-> - `/to-jira-issue` — create a Jira ticket first"
-
-- **Implement** — hand off to `/task-implementation` with the approved output
-- **Jira ticket** — hand off to `/to-jira-issue` with the approved output
+After approval, offer routing:
+- **Implement** — hand off to `code-dev` agent with the approved plan
+- **Create Jira ticket** — hand off to `producer` agent
+- **Adjust** — re-enter plan mode and revise
