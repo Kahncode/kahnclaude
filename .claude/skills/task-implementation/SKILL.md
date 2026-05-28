@@ -15,7 +15,23 @@ Use PROACTIVELY when the user says: `implement this`, `implement feature`, `buil
 
 If the input contains a Jira ticket reference (e.g., `CLTR-123`):
 
-### 0a. Mark In Progress
+### 0a. Fetch Ticket Context
+1. Use `mcp__atlassian__getJiraIssue`
+2. Extract from the response:
+   - **Summary** — `fields.summary`
+   - **Description** — `fields.description`
+   - **Comments** — `renderedFields.comment.comments[]` (this is an ARRAY — iterate through each comment)
+3. **Tech Plan Detection:** For EACH comment in the `comments[]` array, check if `body` (rendered HTML) or the ADF structure contains:
+   - "Implementation Plan", "Tech Plan", "Technical Plan"
+   - Structured sections: "## Approach", "## Files to Modify", "## Design"
+   - A table with "File" and "Change" columns
+   - Code blocks with implementation details
+4. If a tech plan comment is found:
+   - Set `TICKET_TECH_PLAN` = the comment body (use rendered HTML version for readability)
+   - Set `PLAN_APPROVED = true` — ticket tech plans are pre-approved, skip planning stage
+5. If no tech plan found, `TICKET_TECH_PLAN` = empty, `PLAN_APPROVED = false`
+
+### 0b. Mark In Progress
 1. Use `mcp__atlassian__getTransitionsForJiraIssue` to get available transitions
 2. Find the "In Progress" transition (or similar: "Start Progress", "Begin Work")
 3. Use `mcp__atlassian__transitionJiraIssue` to move the ticket to In Progress
@@ -25,27 +41,28 @@ Skip if: no ticket reference, or user says "don't update Jira".
 
 ## 0.5. Detect Pre-Approved Plan
 
-Check if the input contains structured output from `/task-planning`:
+A pre-approved plan can come from TWO sources:
 
-**Has pre-approved plan if ALL of:**
-- Contains `**Plan:**` section with a `| File | Change |` table
-- Contains `**Acceptance Criteria:**` section
+**Source 1: Ticket comments (from Stage 0a)**
+- If `TICKET_TECH_PLAN` is set and `PLAN_APPROVED = true` was set in Stage 0a, you already have a pre-approved plan
+- Use `TICKET_TECH_PLAN` as the implementation plan
 
-If pre-approved plan detected:
-- Set `PLAN_APPROVED = true`
-- Extract the Plan table and Acceptance Criteria for sub-agents
-- Skip Stage 1 entirely
+**Source 2: Input from `/task-planning`**
+- Check if the input contains structured output with:
+  - `**Plan:**` section with a `| File | Change |` table
+  - `**Acceptance Criteria:**` section
+- If found: Set `PLAN_APPROVED = true`, extract the Plan table for sub-agents
 
-If no pre-approved plan:
-- Set `PLAN_APPROVED = false`
-- Proceed to Stage 1
+**Result:**
+- If `PLAN_APPROVED = true` (from either source): Skip Stage 1, proceed directly to Stage 2
+- If `PLAN_APPROVED = false`: Proceed to Stage 1
 
 ## 1. Requirements Clarification
 
 Before implementation, ask clarifying questions to reach shared understanding.
 
 **Skip this step if:**
-- `PLAN_APPROVED = true` (Stage 0.5 detected pre-approved plan)
+- `PLAN_APPROVED = true` (pre-approved plan from ticket comments or /task-planning)
 - User says "just do it", "skip questions", "no questions".
 
 ## 2. Classify Work Type
@@ -60,7 +77,9 @@ If unclear, ask: "Does this involve C++ code, Blueprint assets, or both?"
 ## 3. C++ Track (if cpp or both)
 
 **If `PLAN_APPROVED = true`:**
-1. Delegate to `code-dev` agent with the approved plan
+1. Use the approved plan (either `TICKET_TECH_PLAN` from ticket comments or the plan from /task-planning input)
+2. Report to user: "Using pre-approved tech plan from [ticket comments / input]. Delegating to code-dev."
+3. Delegate to `code-dev` agent with the approved plan
 
 **If `PLAN_APPROVED = false`:**
 1. Spawn `code-planner` agent — pass the full requirement
@@ -77,9 +96,11 @@ Proceed to Stage 4 if both, else proceed to Stage 5.
 ## 4. Blueprint Track (if blueprint or both)
 
 **If `PLAN_APPROVED = true`:**
-1. Delegate to `blueprint-dev` agent with the approved plan (include CL# from C++ track if both)
-2. After blueprint-dev completes, invoke `/unreal-asset-inspections` to verify properties
-3. If verification fails: pass discrepancies back to blueprint-dev, re-verify (max 3 iterations)
+1. Use the approved plan (either `TICKET_TECH_PLAN` or the plan from input)
+2. Report to user: "Using pre-approved tech plan. Delegating to blueprint-dev."
+3. Delegate to `blueprint-dev` agent with the approved plan (include CL# from C++ track if both)
+4. After blueprint-dev completes, invoke `/unreal-asset-inspections` to verify properties
+5. If verification fails: pass discrepancies back to blueprint-dev, re-verify (max 3 iterations)
 
 **If `PLAN_APPROVED = false`:**
 1. Spawn `blueprint-planner` agent — pass the full requirement (include CL# from C++ track if both)
