@@ -55,6 +55,10 @@ Use dedicated changelists or development/task streams for all work:
   ```
 - Never submit directly to the mainline stream without review
 
+### 4. No Worktrees
+
+Never use EnterWorktree. Work directly in the main workspace.
+
 ---
 
 ## Project-Specific Rules
