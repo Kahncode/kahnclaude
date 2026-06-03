@@ -212,7 +212,7 @@ For each artifact:
 4. For `merge` or `replace`: show a before/after diff of the existing file
 5. Ask: `"Integrate this artifact as shown? Reply yes, skip, or describe modifications."`
 6. Write only after `yes`
-7. For hooks: run `python -m py_compile .claude/hooks/<name>.py` immediately after writing;
+7. For hooks: run `python3 -m py_compile .claude/hooks/<name>.py` immediately after writing;
    report the result before moving on
 
 If the user says `skip`: record it and continue.
@@ -288,7 +288,7 @@ Skipped: <name — reason>, ...
 Merged: <name — what was kept>, ...
 
 Next steps:
-  - python -m py_compile .claude/hooks/*.py
+  - python3 -m py_compile .claude/hooks/*.py
   - /review on any significantly reworked artifact
   - feat(import): integrate <source-repo-name> components
 ```

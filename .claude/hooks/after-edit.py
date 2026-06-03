@@ -48,6 +48,9 @@ def main() -> None:
         run(["black", "--quiet"], file_path)
         run(["ruff", "check", "--fix", "--silent"], file_path)
 
+    elif ext in ("h", "cpp", "hpp", "inl"):
+        run(["clang-format", "-i"], file_path)
+
     elif ext == "go":
         run(["gofmt", "-w"], file_path)
 

@@ -15,6 +15,7 @@ Cross-platform:
 import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -88,7 +89,39 @@ def send_notification(title: str, message: str) -> None:
     sys.stdout.flush()
 
 
-MAX_MESSAGE_LENGTH = 100
+MAX_MESSAGE_LENGTH = 200
+
+TYPE_LABELS: dict[str, str] = {
+    "permission_prompt": "Permission needed",
+    "idle_prompt": "Waiting for input",
+    "elicitation_dialog": "Question",
+    "auth_success": "Auth complete",
+}
+
+
+SHELL_TITLE_RE = re.compile(
+    r"(bash|cmd|powershell|pwsh|zsh|sh|fish|nu)(\.exe)?$", re.IGNORECASE
+)
+
+
+def get_terminal_name() -> str:
+    """Get the terminal/tab name from the console title (set by Claude Code)."""
+    if platform.system() != "Windows":
+        return ""
+    try:
+        import ctypes  # noqa: PLC0415
+
+        buf = ctypes.create_unicode_buffer(512)
+        length = ctypes.windll.kernel32.GetConsoleTitleW(buf, 512)
+        if length and buf.value:
+            title = buf.value.strip()
+            # Skip if it's just a shell executable path
+            if SHELL_TITLE_RE.search(title):
+                return ""
+            return title
+    except (OSError, AttributeError, ImportError):
+        pass
+    return ""
 
 
 def main() -> None:
@@ -97,18 +130,33 @@ def main() -> None:
     except (json.JSONDecodeError, ValueError):
         sys.exit(0)
 
-    content = data.get("content", "Claude needs your attention")
-
     # Get folder name from project directory
     project_dir = os.environ.get("CLAUDE_PROJECT_DIR", str(Path.cwd()))
     folder_name = Path(project_dir).name
 
-    # Build message with folder context
-    message = f"[{folder_name}] {content}"
+    # Build title with session name and notification type
+    session_name = data.get("session_name", "")
+    notification_type = data.get("notification_type", "")
+    type_label = TYPE_LABELS.get(notification_type, "")
+    terminal_name = get_terminal_name()
+
+    title_parts = ["Claude Code"]
+    if session_name:
+        title_parts.append(session_name)
+    elif terminal_name:
+        title_parts.append(terminal_name)
+    if type_label:
+        title_parts.append(type_label)
+    title = " — ".join(title_parts)
+
+    # Build body from payload message only
+    body = data.get("message", "").strip() or "Claude needs your attention"
+
+    message = f"[{folder_name}] {body}"
     if len(message) > MAX_MESSAGE_LENGTH:
         message = message[:MAX_MESSAGE_LENGTH] + "..."
 
-    send_notification("Claude Code", message)
+    send_notification(title, message)
     sys.exit(0)
 
 

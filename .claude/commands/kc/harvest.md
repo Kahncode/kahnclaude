@@ -116,7 +116,7 @@ Do NOT modify `project/`, `global/`, `inspiration/`, `CLAUDE.md`, or any non-com
 
 After applying all changes:
 
-- Remind the user: "Run `python -m py_compile .claude/hooks/*.py` if any hooks were modified."
+- Remind the user: "Run `python3 -m py_compile .claude/hooks/*.py` if any hooks were modified."
 - Remind the user: "Update README.md and CONTRIBUTING.md for any new components added."
 - Summarize: X files integrated, Y files skipped, Z new files ported.
 

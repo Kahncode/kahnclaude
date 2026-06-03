@@ -18,7 +18,7 @@ Use GitHub Issues. Include:
 1. Create a branch from `main` (`git checkout -b feat/your-change`)
 2. Make your changes
 3. Run `/review` in Claude Code on every file you changed
-4. Verify hooks pass syntax check: `python -m py_compile .claude/hooks/*.py`
+4. Verify hooks pass syntax check: `python3 -m py_compile .claude/hooks/*.py` (Windows: use `py -m py_compile`)
 5. Commit with conventional format: `feat(commands): add review command`
 
 ---
@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
 1. Wire it in `@.claude/settings.json`
 2. Document the wiring example in `@global/settings.json`
-3. Syntax-check: `python -m py_compile .claude/hooks/your-hook.py`
+3. Syntax-check: `python3 -m py_compile .claude/hooks/your-hook.py`
 4. Test with mock stdin: `echo '{"tool_name":"Write","tool_input":{"file_path":".env"}}' | python3 .claude/hooks/your-hook.py`
 
 ---
@@ -243,7 +243,7 @@ Installed at `@~/.claude/CLAUDE.md`. Keep it:
 - [ ] Component in correct location (`scope: project` → `.claude/commands/`, `scope: framework` → `.claude/commands/kc/`, skills, agents, hooks in their respective dirs)
 - [ ] `README.md` updated with description
 - [ ] This file updated if new conventions introduced
-- [ ] If hook: syntax-checked (`python -m py_compile`)
+- [ ] If hook: syntax-checked (`python3 -m py_compile`)
 - [ ] If hook: wired in `@.claude/settings.json` and `@global/settings.json`
 - [ ] No secrets, credentials, or personal data in any file
 
