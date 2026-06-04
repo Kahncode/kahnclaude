@@ -76,10 +76,10 @@ Always start by determining which changes to review using the above logic.
 
 ## Output Format
 
-For each issue:
+Number each finding sequentially (1, 2, 3…) so users can refer to them by number:
 
 ```
-[CRITICAL | WARNING | INFO]
+1. [CRITICAL | WARNING | INFO]
 
 File: path/to/file:42
 Issue: [What's wrong]
@@ -89,13 +89,13 @@ Fix: [Specific change to make]
 
 End with a summary: X critical, Y warnings, Z info items. If none: "No issues found."
 
-If you spotted pre-existing issues outside the diff, add them after the summary in a clearly separated block:
+If you spotted pre-existing issues outside the diff, add them after the summary in a clearly separated block. Continue the numbering sequence from the main findings:
 
 ```
 ---
 UNRELATED (pre-existing, not introduced by this change)
 
-[CRITICAL | WARNING | INFO]
+4. [CRITICAL | WARNING | INFO]
 File: path/to/file:42
 Issue: [What's wrong]
 Fix: [Specific change to make]
