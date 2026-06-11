@@ -179,7 +179,8 @@ kahnclaude/
 │
 ├── global/                      # Global ~/.claude/ config templates
 │   ├── CLAUDE.md
-│   └── settings.json
+│   ├── settings.json
+│   └── statusline.py            # Status line script (installed to ~/.claude/statusline.py)
 │
 └── inspiration/                 # Third-party reference — NEVER MODIFY
 ```
@@ -363,7 +364,11 @@ Installed once at `@~/.claude/CLAUDE.md`. Applies security rules and coding stan
 
 ### `@global/settings.json`
 
-Installed once at `@~/.claude/settings.json`. Wires up global hooks. Merged with existing settings.
+Installed once at `@~/.claude/settings.json`. Wires up global hooks and configures the status line. Merged with existing settings — top-level keys like `statusLine` are added only if absent.
+
+### `@global/statusline.py`
+
+Installed to `~/.claude/statusline.py`. Renders the Claude Code status line showing: `cwd | branch | model | ctx% | $cost | rate-limit %`. Reads JSON from stdin (Claude Code's `StatusLine` event). No dependencies beyond stdlib.
 
 ---
 

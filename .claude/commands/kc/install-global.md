@@ -16,7 +16,9 @@ Install or merge the KahnClaude global config, skills, and agents into `~/.claud
 
 3. Check if `@~/.claude/settings.json` exists
    - If NO: copy `@global/settings.json` → `@~/.claude/settings.json`
-   - If YES: deep-merge the hooks arrays — add any hooks from `@global/settings.json` that are not already present. Never remove existing hooks.
+   - If YES: deep-merge the settings — add any hooks arrays entries from `@global/settings.json` that are not already present; merge top-level non-hook keys (e.g. `statusLine`, `permissions`) if absent. Never remove existing entries.
+
+3a. Copy any extra files from `global/` (anything that is not `CLAUDE.md` or `settings.json`) to `~/.claude/`. Skip files that already exist (ask before overwriting).
 
 4. Create `~/.claude/hooks/` if it doesn't exist. Copy hook files from `hooks/` → `~/.claude/hooks/` for any hooks wired in `@global/settings.json`. Skip hooks that already exist (ask before overwriting).
 
