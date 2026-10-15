@@ -106,6 +106,33 @@ Examples:
 
 ---
 
+## Development Commands
+
+<!-- GUIDE: Exact commands Claude should run for common tasks
+Format: Table with columns: Task | Command
+Include: setup/install, run dev server, build, run all tests, run a single test, lint, format, type-check, DB migrate/reset, code generation
+Rules: commands must be copy-pasteable and verified to work; note prerequisites (runtime version, services that must be running) below the table
+Example:
+  | Install | `npm install` |
+  | Dev server | `npm run dev` |
+  | Run one test | `npm test -- path/to/file.test.ts` |
+-->
+
+| Task            | Command             |
+| --------------- | ------------------- |
+| Install         | `[command]`         |
+| Run dev server  | `[command]`         |
+| Build           | `[command]`         |
+| Run all tests   | `[command]`         |
+| Run single test | `[command]`         |
+| Lint            | `[command]`         |
+| Format          | `[command]`         |
+| Type-check      | `[command]`         |
+
+**Prerequisites:** [runtime versions, services that must be running, required env files]
+
+---
+
 ## When Something Seems Wrong
 
 <!-- GUIDE: Diagnostic checklist for common issues
