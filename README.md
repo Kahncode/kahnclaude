@@ -110,13 +110,13 @@ Look for MCPs matching **your specific tools and workflow** — project manageme
 
 Plugins extend Claude Code itself — adding slash commands, skills, and automation at the editor level rather than at the MCP/tool level.
 
-### Always Recommended
+### Recommended for Web UI Projects
 
 | Plugin | What It Adds | Install |
 | ------ | ------------ | ------- |
-| **claude-warden** | Permission manager — pre-approves safe bash commands to eliminate repetitive allow/deny prompts | `/plugin marketplace add banyudu/claude-warden` then `/plugin install warden@claude-warden` |
+| **impeccable** | Frontend design skill — design, critique, audit, polish and harden web UI (typography, layout, color, motion, accessibility) | `/plugin marketplace add pbakaus/impeccable` then `/plugin install impeccable@impeccable` |
 
-> **Why warden?** Claude frequently asks permission for routine commands like `git status`, `ls`, `grep`, etc. Warden lets you approve patterns once so they never prompt again, without weakening security for genuinely risky operations.
+> **Why impeccable?** Steers Claude away from generic AI-looking interfaces and gives it structured commands for UX review, visual hierarchy, and design-system work.
 
 ### Finding More Plugins
 
