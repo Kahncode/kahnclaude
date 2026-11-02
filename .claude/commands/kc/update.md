@@ -14,6 +14,8 @@ The argument is the path to the target project. If omitted, ask the user for it 
 
 1. Resolve the target project path from the argument (or ask if not provided).
 
+   **Git preflight:** run `git --version`; if it fails, abort with "git is required to update KahnClaude." If `<target>` is not a git repo (`git -C <target> rev-parse --git-dir`), abort and tell the user to run `/kc:install` first.
+
 2. **Read the install manifest** from `<target>/.claude/.kahnclaude`. If it does not exist, tell the user to run `/kc:install <project-path>` first and stop.
    - **Validate the stored commit**: Run `git rev-parse --verify <manifest.commit>^{commit}` in the KahnClaude directory
    - If validation fails, attempt recovery:

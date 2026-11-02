@@ -14,9 +14,11 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 1. Resolve the target project path from the argument (or ask if not provided)
 
+   **Git preflight:** run `git --version`; if it fails, abort with "git is required to install KahnClaude." Then check the target is a git repo (`git -C <target> rev-parse --git-dir`). If not, offer to run `git init`; abort if the user declines.
+
 2. Get the current KahnClaude git commit hash by running `git rev-parse --verify HEAD^{commit}` in the KahnClaude source directory. This expands to the canonical (full 40-char) hash and validates it's a real commit. Save this for the manifest.
 
-3. **Ask the user about their tech stack** before copying any agents or skills. Perform a quick research in the target project to determine the likely tech stack, then:
+3. **Ask the user about their tech stack** (skip the question if `/kc:create-project` passed the stack) before copying any agents or skills. Perform a quick research in the target project to determine the likely tech stack, then:
 
    a. **Always copy `core/` agents without asking** — they are universal. Do not present them as optional.
 
@@ -42,7 +44,7 @@ The argument is the path to the project to install into. If omitted, ask the use
 
    b. If it already exists: deep-merge — add any `permissions.allow`, `permissions.deny`, and `hooks` entries from `project/settings.json` that are not already present. Never remove existing entries. Show the user what will be added and confirm before applying.
 
-10. **Handle CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/tech-stacks/` are used here and never copied to the target):
+10. **Handle CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/tech-stacks/` are used here and never copied to the target). When invoked by `/kc:create-project`, skip this step: create-project generates `CLAUDE.md` itself afterwards with the interview answers.
 
    a. If `CLAUDE.md` does not exist in the target project:
    - Run `/kc:generate-claude-md` with the target project path
@@ -66,9 +68,12 @@ The argument is the path to the project to install into. If omitted, ask the use
       "installed_at": "<ISO-8601-timestamp>",
       "updated_at": "<ISO-8601-timestamp>",
       "agents": ["<relative-agent-path>", ...],
-      "notes": "<one-line summary of stack detected and agent selections>"
+      "notes": "<one-line summary of stack detected and agent selections>",
+      "scaffold": { "stack": "<stack>", "template_repo": "<url>", "template_ref": "<ref>" }
     }
     ```
+
+    - `scaffold` is optional: written only when invoked by `/kc:create-project`; omit otherwise
 
     - `commit` is the canonical commit hash from step 2
     - `installed_at` is when this manifest was first created

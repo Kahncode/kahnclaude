@@ -32,6 +32,7 @@ This is the Claude Code configuration for working on the KahnClaude framework it
 | `.claude/hooks/` | Hook scripts distributed to projects |
 | `.claude/settings.json` | Hooks wiring for this framework repo |
 | `project/` | CLAUDE.md templates and `settings.json` template for new projects |
+| `scripts/` | Framework helper scripts (Python), e.g. `apply_template.py` used by `/kc:create-project` |
 | `global/` | Global `~/.claude/` config templates |
 | `inspiration/` | Read-only third-party references |
 

@@ -216,6 +216,8 @@ if __name__ == "__main__":
 
 CLAUDE.md generation templates and guides live in `project/` — the master template at `project/CLAUDE.md` and per-stack Q&A guides in `project/tech-stacks/<name>.md` (e.g., `unreal.md`). Read `project/tech-stacks/unreal.md` for an example of the expected structure: detection pattern, numbered questions with CLAUDE.md section mappings, and rationale for each question. Guides are Markdown only and are used by `/kc:generate-claude-md` from the KahnClaude source directory; they are never copied to target projects. After adding a guide, update `README.md` to list it.
 
+**Create Project section (optional):** a guide that adds a `## Create Project` section becomes available to `/kc:create-project`. It must list, as literal bold-labelled bullets: the init command per package manager (non-interactive, no install, no git, `<target>` placeholder; write `none` when the stack has no scaffolder and the template repo is the whole project), `Template repo` (git URL of a functional project; its files overwrite the init output), `Template ref`, `Default package manager` (the language's own default, e.g. npm for Node; never assume an alternative) and `Post-init` steps. Verify init flags against current docs (Context7) when adding or changing one. Helper scripts live in `scripts/` (Python, stdlib only, type hints, cross-platform) and must pass `python -m py_compile`.
+
 ---
 
 ## Updating Templates

@@ -26,15 +26,17 @@ If no path is given, the current directory is the target. When invoked by `/kc:i
 Scan the **target project root** for manifest files. Check in this priority order:
 
 1. `.uproject` → **Unreal Engine**
-2. `package.json` → **Node.js** (inspect `dependencies` for next/react/express/etc.)
-3. `pyproject.toml` or `setup.py` → **Python** (inspect for django/fastapi/flask)
-4. `Cargo.toml` → **Rust**
-5. `*.csproj` or `*.sln` → **C#/.NET**
-6. `go.mod` → **Go**
-7. `CMakeLists.txt` → **C++**
-8. `Gemfile` → **Ruby**
-9. `pom.xml` or `build.gradle` → **Java**
-10. None found → **Unknown** (use generic questions)
+2. `astro.config.*` or `package.json` with `astro` → **Astro** (guide: `astro.md`)
+3. `next.config.*` or `package.json` with `next` → **Next.js** (guide: `nextjs.md`)
+4. `package.json` → **Node.js** (inspect `dependencies` for react/express/etc.)
+5. `pyproject.toml` or `setup.py` → **Python** (inspect for django/fastapi/flask; `fastapi` → guide `fastapi.md`)
+6. `Cargo.toml` → **Rust**
+7. `*.csproj` or `*.sln` → **C#/.NET**
+8. `go.mod` → **Go**
+9. `CMakeLists.txt` → **C++**
+10. `Gemfile` → **Ruby**
+11. `pom.xml` or `build.gradle` → **Java**
+12. None found → **Unknown** (use generic questions)
 
 If multiple primary stacks are detected (e.g., Unreal + Python tooling), ask the user which is primary.
 
@@ -43,6 +45,7 @@ If multiple primary stacks are detected (e.g., Unreal + Python tooling), ask the
 **With a guide (e.g., Unreal):**
 
 - Read `project/tech-stacks/<tech-stack>.md` from KahnClaude source directory
+- Ignore the `## Create Project` section (used only by `/kc:create-project`)
 - Use its guided questions tailored to this type of projects
 
 **Without a guide (other stacks):**
@@ -58,6 +61,8 @@ If multiple primary stacks are detected (e.g., Unreal + Python tooling), ask the
 ### Phase 3: Ask Questions
 
 Present questions one by one. All questions are optional — user can skip any.
+
+When invoked by `/kc:create-project`, the project description and interview answers are passed in. Use them to fill the template and do not ask those questions again; ask only what is still unanswered.
 
 Auto-detect project name from: `package.json` name field, `.uproject` DisplayName, git remote `origin` URL, or folder name. Offer the detected value and let the user confirm or override.
 
@@ -103,7 +108,7 @@ If this line is absent after substitution, insert it after the `## Project Overv
 All source files are read from the KahnClaude source directory, not from the target project:
 
 - `project/CLAUDE.md` — master template
-- `project/tech-stacks/unreal.md` — Unreal Q&A guide
+- `project/tech-stacks/unreal.md`, `astro.md`, `nextjs.md`, `fastapi.md` — stack Q&A guides
 - `project/tech-stacks/<stack>.md` — future guides (load if file exists)
 
 Output is written to `<target>/CLAUDE.md`.
