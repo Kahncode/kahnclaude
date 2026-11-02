@@ -28,7 +28,7 @@ Notes:
 
 - The init flags were checked against the Astro docs; re-verify with `npm create astro@latest -- --help` if the init fails.
 - The `--typescript` flag no longer exists (strict TS is the default since Astro 5).
-- The template repo is a normal functional Astro project. Its files overwrite the init output.
+- The template repo is a normal functional Astro project. Its files overwrite the init output, so init flags need not match user preferences.
 
 ---
 

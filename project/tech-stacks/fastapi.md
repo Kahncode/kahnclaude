@@ -25,7 +25,7 @@ Read by `/kc:create-project`. Values are literal; `<target>` is the project dire
 
 Notes:
 
-- With no init command, `/kc:create-project` skips the init phase and the template overlay is the first commit.
+- With no init command, `/kc:create-project` skips the init phase and the template is the first commit.
 - The template requires Python 3.14+ (`requires-python`). Check `python --version` before `uv sync`; uv can fetch a matching interpreter.
 - The template ships no `CLAUDE.md`, so one is generated from `project/CLAUDE.md` using the interview answers.
 - `uv run pytest` needs PostgreSQL (pytest-postgresql); do not use it as the smoke test.

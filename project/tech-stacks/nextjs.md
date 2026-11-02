@@ -24,9 +24,9 @@ Read by `/kc:create-project`. Values are literal; `<target>` is the project dire
 
 Notes:
 
-- Flags were checked against the `create-next-app` reference. The user's answers (TypeScript, Tailwind, `src/`, linter) replace the corresponding flags; `--no-tailwind`, `--no-src-dir`, `--biome` or `--no-eslint` are the negations.
+- Flags were checked against the `create-next-app` reference. Init runs before the interview with these literal defaults; the template overlay overwrites the result, so the flags are not tailored to answers.
 - `--yes` uses defaults for anything not given. Recent versions also add `AGENTS.md`; pass `--no-agents-md` since KahnClaude generates `CLAUDE.md`.
-- The template repo is a normal functional Next.js project. Its files overwrite the init output.
+- The template repo is a normal functional Next.js project. Its files overwrite the init output, so init flags need not match user preferences.
 
 ---
 
