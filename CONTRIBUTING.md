@@ -287,6 +287,8 @@ When adding standards content:
 3. Keep reference docs under 150 lines; agent files under 300 lines
 4. Update `README.md` if a new skill is created
 
+**Create Project section (optional):** a guide that adds a `## Create Project` section becomes available to `/kc:create-project`. It must list, as literal bold-labelled bullets: the init command per package manager (non-interactive, no install, no git, `<target>` placeholder; write `none` when the stack has no scaffolder and the template repo is the whole project), `Template repo` (git URL of a functional, opinionated project; it overlays the init output, and the guide's `Auto-detection` rules are run against the result to skip already-answered questions, so keep those rules accurate), `Template ref`, `Default package manager` (the language's own default, e.g. npm for Node; never assume an alternative) and `Post-init` steps. Verify init flags against current docs (Context7) when adding or changing one. Helper scripts live in `scripts/` (Python, stdlib only, type hints, cross-platform) and must pass `python -m py_compile`.
+
 ---
 
 ## Updating Templates

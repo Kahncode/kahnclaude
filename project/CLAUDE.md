@@ -75,6 +75,49 @@ Never use EnterWorktree. Work directly in the main workspace.
 
 ---
 
+## Development Commands
+
+<!-- GUIDE: Exact commands Claude should run for common tasks
+Format: Table with columns: Task | Command
+Include: setup/install, run dev server, build, run all tests, run a single test, lint, format, type-check, DB migrate/reset, code generation
+Rules: commands must be copy-pasteable and verified to work; note prerequisites (runtime version, services that must be running) below the table
+Example:
+  | Install | `npm install` |
+  | Dev server | `npm run dev` |
+  | Run one test | `npm test -- path/to/file.test.ts` |
+-->
+
+| Task            | Command             |
+| --------------- | ------------------- |
+| Install         | `[command]`         |
+| Run dev server  | `[command]`         |
+| Build           | `[command]`         |
+| Run all tests   | `[command]`         |
+| Run single test | `[command]`         |
+| Lint            | `[command]`         |
+| Format          | `[command]`         |
+| Type-check      | `[command]`         |
+
+**Prerequisites:** [runtime versions, services that must be running, required env files]
+
+---
+
+## When Something Seems Wrong
+
+<!-- GUIDE: Diagnostic checklist for common issues
+Format: Symptom → Check → Action
+Use this to prevent false-positive bug reports and guide debugging -->
+
+Before assuming something is broken:
+
+- **Missing feature?** → Check feature flags / config BEFORE assuming bug
+- **Empty data?** → Check if services are running BEFORE assuming broken
+- **Auth failing?** → Check which auth system is active BEFORE debugging
+- **Test failing?** → Read the full error message BEFORE changing code
+- **Build error?** → Clean cache (`rm -rf node_modules/` or equivalent) BEFORE reporting
+
+---
+
 ## Service Ports & Configuration
 
 | Service   | Dev Port | Environment Variables |

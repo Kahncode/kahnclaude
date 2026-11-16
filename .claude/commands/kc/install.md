@@ -14,13 +14,19 @@ The argument is the path to the project to install into. If omitted, ask the use
 
 1. Resolve the target project path from the argument (or ask if not provided)
 
+   **Git preflight:** run `git --version`; if it fails, abort with "git is required to install KahnClaude." Then check the target is a git repo (`git -C <target> rev-parse --git-dir`). If not, offer to run `git init`; abort if the user declines.
+
 2. Get the current KahnClaude git commit hash by running `git rev-parse --verify HEAD^{commit}` in the KahnClaude source directory. This expands to the canonical (full 40-char) hash and validates it's a real commit. Save this for the manifest.
 
-3. **Ask the user about their tech stack** before copying any agents or skills. Perform a quick research in the target project to determine the likely tech stack, then:
+3. **Ask the user about their tech stack** (skip the question if `/kc:create-project` passed the stack) before copying any agents or skills. Perform a quick research in the target project to determine the likely tech stack, then:
 
    a. **Always copy `core/` agents without asking** — they are universal. Do not present them as optional.
 
-   b. **Present remaining agents grouped by subfolder** — ask the user which to include. Note: `AskUserQuestion` is capped at 4 options per question. When a subfolder group has more than 4 agents, do NOT use the structured UI for that group — instead describe the agents in plain text and ask the user to reply with which ones to include.
+   b. **Auto-select agents that match detected technologies** — scan all subfolders under `.claude/agents/`, not just the obvious stack folder.
+
+   c. **Present remaining agents grouped by subfolder** — ask the user which to include. Note: `AskUserQuestion` is capped at 4 options per question. When a subfolder group has more than 4 agents, do NOT use the structured UI for that group — instead describe the agents in plain text and ask the user to reply with which ones to include.
+
+   d. Make clear that agents not relevant to the project should be excluded — a backend-only project doesn't need mobile or pure-frontend agents.
 
 4. Create `.claude/` subdirectories in the target project if they don't exist: `commands/`, `skills/`, `agents/`, `hooks/`
 
@@ -42,7 +48,7 @@ The argument is the path to the project to install into. If omitted, ask the use
 
    b. If it already exists: deep-merge — add any `permissions.allow`, `permissions.deny`, and `hooks` entries from `project/settings.json` that are not already present. Never remove existing entries. Show the user what will be added and confirm before applying.
 
-12. **Offer CLAUDE.md generation** (run from the KahnClaude working directory; guides in `project/docs/tech-stacks/` are also copied to the target via the docs tree):
+12. **Offer CLAUDE.md generation** (run from the KahnClaude working directory; stack guides in `project/tech-stacks/` are used here and never copied, while guides in `project/docs/tech-stacks/` are also copied to the target via the docs tree). When invoked by `/kc:create-project`, skip this step: create-project generates `CLAUDE.md` itself afterwards with the interview answers.
 
    Ask the user: "Would you like to run `/tool:generate-claude-md` on the target project?"
 
@@ -50,7 +56,7 @@ The argument is the path to the project to install into. If omitted, ask the use
    - If **yes** and `CLAUDE.md` already exists: run `/tool:generate-claude-md` in enhance mode for the target to add any missing sections
    - If **no**: skip to step 13
 
-13. Verify `<target>/.gitignore` includes `CLAUDE.local.md` and `.env` — add them if missing
+13. Verify `<target>/.gitignore` includes `CLAUDE.local.md`, `.claude/settings.local.json`, and `.env` — add them if missing
 
 14. **Write the install manifest** to `<target>/.claude/.kahnclaude` as JSON:
 
@@ -62,9 +68,12 @@ The argument is the path to the project to install into. If omitted, ask the use
       "installed_at": "<ISO-8601-timestamp>",
       "updated_at": "<ISO-8601-timestamp>",
       "agents": ["<relative-agent-path>", ...],
-      "notes": "<one-line summary of stack detected and agent selections>"
+      "notes": "<one-line summary of stack detected and agent selections>",
+      "scaffold": { "stack": "<stack>", "template_repo": "<url>", "template_ref": "<ref>" }
     }
     ```
+
+    - `scaffold` is optional: written only when invoked by `/kc:create-project`; omit otherwise
 
     - `commit` is the canonical commit hash from step 2
     - `installed_at` is when this manifest was first created

@@ -127,10 +127,14 @@ kahnclaude/
 │   ├── docs/
 │   │   ├── tech-stacks/         # Tech-specific Q&A guides (UE5, P4, Swarm, Jira, etc.)
 │   │   └── standards/           # Shared reference docs (standards, checklists)
-│   └── scripts/
-│       ├── unreal/              # UE5 editor automation
-│       └── vs/                  # Visual Studio automation
+│   ├── scripts/
+│   │   ├── unreal/              # UE5 editor automation
+│   │   └── vs/                  # Visual Studio automation
+│   └── tech-stacks/             # Primary-stack guides + create-project recipes (Astro, Next.js, FastAPI)
+├── scripts/                     # Framework helper scripts (Python, cross-platform)
+│   └── apply_template.py        # Overlay a template git repo onto a new project
 ├── global/                      # Global ~/.claude/ config templates
+│   └── statusline.py            # Status line script (installed to ~/.claude/statusline.py)
 └── inspiration/                 # Third-party reference — read-only
 ```
 
@@ -205,13 +209,14 @@ These are distributed to your project via `/kc:install` — available in any Kah
 
 > **Start with these:** `/document` (build initial knowledge), `/explain` (understand unfamiliar code), `/answer` (research questions)
 
-### Framework Commands (8)
+### Framework Commands (9)
 
 These are only available in the KahnClaude repository itself — for managing and developing the framework.
 
 | Command                    | What It Does                                                                      |
 | -------------------------- | --------------------------------------------------------------------------------- |
 | `/kc:install`              | Install KahnClaude components into the current project                            |
+| `/kc:create-project`       | Create a new project (astro, nextjs, fastapi): init CLI, template overlay, targeted interview + install, CLAUDE.md |
 | `/kc:install-global`       | Install commands, skills, agents, hooks, and config into `~/.claude/`             |
 | `/kc:update`               | Update installed components in a target project to the latest versions            |
 | `/kc:sync-back`            | Sync changes from a KahnClaude-installed project back into the framework          |
@@ -340,6 +345,16 @@ Specialized Q&A guides loaded by `/kc:generate-claude-md` when a tech stack is d
 - **`atlassian_confluence.md`** — Confluence documentation publishing conventions, formatting references
 - **`visual_studio.md`** — Visual Studio (UE5 integration): env vars (`KC_UE_SOLUTION`, `KC_UE_ENGINE`, `KC_PROJECT_ROOT`), build config, COM/DTE automation reference, UBT fallback
 
+Primary-stack guides in `project/tech-stacks/` (matched by manifest file, used only by the generator and never copied to targets):
+
+- **`astro.md`** — Astro (9 questions: description, rendering mode, content source, islands, styling, deploy, package manager, testing, SEO)
+- **`nextjs.md`** — Next.js (9 questions: description, router, data, auth, styling, deploy, package manager, testing, env)
+- **`fastapi.md`** — FastAPI (9 questions: description, database, auth, storage, deploy, environments, tooling, testing, structure); scaffolds from `Kahncode/py-fastapi-template` with no init CLI
+
+### Creating New Projects: `/kc:create-project <stack> <path> [description]`
+
+Guides with a `## Create Project` section (astro, nextjs, fastapi) can scaffold a new project. Flow, one git commit per phase: git init, official init CLI (skipped when the guide says `none`), overlay of a per-stack template repo (`scripts/apply_template.py`, template files win), then an interview limited to questions the template does not already answer (resolved via each question's auto-detection) run together with `/kc:install`, dependency install and build, then `/kc:generate-claude-md` with the interview answers. Requires git. Template repos are normal functional projects (own `package.json`, optional `CLAUDE.md`); URLs are set in the guide.
+
 ### Coding Standards
 
 Coding standards live in `project/docs/standards/` reference docs (for multi-consumer review criteria) and directly in their consuming agent files (for single-consumer standards like documentation and Python). Agents and skills reference these shared docs via `@docs/standards/` paths.
@@ -354,7 +369,11 @@ Installed once at `~/.claude/CLAUDE.md`. Applies security rules and coding stand
 
 ### `global/settings.json`
 
-Installed once at `~/.claude/settings.json`. Wires up global hooks. Merged with existing settings.
+Installed once at `~/.claude/settings.json`. Wires up global hooks and configures the status line. Merged with existing settings — top-level keys like `statusLine` are added only if absent.
+
+### `global/statusline.py`
+
+Installed to `~/.claude/statusline.py`. Renders the Claude Code status line showing: `cwd | branch | model | ctx% | $cost | rate-limit %`. Reads JSON from stdin (Claude Code's `StatusLine` event). No dependencies beyond stdlib.
 
 ---
 
