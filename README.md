@@ -38,7 +38,8 @@ KahnClaude Unreal Engine is a **Claude Code configuration layer** specialized fo
 - **Guardrails** — Hooks block dangerous commands before they execute
 - **Workflow integration** — Skills for P4, Swarm, Jira, Confluence out of the box
 - **Team memory** — CLAUDE.md captures lessons learned; mistakes become rules
-- **Specialist delegation** — Agents for code review, Blueprint work, production
+- **Specialist delegation** — Agents for code review, Blueprint work, tests, Horde CI, production
+- **Project-agnostic** — Project values are `{{VAR}}`s read from each project's `.claude/rules/project-vars.md` (see [Project Variables](#project-variables-var))
 
 ---
 
@@ -46,11 +47,11 @@ KahnClaude Unreal Engine is a **Claude Code configuration layer** specialized fo
 
 | Component             | Count | Purpose                                                                   |
 | --------------------- | ----- | ------------------------------------------------------------------------- |
-| **Slash Commands**    | 14    | On-demand workflows invoked with `/command` (6 project + 8 framework)     |
-| **Skills**            | 15    | Focused skills with colocated reference docs, auto-triggered + user-invokable |
-| **Agents**            | 11    | Specialist subagents with restricted tool access                          |
-| **Hooks**             | 11    | Deterministic enforcement scripts (Python)                                |
-| **Tech-Stack Guides** | 6     | Compact Q&A + operational reference guides for CLAUDE.md generation       |
+| **Slash Commands**    | 16    | On-demand workflows invoked with `/command` (6 project + 10 framework)    |
+| **Skills**            | 39    | Focused skills with colocated reference docs, auto-triggered + user-invokable |
+| **Agents**            | 14    | Specialist subagents with restricted tool access                          |
+| **Hooks**             | 14    | Deterministic enforcement scripts (Python)                                |
+| **Tech-Stack Guides** | 8     | Compact Q&A + operational reference guides for CLAUDE.md generation       |
 
 ---
 
@@ -81,17 +82,20 @@ claude
 # 3. Install KahnClaude into this project
 /kc:install
 
-# 4. Customize CLAUDE.md for your project
+# 4. Fill in project variables (see project/templates/unreal-project/README.md)
+#    copy project-vars.md to .claude/rules/project-vars.md and set its values
+
+# 5. Customize CLAUDE.md for your project
 /kc:generate-claude-md
 
-# 5. Configure integrations for Perforce, Jira, etc.
+# 6. Configure integrations for Perforce, Jira, etc.
 /plugins
 
-# 6. Build Claude's knowledge base of your project
+# 7. Build Claude's knowledge base of your project
 /document
 ```
 
-> **Step 6:** `/document` creates an `ARCHITECTURE.md` and subsystem docs so Claude understands your codebase from the first session. Run it once after setup. Use `/learn` to update documentation from the current context as you go.
+> **Step 7:** `/document` creates an `ARCHITECTURE.md` and subsystem docs so Claude understands your codebase from the first session. Run it once after setup. Use `/learn` to update documentation from the current context as you go.
 
 ---
 
@@ -128,8 +132,12 @@ kahnclaude/
 │   │   ├── tech-stacks/         # Tech-specific Q&A guides (UE5, P4, Swarm, Jira, etc.)
 │   │   └── standards/           # Shared reference docs (standards, checklists)
 │   ├── scripts/
+│   │   ├── lib/                 # project_vars.py / ProjectVars.ps1 ({{VAR}} lookup for hooks and scripts)
+│   │   ├── p4/                  # Perforce helpers (open-work view for /progress)
 │   │   ├── unreal/              # UE5 editor automation
 │   │   └── vs/                  # Visual Studio automation
+│   ├── templates/
+│   │   └── unreal-project/      # Onboarding: project-vars.md, settings.json, README
 │   └── tech-stacks/             # Primary-stack guides + create-project recipes (Astro, Next.js, FastAPI)
 ├── scripts/                     # Framework helper scripts (Python, cross-platform)
 │   └── apply_template.py        # Overlay a template git repo onto a new project
@@ -204,12 +212,12 @@ These are distributed to your project via `/kc:install` — available in any Kah
 | `/document`                | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive             |
 | `/explain`                 | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage                  |
 | `/learn`                   | Update docs from a P4 changelist number, CL range, a plain-text fact, or auto-detected opened/pending      |
-| `/progress`                | Show file counts, test status, recent P4 submitted/pending activity, and next actions                      |
+| `/progress`                | Open-work view: pending CLs cited (or not) in memory, `Next:` lines, and Jira status of memory's Jira keys |
 | `/refactor`                | Refactor a file against CLAUDE.md rules — split, extract, clean up                                         |
 
 > **Start with these:** `/document` (build initial knowledge), `/explain` (understand unfamiliar code), `/answer` (research questions)
 
-### Framework Commands (9)
+### Framework Commands (10)
 
 These are only available in the KahnClaude repository itself — for managing and developing the framework.
 
@@ -220,6 +228,7 @@ These are only available in the KahnClaude repository itself — for managing an
 | `/kc:install-global`       | Install commands, skills, agents, hooks, and config into `~/.claude/`             |
 | `/kc:update`               | Update installed components in a target project to the latest versions            |
 | `/kc:sync-back`            | Sync changes from a KahnClaude-installed project back into the framework          |
+| `/kc:harvest`              | Pull improvements from a target project back into KahnClaude (reverse of `/kc:update`) |
 | `/kc:import`               | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
 | `/kc:create-agent-skill`   | Create a new agent, skill, or slash command following framework conventions       |
 | `/kc:fix-agent-skill`      | Debug a misbehaving agent or skill — session analysis + convention audit          |
@@ -233,20 +242,45 @@ Skills are auto-triggered on keywords AND user-invokable with `/skill-name`. Eac
 
 | Skill | Category | What It Does |
 | ----- | -------- | ------------ |
-| `/task-implementation` | Implementation | Unified implementation orchestrator — routes C++, Blueprint, or mixed tasks to correct agents |
+| `/task-implementation` | Implementation | Unified implementation orchestrator — routes C++, Blueprint, or mixed tasks to correct agents, then test, review, shelve |
+| `/task-user-story` | Planning | Requirements discovery — pressure-tests a raw idea with skeptical agents until WHAT and WHY are settled |
+| `/task-planning` | Planning | Clarify requirements, draft implementation plan, architecture review |
+| `/solution-options` | Planning | Read-only scout — table of implementation options with effort, upsides, downsides and one recommendation |
+| `/grill-me` | Planning | Interview the user about a plan or design until every branch of the decision tree is resolved |
+| `/to-jira-issue` | Jira | Create one Jira issue from a plan (split only at XL), delegated to the producer agent |
+| `/save-task-insight` | Jira | Save an insight about a Jira task to a local findings file |
+| `/product-review` | Jira | Meeting prep — compiles recent work and upcoming tasks into a non-technical summary |
+| `/investigate` | Debugging | Root-cause investigator — searches code, P4 history and the web, returns 10+ ranked causes |
+| `/diagnose` | Debugging | Proves a root cause to 95%+ with diagnostic logging and repro tests in a build-run loop |
+| `/reuse-finder` | Code | Finds code that re-implements something the engine, Lyra or the codebase already provides |
 | `/code-review` | Code | Smart orchestrator — resolves diff, spawns concern-based review agents, re-verifies criticals |
+| `/improve-codebase-architecture` | Code | Finds deepening and refactoring opportunities, informed by CONTEXT.md and ADRs |
+| `/ubiquitous-language` | Code | Extracts a DDD-style glossary to `UBIQUITOUS_LANGUAGE.md`, flagging ambiguous terms |
+| `/qa-bug-sweep` | QA | Pre-QA sweep of every CL submitted in the last N days — parallel reviewers, verified findings, Jira dupe check |
+| `/submit-test-gaps` | QA | Ranks the automation tests worth adding for recently submitted game code |
+| `/test-feasibility` | QA | Ranks bugs, tickets or test ideas by whether an automation test could catch them |
 | `/perforce-changelog` | Perforce | Generate changelog from P4 history — filter by code system, user, time range |
 | `/perforce-changelist-description` | Perforce | Generate CL description from diff + Jira ticket, enforces `[TICKET][Summary] Tech #review` format |
 | `/swarm-review-shelve` | Swarm | Write CL description → shelve → report Swarm URL if `#review` present |
 | `/swarm-review-comments` | Swarm | Fetch Swarm review comments, fix one-by-one, reply, re-shelve |
-| `/to-jira-issue` | Jira | Break a plan into vertical slice issues, delegate to producer for ticket creation |
-| `/to-confluence-page` | Confluence | Create, update, or publish Confluence pages including game wiki publishing |
-| `/task-planning` | Planning | Clarify requirements, draft implementation plan, architecture review |
+| `/horde` | Horde | Answers Horde CI questions and handles pasted Horde links (jobs, schedules, agents, config) |
+| `/horde-artifact` | Horde | Downloads and triages a step's saved artifact into a `DIGEST.md` with a rerun-or-hand-off verdict |
 | `/unreal-project-compilation` | Unreal | Build + analyze + fix loop, supports all build targets, shelves on success |
-| `/game-log` | Unreal | Read + diagnose game logs, auto-detect log file, cross-reference source |
+| `/game-log` | Unreal | Read + diagnose game logs and automation reports, auto-detect log file, cross-reference source |
 | `/unreal-pie` | Unreal | Manage PIE sessions — start, stop, or execute console commands |
 | `/unreal-asset-inspections` | Unreal | Inspect and modify UE5 assets — read/set properties, dump all, find referencers |
 | `/editor-python` | Unreal | Execute arbitrary Python code or script files in the running editor |
+| `/to-confluence-page` | Docs | Create, update, or publish Confluence pages, including local Markdown docs and game wikis |
+| `/confluence-user-guide` | Docs | Creates or refreshes a system's Confluence page as an illustrated user guide |
+| `/illustrate` | Docs | Builds an explainer page with SVG figures, interactive diagrams and annotated screenshots |
+| `/presentation` | Docs | Slide-deck maker in the user's design-system template, from real code, Jira and Confluence facts |
+| `/create-tutorial` | Docs | Writes a subsystem tutorial: architecture, key variables and a usage walkthrough |
+| `/web-search` | Research | Web-first answers for current events, latest releases, version-specific APIs, CVEs |
+| `/latest-updates-info` | Research | Briefs what's new in a named tool, library, framework or service |
+| `/generify-to-user` | Setup | Moves Claude setup items from a project into `~/.claude`, replacing project values with `{{VAR}}`s |
+| `/setup-review` | Setup | Reviews the Claude Code setup from memory and history evidence and suggests changes |
+| `/burn-tokens` | Setup | Ranks 10 big, useful ways to spend spare token quota, with sizes and a launch plan |
+| `/processes-cleanup` | Setup | Finds stuck or duplicate dev-tool processes and kills them after confirmation |
 
 > **Start with these:** `/code-review` (review your code), `/perforce-changelist-description` (better CL descriptions), `/task-planning` (plan before coding)
 
@@ -268,8 +302,11 @@ Agents are specialists Claude delegates to automatically. Each has restricted to
 | `code-reviewer`               | Read, Grep, Glob, Bash(p4)           | C++/UE5 code reviewer: security, correctness, performance, C++ craft, engine pitfalls, Blueprint boundary |
 | `designer`                    | Read, Write, Edit, Grep, Glob, Confluence+Jira MCP | Game design specialist — balance decisions, system design, local game wiki generation, Confluence wiki management |
 | `documenter`                  | Read, Write, Edit, Grep, Glob        | Architecture docs, subsystem docs, Mermaid diagrams, Decisions logs          |
+| `horde-guide`                 | Read, Grep, Glob, WebFetch, WebSearch, PowerShell(p4 read-only) | Read-only Horde CI expert — answers from project docs, stream config, engine Horde docs and source; Learn mode proposes doc additions |
 | `producer`                    | Read, Grep, Glob, Jira MCP           | Fetches Jira tickets, clarifies technical requirements, identifies cross-team dependencies, gathers estimates, and creates well-structured tickets |
 | `python-dev`                  | Read, Write, Edit, Bash, Grep, Glob, WebFetch | Modern Python 3.12+ — architecture, packaging, async, type system         |
+| `remote-controller`           | Bash, Read                           | Claude Code remote control — launch servers, explain flags and spawn modes, troubleshoot missing sessions |
+| `test-dev`                    | Read, Write, Edit, Grep, Glob, Bash  | Writes and fixes CQTest automation tests from a pre-approved plan or a flake, with P4 discipline and a full build |
 | `unreal-guide`                | Read, Grep, Glob, WebSearch, WebFetch | Answers UE5 questions using official Epic docs and forums, cites sources   |
 
 > **Note:** Reviewers are read-only (no Write/Edit) to prevent accidental modifications during review.
@@ -293,7 +330,10 @@ PreToolUse hook blocking .env access
 | `block-secrets`                 | PreToolUse   | Blocks Read/Edit on `.env`, SSH keys, credentials, and secret path patterns                                |
 | `block-write-outside-repo`      | PreToolUse   | Blocks Edit/Write operations targeting files outside the project directory                                  |
 | `block-dangerous-commands`      | PreToolUse   | Blocks `p4 submit`, `p4 obliterate`, `rm -rf /`, `chmod 777`, `curl \| sh`, and secret exfiltration       |
-| `p4-commands-permission`        | PreToolUse   | Controls permission prompts for P4 CLI commands in Bash                                                    |
+| `p4-commands-permission`        | PreToolUse   | P4 permission gate in Bash and PowerShell: denies blocked subcommands, asks for destructive/workspace-switching ones, allows safe single commands |
+| `block-asset-grep`              | PreToolUse   | Blocks recursive content searches over Unreal `Content/`, `Plugins/` or `*.uasset`/`*.umap` (no-op outside UE projects) |
+| `glob-scope`                    | PreToolUse   | Narrows Glob calls rooted at an Unreal workspace; denies `**` at the root with a narrower-path hint        |
+| `track-tokens`                  | SessionEnd   | Appends the session's token usage to `~/.claude/token-log.jsonl`; never blocks                             |
 | `verify-no-secrets`             | Stop         | Warns if P4 opened files contain secrets (AWS keys, GitHub tokens, Stripe keys, PEM)                       |
 | `check-env-sync`                | Stop         | Warns if `.env` has keys missing from `.env.example`                                                       |
 | `after-edit`                    | PostToolUse  | Auto-formats files after edit/write: clang-format (C++), black+ruff (Python), prettier (JS/JSON/MD)       |
@@ -311,6 +351,9 @@ PreToolUse hook blocking .env access
 | `PostToolUse`      | After Claude writes or edits a file            |
 | `Stop`             | When Claude finishes a turn                    |
 | `Notification`     | When Claude sends a notification to the user   |
+| `SessionEnd`       | When the session ends                          |
+
+`hook_project.py` is not a hook: it is the shared helper the hooks import to read project vars and detect the Unreal layout.
 
 ### Exit Codes
 
@@ -343,7 +386,9 @@ Specialized Q&A guides loaded by `/kc:generate-claude-md` when a tech stack is d
 - **`helix_swarm.md`** — Helix Swarm code review integration, review workflow, comment handling, API reference
 - **`atlassian_jira.md`** — Jira project setup, issue tracking conventions, operational reference
 - **`atlassian_confluence.md`** — Confluence documentation publishing conventions, formatting references
-- **`visual_studio.md`** — Visual Studio (UE5 integration): env vars (`KC_UE_SOLUTION`, `KC_UE_ENGINE`, `KC_PROJECT_ROOT`), build config, COM/DTE automation reference, UBT fallback
+- **`visual_studio.md`** — Visual Studio (UE5 integration): project vars (`UE_SOLUTION`, `UE_ENGINE`, `PROJECT_ROOT`), build config, COM/DTE automation reference, UBT fallback
+- **`horde.md`** — Generic Horde CI reference (API, link shapes, scheduler, storage, gotchas) for the `horde` skill and `horde-guide` agent; project facts live in `{{HORDE_DOC}}`
+- **`unreal-navigation.md`** — UE5 navigation facts verified in engine source: nav octree memory, instant vs lazy gathering
 
 Primary-stack guides in `project/tech-stacks/` (matched by manifest file, used only by the generator and never copied to targets):
 
@@ -358,6 +403,16 @@ Guides with a `## Create Project` section (astro, nextjs, fastapi) can scaffold 
 ### Coding Standards
 
 Coding standards live in `project/docs/standards/` reference docs (for multi-consumer review criteria) and directly in their consuming agent files (for single-consumer standards like documentation and Python). Agents and skills reference these shared docs via `@docs/standards/` paths.
+
+### Project Variables (`{{VAR}}`)
+
+Skills, agents, commands and docs are project-agnostic: they write project values (P4 stream, Confluence space, engine path, test module…) as `{{NAME}}`.
+
+- `{{NAME}}` is the value of `NAME` in the project's `.claude/rules/project-vars.md`, which Claude Code auto-loads. Secrets never go in this file.
+- A needed var that is missing or empty stops the skill, which names it instead of guessing.
+- Hooks and scripts read vars through `project/scripts/lib/project_vars.py` / `ProjectVars.ps1`. `PROJECT_ROOT`, `UE_ENGINE`, `UE_PROJECT` and `UE_SOLUTION` also go in `.claude/settings.local.json` → `env`.
+- Project-only rules for a skill, agent or standard `X` go in `{{PROJECT_NOTES_DIR}}\X.md`; the generic file reads that overlay when present and it wins.
+- Onboarding: `project/templates/unreal-project/` holds `project-vars.md`, a `settings.json` permissions template and a README. `project_vars.py --check <dirs>` lists every `{{VAR}}` the setup uses that the project hasn't defined.
 
 ### `project/CLAUDE.local.md`
 
@@ -385,6 +440,7 @@ Installed to `~/.claude/statusline.py`. Renders the Claude Code status line show
 |------|-------|------------|---------|
 | Project rules | `CLAUDE.md` | Yes | Team-wide conventions, commit to repo |
 | Personal overrides | `CLAUDE.local.md` | No | Individual preferences, never commit |
+| Project values | `.claude/rules/project-vars.md` | No | Machine-specific `{{VAR}}` values (paths, stream, service IDs), never secrets |
 | Global rules | `~/.claude/CLAUDE.md` | No | Cross-project rules (security, etc.) |
 
 ### Rolling Out to a Team
@@ -392,7 +448,7 @@ Installed to `~/.claude/statusline.py`. Renders the Claude Code status line show
 1. **Lead installs first:** Run `/kc:install` and `/kc:generate-claude-md` in the project
 2. **Commit the generated files:** `CLAUDE.md`, `.claude/` folder (except `settings.local.json`)
 3. **Team members pull:** Everyone gets commands, skills, agents, hooks automatically
-4. **Personal setup:** Each member runs `/kc:install-global` once for global hooks
+4. **Personal setup:** Each member runs `/kc:install-global` once for global hooks, then fills in `.claude/rules/project-vars.md` from `project/templates/unreal-project/`
 5. **Configure MCPs individually:** Atlassian, GitHub tokens are personal credentials
 
 ### Keeping Updated
@@ -615,8 +671,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 | ------------------- | --------------------------------------------- | ----------------------------------------------- |
 | Command (project)   | `.claude/commands/<name>.md`                  | kebab-case action verb                          |
 | Command (framework) | `.claude/commands/kc/<name>.md`               | kebab-case action verb; invoked as `/kc:<name>` |
-| Skill               | `.claude/skills/<theme>/<name>/SKILL.md`      | kebab-case, reference doc in `project/docs/standards/` |
-| Agent               | `.claude/agents/<name>.md`                    | kebab-case role                                 |
+| Skill               | `.claude/skills/<name>/SKILL.md`              | kebab-case, reference doc in `project/docs/standards/` |
+| Agent               | `.claude/agents/core/<name>.md`               | kebab-case role                                 |
 | Hook                | `.claude/hooks/<name>.py`                     | `block-`, `check-`, `lint-`, `verify-` prefix   |
 
 ---
