@@ -16,7 +16,20 @@ Defaults to the current working directory if no path is given. If no `CLAUDE.md`
 
 ## Phase 1: Detect Tech Stack
 
-Scan the target project root for manifest files (`package.json`, `pyproject.toml`, `Cargo.toml`, `*.sln`, etc.) to identify the primary tech stack. If unclear, ask the user which stack they want to configure.
+Scan the target project root for manifest files (`package.json`, `pyproject.toml`, `Cargo.toml`, `*.sln`, etc.) to identify the primary tech stack. If unclear, ask the user which stack they want to configure. Check in this priority order:
+
+1. `.uproject` → **Unreal Engine** (guide: `unreal.md`)
+2. `astro.config.*` or `package.json` with `astro` → **Astro** (guide: `astro.md`)
+3. `next.config.*` or `package.json` with `next` → **Next.js** (guide: `nextjs.md`)
+4. `package.json` → **Node.js** (inspect `dependencies` for react/express/etc.)
+5. `pyproject.toml` or `setup.py` → **Python** (inspect for django/fastapi/flask; `fastapi` → guide `fastapi.md`)
+6. `Cargo.toml` → **Rust**
+7. `*.csproj` or `*.sln` → **C#/.NET**
+8. `go.mod` → **Go**
+9. `CMakeLists.txt` → **C++**
+10. `Gemfile` → **Ruby**
+11. `pom.xml` or `build.gradle` → **Java**
+12. None found → **Unknown** (use generic questions)
 
 ---
 
@@ -30,6 +43,8 @@ Scan every `*.md` file in `project/docs/tech-stacks/`. Each guide has HTML comme
 ```
 
 For each guide, parse `detection`, `signal`, `prerequisite`, and `prompt` from the header comments.
+
+Also, if Phase 1 matched a primary-stack guide in `project/tech-stacks/<stack>.md`, load it as auto-detected (these guides have no metadata header). Ignore its `## Create Project` section (used only by `/kc:create-project`).
 
 ### Step 2: Presentation rules
 
@@ -57,8 +72,9 @@ After auto-detected stacks are confirmed, gather all `detection: opt-in` guides 
 - Environment variables go in `CLAUDE.local.md`, never in `CLAUDE.md`
 - For each env var, explain what it is and how to find it
 - Auto-detect values where possible; offer detected values and let user confirm or override
+- When invoked by `/kc:create-project`, the project description and interview answers are passed in. Use them to fill the template and do not ask those questions again; ask only what is still unanswered.
 
-Auto-detect project name from `package.json`, `pyproject.toml`, git remote, or folder name. Confirm with user.
+Auto-detect project name from: `package.json` name field, `pyproject.toml`, `.uproject` DisplayName, git remote `origin` URL, or folder name. Offer the detected value and let the user confirm or override.
 
 ### Grouping: one stack at a time
 
@@ -164,4 +180,17 @@ Walk the user through setting up every environment variable from the loaded tech
 All source files are read from the KahnClaude source directory:
 
 - `project/CLAUDE.md` — master template
-- `project/docs/tech-stacks/` — tech stack guides (enumerated dynamically at runtime)
+- `project/docs/tech-stacks/` — tech stack guides with metadata headers (enumerated dynamically at runtime)
+- `project/tech-stacks/unreal.md`, `astro.md`, `nextjs.md`, `fastapi.md` — primary-stack Q&A guides (matched in Phase 1)
+- `project/tech-stacks/<stack>.md` — future guides (load if file exists)
+
+Output is written to `<target>/CLAUDE.md`.
+
+---
+
+## Notes
+
+- Skip any question by leaving the answer empty
+- If manifest parsing fails, fall back to generic questions
+- Existing sections are never overwritten in enhance mode — only new sections are appended
+- Verify no secrets in generated output before writing

@@ -110,13 +110,13 @@ Look for MCPs matching **your specific tools and workflow** — project manageme
 
 Plugins extend Claude Code itself — adding slash commands, skills, and automation at the editor level rather than at the MCP/tool level.
 
-### Always Recommended
+### Recommended for Web UI Projects
 
 | Plugin | What It Adds | Install |
 | ------ | ------------ | ------- |
-| **claude-warden** | Permission manager — pre-approves safe bash commands to eliminate repetitive allow/deny prompts | `/plugin marketplace add banyudu/claude-warden` then `/plugin install warden@claude-warden` |
+| **impeccable** | Frontend design skill — design, critique, audit, polish and harden web UI (typography, layout, color, motion, accessibility) | `/plugin marketplace add pbakaus/impeccable` then `/plugin install impeccable@impeccable` |
 
-> **Why warden?** Claude frequently asks permission for routine commands like `git status`, `ls`, `grep`, etc. Warden lets you approve patterns once so they never prompt again, without weakening security for genuinely risky operations.
+> **Why impeccable?** Steers Claude away from generic AI-looking interfaces and gives it structured commands for UX review, visual hierarchy, and design-system work.
 
 ### Finding More Plugins
 
@@ -164,7 +164,7 @@ kahnclaude/
 │   │   ├── <name>.md            # Universal agents
 │   │   ├── core/                # Cross-cutting specialists
 │   │   ├── python/              # Python specialists
-│   │   ├── web/                 # Web/React specialists
+│   │   ├── frontend/            # Web/React specialists
 │   │   └── mobile/              # React Native/Expo specialists
 │   └── hooks/                   # Enforcement scripts (Python only)
 │       └── <name>.py
@@ -174,12 +174,18 @@ kahnclaude/
 │   ├── CLAUDE.local.md
 │   └── tech-stacks/             # Tech-specific Q&A guides for auto-generation
 │       ├── unreal.md            # Unreal Engine detection + 8 guided questions
-│       ├── react-nextjs.md      # (Placeholder for future implementation)
+│       ├── astro.md             # Astro detection + questions + create-project recipe
+│       ├── nextjs.md            # Next.js detection + questions + create-project recipe
+│       ├── fastapi.md           # FastAPI detection + questions + create-project recipe (template-only)
 │       └── [more stacks...].md
+│
+├── scripts/                     # Framework helper scripts (Python, cross-platform)
+│   └── apply_template.py        # Overlay a template git repo onto a new project
 │
 ├── global/                      # Global ~/.claude/ config templates
 │   ├── CLAUDE.md
-│   └── settings.json
+│   ├── settings.json
+│   └── statusline.py            # Status line script (installed to ~/.claude/statusline.py)
 │
 └── inspiration/                 # Third-party reference — NEVER MODIFY
 ```
@@ -198,6 +204,7 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 | Command                  | What It Does                                                                      |
 | ------------------------ | --------------------------------------------------------------------------------- |
 | `/kc:install`            | Install KahnClaude components into the current project                            |
+| `/kc:create-project`     | Create a new project (astro, nextjs, fastapi): init CLI, template overlay, targeted interview + install, CLAUDE.md |
 | `/kc:install-global`     | Merge global config into `~/.claude/` (smart merge, never overwrites)             |
 | `/kc:update`             | Update installed components from the latest framework source                      |
 | `/kc:import`             | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
@@ -348,10 +355,16 @@ Every section includes `<!-- GUIDE: ... -->` comments explaining purpose, format
 Specialized Q&A guides loaded by `/kc:generate-claude-md` when a tech stack is detected.
 
 - **`unreal.md`** — Unreal Engine (8 guided questions: version, project type, platforms, C++ vs Blueprint, plugins, content structure, build targets, do's/don'ts)
-- **`react-nextjs.md`** — React / Next.js (placeholder for future; guides in progress)
+- **`astro.md`** — Astro (9 questions: description, rendering mode, content source, islands, styling, deploy, package manager, testing, SEO)
+- **`nextjs.md`** — Next.js (9 questions: description, router, data, auth, styling, deploy, package manager, testing, env)
+- **`fastapi.md`** — FastAPI (9 questions: description, database, auth, storage, deploy, environments, tooling, testing, structure); scaffolds from `Kahncode/py-fastapi-template` with no init CLI
 - **`[more stacks].md`** — Additional stacks (Django, Rust, C#/.NET) can be added following the same pattern
 
-When `/kc:generate-claude-md` detects a manifest file (`.uproject`, `package.json`, `pyproject.toml`, etc.), it loads the matching guide and asks all questions to build a complete, annotated CLAUDE.md.
+When `/kc:generate-claude-md` detects a manifest file (`.uproject`, `astro.config.*`, `next.config.*`, `pyproject.toml`, etc.), it loads the matching guide and asks all questions to build a complete, annotated CLAUDE.md.
+
+### Creating New Projects: `/kc:create-project <stack> <path> [description]`
+
+Guides with a `## Create Project` section (astro, nextjs, fastapi) can scaffold a new project. Flow, one git commit per phase: git init, official init CLI (skipped when the guide says `none`), overlay of a per-stack template repo (`scripts/apply_template.py`, template files win), then an interview limited to questions the template does not already answer (resolved via each question's auto-detection) run together with `/kc:install`, dependency install and build, then `/kc:generate-claude-md` with the interview answers. Requires git. Template repos are normal functional projects (own `package.json`, optional `CLAUDE.md`); URLs are set in the guide.
 
 ### `@project/CLAUDE.local.md`
 
@@ -363,7 +376,11 @@ Installed once at `@~/.claude/CLAUDE.md`. Applies security rules and coding stan
 
 ### `@global/settings.json`
 
-Installed once at `@~/.claude/settings.json`. Wires up global hooks. Merged with existing settings.
+Installed once at `@~/.claude/settings.json`. Wires up global hooks and configures the status line. Merged with existing settings — top-level keys like `statusLine` are added only if absent.
+
+### `@global/statusline.py`
+
+Installed to `~/.claude/statusline.py`. Renders the Claude Code status line showing: `cwd | branch | model | ctx% | $cost | rate-limit %`. Reads JSON from stdin (Claude Code's `StatusLine` event). No dependencies beyond stdlib.
 
 ---
 
