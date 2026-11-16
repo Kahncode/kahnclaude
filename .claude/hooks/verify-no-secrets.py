@@ -12,11 +12,23 @@ Matcher: (none — Stop events have no matcher)
 Exit codes:
   0 — Allow / no issues found
   1 — Warning (violations printed to stderr, turn continues)
+
+No-op unless the project is a Perforce workspace (.p4config in/above it, or a P4CLIENT var).
 """
+import os
 import re
 import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from hook_project import project_var
+except ImportError as import_error:  # helper missing: env vars only
+    print(f"verify-no-secrets: {import_error}", file=sys.stderr)
+
+    def project_var(name: str, project_dir: str) -> str:
+        return os.environ.get(name, "")
 
 
 # Basenames of files that should never be submitted
@@ -82,7 +94,19 @@ def get_opened_local_paths() -> list[str]:
     return local_paths
 
 
+def is_p4_workspace(project_dir: str) -> bool:
+    """A .p4config (or $P4CONFIG name) in/above the project, or P4CLIENT from env/project vars."""
+    if project_dir:
+        names = {".p4config", os.environ.get("P4CONFIG", "") or ".p4config"}
+        here = Path(project_dir).resolve()
+        if any((folder / name).is_file() for folder in (here, *here.parents) for name in names):
+            return True
+    return bool(project_var("P4CLIENT", project_dir))
+
+
 def main() -> None:
+    if not is_p4_workspace(os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()):
+        sys.exit(0)
     local_paths = get_opened_local_paths()
     if not local_paths:
         sys.exit(0)

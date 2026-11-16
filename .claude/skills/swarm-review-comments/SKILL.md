@@ -18,6 +18,14 @@ Use PROACTIVELY when user says `fetch swarm comments`, `address review comments`
 
 Read, Write, Edit, Grep, Glob, Bash(p4 *), WebFetch
 
+## Required Variables
+
+| Variable | Source |
+|----------|--------|
+| `SWARM_URL` | .claude/rules/project-vars.md, or `p4 property -l -n P4.Swarm.URL` |
+
+P4USER and P4TICKET are real Perforce env vars — get them via `p4 set`.
+
 ## Step 1 -- Parse CL and Get Auth
 
 Extract CL number from $ARGUMENTS. Get P4USER and P4TICKET:
@@ -31,9 +39,11 @@ Parse ticket file (`<server>=<user>:<ticket>`) to extract the hex ticket string.
 
 ## Step 2 -- Fetch Review and Comments
 
-```bash
-curl -s -u "$P4USER:$P4TICKET" "$SWARM_URL/api/v9/reviews?change=$CL"
-curl -s -u "$P4USER:$P4TICKET" "$SWARM_URL/api/v9/comments?topic=reviews/$REVIEW_ID"
+Look up SWARM_URL in .claude/rules/project-vars.md. Then:
+
+```
+curl -s -u "<P4USER>:<P4TICKET>" "<SWARM_URL>/api/v9/reviews?change=<CL>"
+curl -s -u "<P4USER>:<P4TICKET>" "<SWARM_URL>/api/v9/comments?topic=reviews/<REVIEW_ID>"
 ```
 
 Display numbered summary of unaddressed comments with: author, file, line, body, taskState.
@@ -49,11 +59,11 @@ For each unaddressed comment (`taskState` is `comment` or `open`):
 5. Present the proposed fix. **Auto-apply** if comment is by current P4USER; **ask approval** if by someone else.
 6. On approval: `p4 edit <file>`, apply fix with Edit tool
 7. **Reply** via v11 API (threaded):
-   ```bash
-   curl -s -u "$P4USER:$P4TICKET" -X POST \
-     "$SWARM_URL/api/v11/comments/reviews/$REVIEW_ID" \
+   ```
+   curl -s -u "<P4USER>:<P4TICKET>" -X POST \
+     "<SWARM_URL>/api/v11/comments/reviews/<REVIEW_ID>" \
      -H "Content-Type: application/json" \
-     -d '{"body":"[ClaudeCode] Comment Addressed","context":{"comment":COMMENT_ID}}'
+     -d '{"body":"[ClaudeCode] Comment Addressed","context":{"comment":<COMMENT_ID>}}'
    ```
 8. **Mark addressed** -- two PATCH calls (`comment` -> `open` -> `addressed`)
 9. **Archive** the comment

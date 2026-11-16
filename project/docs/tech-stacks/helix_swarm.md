@@ -7,7 +7,7 @@
 
 ## Setup — Environment Variables
 
-Store in `CLAUDE.local.md` (never committed).
+Store in `.claude/rules/project-vars.md` (never committed).
 
 ### Required
 

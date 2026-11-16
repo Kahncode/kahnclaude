@@ -4,7 +4,7 @@ Read properties from a UE5 .uasset via the Editor's Python Remote Execution prot
 Usage:
     py read_uasset_property.py <asset_path> [property_name]
 
-    asset_path   - Game-relative path, e.g. /Game/AI/Definitions/Passengers/BD_Passenger_TC
+    asset_path   - Game-relative path, e.g. /Game/Characters/BP_Hero
     property_name - (optional) A specific property to print. If omitted, dumps all properties.
 
 Requires a running Unreal Editor instance with Python Remote Execution enabled
@@ -19,9 +19,11 @@ import sys
 import textwrap
 import time
 
-engine_root = os.environ.get("KC_UE_ENGINE")
+sys.path.insert(0, os.path.join(os.path.expanduser("~"), ".claude", "scripts", "lib"))
+from project_vars import get as _project_var  # noqa: E402
+engine_root = _project_var("UE_ENGINE", "")
 if not engine_root:
-    print("ERROR: KC_UE_ENGINE environment variable is not set.", file=sys.stderr)
+    print("ERROR: UE_ENGINE is not set (env var or .claude/rules/project-vars.md).", file=sys.stderr)
     sys.exit(1)
 ENGINE_PYTHON_PATH = os.path.join(
     engine_root, "Plugins", "Experimental",

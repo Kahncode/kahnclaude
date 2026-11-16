@@ -7,7 +7,7 @@
 
 ## Setup — Environment Variables
 
-Store in `CLAUDE.local.md` (never committed).
+Store in `.claude/rules/project-vars.md` (never committed).
 
 ### Required
 
@@ -84,17 +84,17 @@ parent = <INITIATIVE_KEY> AND issuetype = Epic AND status = "In Progress"
 
 ### Defaults
 
-Configure these values in your CLAUDE.md or CLAUDE.local.md:
+Configure these values in `.claude/rules/project-vars.md` (an ```ini block):
 
-```
-JIRA_CLOUD_ID: <your-cloud-id-uuid>
-JIRA_PROJECT_KEY: <PROJECT>
-JIRA_ASSIGNEE_ACCOUNT_ID: <your-account-id>
-JIRA_ACTIVE_EPIC: <EPIC-KEY>
-JIRA_DEFAULT_ISSUE_TYPE: Task
-JIRA_CONTENT_FORMAT: markdown
-JIRA_COMPONENTS: []
-JIRA_LABELS: ["claude_generated"]
+```ini
+JIRA_CLOUD_ID=<your-cloud-id-uuid>
+JIRA_PROJECT_KEY=<PROJECT>
+JIRA_ASSIGNEE_ACCOUNT_ID=<your-account-id>
+JIRA_ACTIVE_EPIC=<EPIC-KEY>
+JIRA_DEFAULT_ISSUE_TYPE=Task
+JIRA_CONTENT_FORMAT=markdown
+JIRA_COMPONENTS=[]
+JIRA_LABELS=["claude_generated"]
 ```
 
 ### Issue Fields
@@ -112,7 +112,7 @@ project = <KEY> AND sprint in openSprints()
 ```
 Query with `maxResults: 1`, `fields: ["customfield_10020"]`. Extract from `customfield_10020[0]`:
 - `id` — numeric sprint ID (use when setting)
-- `name` — e.g., "13th April - 27th April 2026"
+- `name` — e.g., "Sprint 12"
 - `state` — "active" | "closed" | "future"
 
 **Assign sprint:**
@@ -130,8 +130,6 @@ Use `transitionJiraIssue` with the transition `id`. Common global transitions:
 | 11 | To Do | Backlog |
 | 21 | In Progress | In Progress |
 | 31 | Done | Done |
-| 41 | All | Blocked |
-| 51 | Review Required | Review Required |
 
 Note: Transition IDs vary by project. Use `getTransitionsForJiraIssue` to get available transitions for a specific issue.
 

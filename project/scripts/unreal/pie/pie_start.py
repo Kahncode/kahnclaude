@@ -5,7 +5,9 @@ import os
 import sys
 import time
 
-_ENGINE_ROOT = os.environ.get("KC_UE_ENGINE", "")
+sys.path.insert(0, os.path.join(os.path.expanduser("~"), ".claude", "scripts", "lib"))
+from project_vars import get as _project_var  # noqa: E402
+_ENGINE_ROOT = _project_var("UE_ENGINE", "")
 _RE_PATH = os.path.join(
     _ENGINE_ROOT,
     "Plugins", "Experimental", "PythonScriptPlugin", "Content", "Python",

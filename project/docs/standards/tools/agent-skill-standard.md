@@ -9,8 +9,8 @@ Shared conventions for creating and auditing KahnClaude agents and skills.
 ### File Structure
 
 ```
-.claude/skills/<theme>/<skill-name>/SKILL.md    # Skill definition (< 100 lines)
-project/docs/standards/<theme>/<name>.md         # Reference doc (criteria, patterns)
+.claude/skills/<skill-name>/SKILL.md          # Skill definition (< 100 lines)
+docs/standards/<theme>/<name>.md      # Reference doc (criteria, patterns)
 ```
 
 ### Frontmatter

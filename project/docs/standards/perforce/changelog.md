@@ -27,12 +27,12 @@ Also match system name (case-insensitive) in CL description.
 
 | Technical CL | Player-facing |
 |--------------|---------------|
-| "Fix AI patrol logic not respecting threat radius" | "Cops no longer attack players defending themselves" |
-| "Add 10m spawn exclusion zone around pawns" | "We now avoid spawning bots too close to players (10m)" |
-| "Reduce Gunner HP 80→60 in Dungeon_A, disable sprint" | "Lowered the difficulty of Gunners in Dungeon_A" |
-| "Implement play-dead detection in AIController" | "Playing dead will cause Rats to lose interest in you" |
-| "Add corner clearance to pathfinding" | "Bots no longer collide with walls when turning corners" |
-| "Hook up God PA system to bot waves events" | "Added God announcement to bot wave events" |
+| "Fix AI ignoring cover when under fire" | "Enemies now take cover when you shoot at them" |
+| "Add 10m spawn exclusion zone around pawns" | "Enemies no longer spawn right next to you" |
+| "Reduce EnemyA HP on Easy" | "Basic enemies are easier on Easy difficulty" |
+| "Add footstep audio to NPC movement component" | "You can now hear enemies walking nearby" |
+| "Add corner clearance to pathfinding" | "Enemies no longer get stuck on corners" |
+| "Show match timer in HUD" | "You can now see how much time is left in a match" |
 
 ## Output Format
 

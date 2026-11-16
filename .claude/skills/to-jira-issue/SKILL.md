@@ -1,6 +1,6 @@
 ---
 name: to-jira-issue
-description: "Create a Jira issue from a plan. Defaults to ONE issue; suggests splitting only if estimate is XL (1-2 weeks) or larger. ALWAYS invoke when user says: 'create issue from plan', 'turn this into a ticket', 'create jira issue'. Delegates to producer agent for ticket creation."
+description: "Creates a Jira issue from a plan, one issue by default (suggests a split only at XL, 1-2 weeks, or larger). ALWAYS invoke for 'create issue from plan', 'turn this into a ticket', 'create jira issue'. Delegates to the producer agent. With an approved plan, the ticket description is that plan verbatim."
 allowed-tools: Read, Grep, Glob, Agent
 ---
 
@@ -9,6 +9,27 @@ allowed-tools: Read, Grep, Glob, Agent
 Use PROACTIVELY when the user says: `create issue from plan`, `turn this into a ticket`, `create jira issue`, `make a jira ticket`.
 
 > **Single-issue default**: Start with one comprehensive issue. Only suggest splitting into vertical slices if the estimate exceeds XL (1-2 weeks).
+
+## Step 0: Detect a Validated Plan
+
+A plan is **validated** when either:
+- a plan file was written this session (`~/.claude/plans/*.md`) and the user approved it (ExitPlanMode accepted), or
+- the user points at it: "this plan", "the plan", "exact plan", or a plan file path.
+
+**Found** → follow **Plan Mode** below and skip Steps 1–5. The user already reviewed that text; rewording it throws the review away.
+**Not found** → continue with Step 1.
+
+## Plan Mode
+
+1. **Re-read the plan file from disk** with Read right before delegating. Never reconstruct it from memory, because memory drifts from the exact text. If the plan only exists in conversation (no file), copy it exactly as last shown.
+2. **Derive metadata; never edit the plan:**
+   - **Summary**: imperative title ≤100 chars, from the plan's H1/Context.
+   - **Estimate**: S/M/L/XL.
+   - **Acceptance criteria**: testable checkboxes drawn from the plan's Verification/Change sections, appended *after* the plan. If the plan already has acceptance criteria, add none.
+3. **Keep the plan intact.** Don't trim, reorder, summarize or tidy it, and that includes sections like "Unresolved questions" or "Not recommended". "Exact" means exact.
+4. **Size**: if XL, offer a split as in Step 4. Each slice quotes its plan section verbatim.
+5. **Confirm (lightweight)**: show only Summary, Estimate, Epic, Sprint, AC and `Description: plan verbatim (N lines, from <path>)`. If the invocation already states placement (epic, sprint/backlog) and asks to create it, that is the confirmation, so skip the quiz.
+6. Delegate with the **Plan Mode producer template** in Step 6.
 
 ## Step 1: Gather Context
 
@@ -104,6 +125,31 @@ Link issues with "blocks" / "is blocked by" relationships.
 Add all issues to the active sprint unless specified otherwise.
 ```
 
+**Plan Mode (validated plan, verbatim):**
+```
+Create a Jira issue:
+- Summary: [title]
+- Estimate: [size]
+- Parent epic: [key, or default]
+- Sprint: [active sprint | backlog / no sprint]
+
+Description: the text between the markers, VERBATIM. Keep headings, code blocks
+and lists as markdown. Do not reword, trim, reorder or summarize. Append the
+Acceptance Criteria block after it.
+
+--- PLAN START ---
+[plan file contents, exactly as read from disk]
+--- PLAN END ---
+
+## Acceptance Criteria
+[checkboxes]
+
+If Jira/Atlassian tools are unavailable, stop and say so. Never report a fake key.
+If the parent epic can't be set, say so explicitly.
+```
+
+If the producer reports missing Atlassian tools, relay that to the user: the Atlassian MCP likely needs signing in via `/mcp`. Don't retry blindly.
+
 The producer agent handles all Jira technicalities:
 - Environment variable resolution
 - Sprint detection and assignment
@@ -120,7 +166,9 @@ After the producer completes, summarize:
 
 **PROJ-123** — [title]
 **Estimate:** M
+**Epic:** [key or "none"]
 **Sprint:** [sprint name or "Backlog"]
+**Description:** [drafted | plan verbatim from <path>]
 ```
 
 **Multiple slices:**
@@ -142,7 +190,8 @@ After presenting the created issue(s), offer:
 
 ## Rules
 
-- Never create issues without user confirmation
+- Never create issues without user confirmation. Explicit placement plus "create it" in the invocation args counts as confirmation.
+- A validated plan goes into the description verbatim; add metadata and AC around it, never edit it
 - Default to a single issue — only suggest splitting if estimate is XL or larger
 - If splitting, use vertical slices (end-to-end), not horizontal (layer-by-layer)
 - Each issue must have testable acceptance criteria

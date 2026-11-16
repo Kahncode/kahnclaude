@@ -5,7 +5,7 @@ description: "Perforce shelve + Swarm review. ALWAYS invoke when the user asks t
 
 # Shelve & Swarm Changelist
 
-Use PROACTIVELY when user says `shelve`, `checkpoint`, `shelve for review`, `create swarm review`, `shelve progress`, or when another skill needs to save progress (e.g., after a successful build).
+Use PROACTIVELY when user says `shelve`, `checkpoint`, `shelve for review`, `create swarm review`, `shelve progress`, or when another skill needs to save progress.
 
 **Input:** $ARGUMENTS (optional -- CL number)
 
@@ -26,11 +26,10 @@ Resolve the CL in this order:
 3. **Query P4:** If not found above, detect the active CL:
 
 ```bash
-p4 opened -c default
-p4 changes -s pending -u $P4USER -c $P4CLIENT
+p4 changes -s pending --me -c "$(p4 -ztag -F %clientName% info)"
 ```
 
-If files are in the default changelist, warn the user and ask them to move files to a numbered CL first.
+The default changelist holds the user's unrelated work in this shared workspace: never shelve or move it.
 
 If multiple pending CLs, ask which one to shelve.
 
@@ -38,9 +37,17 @@ If multiple pending CLs, ask which one to shelve.
 
 **Invoke the `perforce-changelist-description` skill.** The CL description must be finalized before shelving because Swarm uses it as the review description.
 
-**Skip this step if:** the caller explicitly requests a quick checkpoint (e.g., programmatic invocation from `unreal-project-compilation`), or the CL already has a properly formatted description (with `[TICKET]`, `[summary]`, and `#review`). If skipping, confirm with the user.
+**Skip this step if:** the caller explicitly requests a quick checkpoint, or the CL already has a properly formatted description (with `[TICKET]`, `[summary]`, and `#review`). If skipping, confirm with the user.
 
 ## Step 3 -- Shelve
+
+**First list what will be shelved** (parallel sessions move files between CLs, so files from an unrelated CL can end up in this one):
+
+```bash
+p4 opened -c <CL#>
+```
+
+Show the list. **Stop and ask** if any file is one the work didn't name, a binary (`.uasset`/`.umap` excepted when the work is content), a `Binaries/` file, a local-only path (`{{LOCAL_ONLY_PATHS}}`), or holds a secret (`p4 diff -du` on opened `.ini`/config files: look for `Token=`, `Key=`, `Password=`, `ATATT`, `Bearer`). Otherwise shelve:
 
 ```bash
 p4 shelve -c <CL#>
@@ -66,18 +73,18 @@ p4 describe -s <CL#>
 - Timestamp of the checkpoint
 
 **If `#review` is in the description, also report:**
-- Swarm review URL: `$SWARM_URL/reviews/<CL#>`
+- Swarm: `<SWARM_URL>/changes/<CL#>` (the change page links its review; review IDs differ from CL numbers, e.g. CL 1000 → review 1012)
 - Reminder: assign reviewers in Swarm (no auto-assignment)
 
-Determine the Swarm URL from `SWARM_URL` env var or `p4 property -l -n P4.Swarm.URL`. If neither found, ask the user.
+Determine the Swarm URL from .claude/rules/project-vars.md (`SWARM_URL`), or `p4 property -l -n P4.Swarm.URL`. If not found, ask the user.
 
 ## Integration
 
-This skill is invoked by other skills (e.g., `unreal-project-compilation` on successful build, `task-implementation` after code-dev or blueprint-dev completes). When called programmatically for a quick checkpoint, skip Step 2 and shelve directly.
+This skill is invoked by other skills (e.g., `task-implementation` after code-dev or blueprint-dev completes). When called programmatically for a quick checkpoint, skip Step 2 and shelve directly.
 
 ## Rules
 
 - **Never run `p4 submit`** -- submitting is the user's responsibility
 - Do not assign reviewers -- the user handles that in Swarm
 - The `#review` tag in the description triggers Swarm to create the review automatically
-- Do not shelve `.claude/`, `CLAUDE.local.md`, or `.env` files
+- Do not shelve local-only paths (`{{LOCAL_ONLY_PATHS}}`)

@@ -7,7 +7,7 @@
 
 ## Setup — Environment Variables
 
-Store in `CLAUDE.local.md` (never committed).
+Store in `.claude/rules/project-vars.md` (never committed).
 
 ### Required
 
@@ -57,10 +57,10 @@ contentFormat: "markdown"   ✗ strips images and rich content
 
 ### Space
 
-Configure your space key in CLAUDE.md or CLAUDE.local.md:
+Configure your space key in `.claude/rules/project-vars.md` (an ```ini block):
 
-```
-CONFLUENCE_SPACE_KEY: <YOUR_SPACE>
+```ini
+CONFLUENCE_SPACE_KEY=<YOUR_SPACE>
 ```
 
 ### Formatting & Editing References

@@ -15,8 +15,8 @@
 | `Stat FPS` | Toggle FPS counter |
 | `Stat Unit` | Toggle frame timing breakdown |
 | `Stat Game` | Toggle game thread stats |
-| `SetHealth <value>` | Set player health |
-| `AddItems <name> <count>` | Add items to inventory |
+| `SetHealth <value>` | Example project cheat: set player health (only if the project's CheatManager defines it) |
+| `AddItems <name> <count>` | Example project cheat: add items to inventory (only if the project defines it) |
 
 ## PIE States
 

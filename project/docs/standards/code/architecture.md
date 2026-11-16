@@ -22,7 +22,6 @@ Does the solution fit the problem?
   - Over-engineering for hypothetical future requirements
 
 - **Size limits**
-  - File >300 lines — split
   - Function >50 lines — extract helpers
 
 ## UE5 Considerations

@@ -4,7 +4,7 @@ Dump all property values from a loaded UE5 asset via Python Remote Execution.
 Usage:
     py dump_asset_properties.py <asset_path>
 
-    asset_path - Game-relative path, e.g. /Game/AI/Definitions/Passengers/BD_Passenger_TC
+    asset_path - Game-relative path, e.g. /Game/Characters/BP_Hero
 
 Connects to a running Unreal Editor instance and reads every editor-visible
 property on the asset, printing a sorted key=value listing for human review.
@@ -18,9 +18,11 @@ import sys
 import time
 import textwrap
 
-engine_root = os.environ.get("KC_UE_ENGINE")
+sys.path.insert(0, os.path.join(os.path.expanduser("~"), ".claude", "scripts", "lib"))
+from project_vars import get as _project_var  # noqa: E402
+engine_root = _project_var("UE_ENGINE", "")
 if not engine_root:
-    print("ERROR: KC_UE_ENGINE environment variable is not set.", file=sys.stderr)
+    print("ERROR: UE_ENGINE is not set (env var or .claude/rules/project-vars.md).", file=sys.stderr)
     sys.exit(1)
 ENGINE_PYTHON_PATH = os.path.join(
     engine_root, "Plugins", "Experimental",

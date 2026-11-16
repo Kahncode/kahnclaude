@@ -8,7 +8,7 @@
 | `p4 diff -du <path>` | Diff pending changes for a file or folder |
 | `p4 diff -du <path>/...` | Diff all pending changes under a folder recursively |
 | `p4 opened` | List currently opened files in the workspace |
-| `p4 changes -s pending -u $P4USER -c $P4CLIENT -m 1` | Latest pending changelist |
+| `p4 changes -s pending --me -c "$(p4 -ztag -F %clientName% info)" -m 1` | Latest pending changelist |
 | `p4 client -o` | Client spec (extract Stream field) |
 
 ## Resolution Priority

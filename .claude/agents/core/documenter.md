@@ -19,6 +19,7 @@ Follow these standards for all documentation work. They are authoritative.
 - **Progressive discovery** — every doc must be reachable via CLAUDE.md or ARCHITECTURE.md links
 - **300-line limit** — split at concept boundaries and cross-link parts
 - **Consistency** — if two docs contradict each other, fix both in the same pass
+- **Skimmable team docs** — a "Start here" box at the top (what it is, the next action, time to read), one "In short:" line under each section heading, numbered steps for flows, a done/next/later tracker for plans, and keep the diagrams
 
 ### File Structure
 

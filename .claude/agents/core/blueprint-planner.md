@@ -22,7 +22,7 @@ Understand what the user is asking. The requirement may come from:
 ### Step 2 — Identify Affected Assets
 
 - If the user provides `/Game/...` paths, use those directly
-- If the user names an asset type or system, use Grep/Glob to find relevant `.uasset` files
+- If the user names an asset type or system, Glob `.uasset` files by **file name** under a narrow `{{UE_PROJECT_DIR}}\Content\<Folder>` path (never content-search assets; the hook blocks it)
 - Run `find_asset_referencers.py` to understand dependencies
 
 ### Step 3 — Inspect Current State

@@ -45,6 +45,7 @@ Use the tightest specifier that works:
 - `BlueprintNativeEvent` when C++ has a default; `BlueprintImplementableEvent` when it does not
 - Missing `BlueprintCallable` on functions designers need is an under-exposure gap
 - Internal implementation exposed to Blueprint is over-exposure
+- Notes above a UPROPERTY/UFUNCTION that aren't its tooltip use `//~` (UHT merges `/* */` and `// --- x ---` across blank lines into the tooltip). Check: UBT `-Mode=UnrealHeaderTool`
 
 ## UPARAM for Clarity
 

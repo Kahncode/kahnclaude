@@ -23,29 +23,26 @@ p4 unshelve -s <CL#> -c <target-CL#>
 ## Resolving the Active CL
 
 ```bash
-# List pending CLs for the current user/workspace
-p4 changes -s pending -u $P4USER -c $P4CLIENT
+# List pending CLs for the current user/workspace ($P4USER/$P4CLIENT are empty in the shell)
+p4 changes -s pending --me -c "$(p4 -ztag -F %clientName% info)"
 
-# Check what files are opened and in which CL
-p4 opened
-
-# Check files in the default changelist specifically
-p4 opened -c default
+# List exactly what a CL will shelve (always before shelving)
+p4 opened -c <CL#>
 ```
 
-Files in the `default` changelist cannot be shelved until moved to a numbered CL:
+Files in the `default` changelist cannot be shelved until moved to a numbered CL. The default CL holds the user's unrelated work in this shared workspace: move only files you name, never a wildcard.
 
 ```bash
-# Create a new numbered CL
-p4 change -o | sed 's/<enter description here>/Checkpoint/' | p4 change -i
+# Create a new, empty numbered CL (strip Files: or it swallows the whole default CL)
+p4 change -o | sed -e 's/<enter description here>/Checkpoint/' -e '/^Files:/,$d' | p4 change -i
 
-# Move files from default to the new CL
-p4 reopen -c <new-CL#> //...
+# Move named files from default to the new CL
+p4 reopen -c <new-CL#> <file> [<file> ...]
 ```
 
 ## Swarm URL Patterns
 
-- Review URL: `$SWARM_URL/reviews/<CL#>`
+- Change page: `$SWARM_URL/changes/<CL#>` (links its review). Review IDs differ from CL numbers (e.g. CL 12000 → review 12042), so never build `/reviews/<CL#>`
 - Shelving a CL with `#review` in its description auto-creates a Swarm review
 - Subsequent shelves to the same CL update the existing review (URL stays the same)
 
@@ -92,4 +89,4 @@ curl -s -u "$P4USER:$P4TICKET" \
   "$SWARM_URL/api/v9/reviews?change=<CL#>"
 ```
 
-Or navigate directly: `$SWARM_URL/reviews/<CL#>`
+Or open `$SWARM_URL/changes/<CL#>`, which links the review.

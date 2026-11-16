@@ -1,0 +1,184 @@
+<title>REPLACE: Short Name</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: single reading column (~70ch), figures full column width; engineering-notebook feel */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --fg: #1d2330; --muted: #5b6475; --rule: #d9dde5;
+  --a: #2f6fd6; --b: #0f8a7a; --c: #8a5cd6; --bad: #c8422f; --good: #1f8a3c; --warn: #c08a10; --hl: #fff4d6; --code: #eef1f6;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --fg: #e3e7ee; --muted: #9aa3b3; --rule: #2d3542;
+  --a: #6ea3ff; --b: #3cc7b2; --c: #b994ff; --bad: #ff7a66; --good: #5fd17f; --hl: #3a3218; --code: #222a35; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --fg: #e3e7ee; --muted: #9aa3b3; --rule: #2d3542;
+  --a: #6ea3ff; --b: #3cc7b2; --c: #b994ff; --bad: #ff7a66; --good: #5fd17f; --hl: #3a3218; --code: #222a35; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 40px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: 2.3rem; }
+h2 { font-size: 1.5rem; padding-top: 12px; border-top: 1px solid var(--rule); }
+h3 { font-size: 1.15rem; }
+p, ul, ol { margin: 0; max-width: 70ch; }
+section { display: grid; gap: 14px; min-width: 0; }
+.eyebrow { font: 500 .78rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.12rem; }
+code, .mono { font-family: var(--mono); font-size: .88em; }
+:not(pre) > code { background: var(--code); padding: 1px 5px; border-radius: 4px; }
+.ref { font-family: var(--mono); font-size: .8rem; color: var(--muted); white-space: nowrap; }
+figure { margin: 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+figcaption { font-size: .88rem; color: var(--muted); max-width: 70ch; }
+.svgbox { overflow-x: auto; }
+svg { display: block; width: 100%; height: auto; min-width: 520px; }
+svg text { font-family: var(--body); font-size: 13px; fill: var(--fg); }
+svg .small { font-size: 11px; fill: var(--muted); }
+svg .strong { font-weight: 600; }
+.tblbox { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+pre { margin: 0; background: var(--code); border-radius: 6px; padding: 14px; overflow-x: auto; font: 13px/1.55 var(--mono); }
+pre .add { background: color-mix(in srgb, var(--good) 18%, transparent); display: block; }
+pre .old { background: color-mix(in srgb, var(--bad) 16%, transparent); display: block; }
+pre .c { color: var(--muted); }
+.flow { display: grid; gap: 8px; }
+.step { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--rule); border-radius: 6px; padding: 10px 14px; min-width: 0; }
+.step.bad { border-left-color: var(--bad); }
+.step.good { border-left-color: var(--good); }
+.step .q { font-weight: 600; }
+.step .d { grid-column: 1 / -1; color: var(--muted); font-size: .92rem; }
+.tag { font: 600 .7rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 3px 6px; border-radius: 4px; }
+.tag.bad { color: var(--bad); border: 1px solid var(--bad); }
+.tag.good { color: var(--good); border: 1px solid var(--good); }
+.tag.open { color: var(--muted); border: 1px solid var(--muted); }
+.note { background: var(--hl); border-radius: 6px; padding: 12px 14px; max-width: 70ch; font-size: .95rem; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.fact { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 12px; display: grid; gap: 2px; }
+.fact b { font-family: var(--display); font-size: 1.4rem; }
+.fact span { color: var(--muted); font-size: .85rem; }
+/* Diff: <div class="diff"><div class="dh">File.cpp · CL 123</div><pre><span class="ln">572</span><span class="add">+ code</span>...</pre></div> */
+.diff { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.diff .dh { font: 500 .8rem/1 var(--mono); color: var(--muted); background: var(--panel); padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+.diff pre { border-radius: 0; }
+.diff .ln { color: var(--muted); display: inline-block; width: 3.5em; user-select: none; }
+.diff .del { background: color-mix(in srgb, var(--bad) 16%, transparent); display: block; }
+/* Timeline of CLs / bugs: <ol class="timeline"><li><span class="when">01-15</span><b>CL 12345</b> summary <span class="tag good">fix</span></li></ol> */
+.timeline { list-style: none; padding: 0 0 0 18px; margin: 0; border-left: 2px solid var(--rule); display: grid; gap: 10px; max-width: 70ch; }
+.timeline li { position: relative; font-size: .93rem; }
+.timeline li::before { content: ""; position: absolute; left: -24px; top: .45em; width: 10px; height: 10px; border-radius: 50%; background: var(--panel); border: 2px solid var(--a); }
+.timeline .when { font: 500 .8rem/1 var(--mono); color: var(--muted); margin-right: 8px; }
+/* Concept index + concept cards */
+.concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; padding: 0; margin: 0; list-style: none; }
+.concepts > li { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.concepts > li > a { font-weight: 600; color: var(--fg); text-decoration: none; }
+.concepts > li > a:hover { color: var(--a); }
+.concepts ul { margin: 4px 0 0; padding-left: 1.1em; font-size: .88rem; color: var(--muted); }
+.concepts ul a { color: inherit; }
+.card { border: 1px solid var(--rule); border-radius: 10px; padding: 18px; background: color-mix(in srgb, var(--panel) 60%, var(--bg)); display: grid; gap: 12px; min-width: 0; scroll-margin-top: 16px; }
+.card > h2 { border-top: 0; padding-top: 0; }
+.card .def { font-size: 1.02rem; }
+.card h4 { margin: 4px 0 0; font: 600 .78rem/1 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.card .up { font-size: .8rem; color: var(--muted); justify-self: end; }
+/* Teaching blocks */
+.goals { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 16px; display: grid; gap: 6px; max-width: 70ch; }
+.goals h3 { font-size: .8rem; font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.goals ul { padding-left: 1.2em; }
+.predict { border-left: 4px solid var(--a); background: var(--panel); border-radius: 6px; padding: 10px 14px; max-width: 70ch; }
+.predict > p:first-child::before { content: "Predict: "; font-weight: 600; color: var(--a); }
+details.reveal { border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px; background: var(--panel); max-width: 70ch; }
+details.reveal summary { cursor: pointer; font-weight: 600; color: var(--a); }
+details.reveal[open] summary { margin-bottom: 6px; }
+.myth { border-left: 4px solid var(--bad); background: color-mix(in srgb, var(--bad) 7%, var(--panel)); border-radius: 6px; padding: 10px 14px; max-width: 70ch; }
+.myth b:first-child { color: var(--bad); }
+.analogy { border-left: 4px solid var(--c); background: color-mix(in srgb, var(--c) 7%, var(--panel)); border-radius: 6px; padding: 10px 14px; max-width: 70ch; }
+.recap { background: color-mix(in srgb, var(--good) 8%, var(--panel)); border: 1px solid color-mix(in srgb, var(--good) 35%, var(--rule)); border-radius: 8px; padding: 12px 16px; max-width: 70ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: .9rem; }
+.controls label { display: flex; gap: 8px; align-items: center; min-width: 0; flex: 1 1 220px; }
+button { font: 500 .85rem/1 var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+button:hover { border-color: var(--a); }
+input[type="range"] { width: 100%; accent-color: var(--a); }
+:focus-visible { outline: 2px solid var(--a); outline-offset: 2px; }
+/* Screenshots: fragments from scripts/annotate_shots.py; highlights are an SVG layer over the image */
+.shotwrap { overflow-x: auto; }
+.shotbox { position: relative; display: block; margin-inline: auto; line-height: 0; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; cursor: zoom-in; }
+.shotbox.big { max-width: none; cursor: zoom-out; }
+.shotbox img { display: block; width: 100%; height: auto; }
+.shotbox svg { position: absolute; inset: 0; width: 100%; height: 100%; min-width: 0; max-width: none; margin: 0; }
+.shotbox svg text.shotn { fill: var(--panel); font-weight: 600; font-family: var(--body); }
+figure .shotwrap + .shotwrap { margin-top: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+
+<header style="display:grid;gap:10px">
+  <div class="eyebrow">REPLACE: ticket · system · CL</div>
+  <h1>REPLACE: Short Name</h1>
+  <p class="lede">REPLACE: one or two sentences — what happens and why, in plain words.</p>
+</header>
+
+<div class="goals">
+  <h3>After this page you can</h3>
+  <ul><li>REPLACE: an ability, e.g. "predict when an actor stops replicating"</li></ul>
+</div>
+
+<div class="facts">
+  <div class="fact"><b>REPLACE</b><span>what this number means</span></div>
+</div>
+
+<!-- Concept index + one card per concept:
+<ul class="concepts" id="concepts">
+  <li><a href="#card-fixture">The fixture</a><ul><li><a href="#card-fixture">queue now, run later</a></li><li>QueueWait</li></ul></li>
+</ul>
+<section class="card" id="card-fixture">
+  <h2>The fixture</h2>
+  <p class="def">One line: what it is.</p>
+  <h4>Why it exists</h4><p>…</p>
+  <h4>How it works</h4><figure>…</figure>
+  <h4>In the code</h4><pre>…</pre><span class="ref">File.cpp:120-134</span>
+  <h4>How to use it</h4><pre>…</pre>
+  <h4>Gotchas</h4><ul><li>…</li></ul>
+  <h4>Learn more</h4><ul><li><a href="https://…">Confluence / Epic doc</a></li></ul>
+  <a class="up" href="#concepts">↑ concepts</a>
+</section>
+-->
+
+<!-- Teaching blocks:
+<div class="analogy"><b>Think of it as</b> … <i>Where the analogy breaks:</i> …</div>
+<div class="predict"><p>The parent actor is rotated 3°. Where does its child component end up?</p></div>
+<details class="reveal"><summary>Answer</summary><p>…</p></details>
+<div class="myth"><b>Looks like:</b> … <b>Actually:</b> …</div>
+<section><h2>Check yourself</h2> several details.reveal with questions as summary </section>
+<div class="recap"><b>Remember</b><ul><li>…</li></ul></div>
+-->
+
+<section>
+  <h2>1 · REPLACE section title</h2>
+  <p>REPLACE text. Claims about code carry a reference: <span class="ref">File.cpp:123</span></p>
+  <figure>
+    <div class="svgbox">
+      <svg viewBox="0 0 640 260" role="img" aria-label="REPLACE: what the figure shows">
+        <!-- see references/figures.md for patterns -->
+      </svg>
+    </div>
+    <figcaption>REPLACE: what to notice in this figure.</figcaption>
+  </figure>
+</section>
+
+<!-- Flow of code decisions:
+<div class="flow">
+  <div class="step"><span class="q">Question the code asks?</span><span class="ref">File.cpp:10-14</span><span class="d">What happens.</span></div>
+  <div class="step bad"><span class="q">Bad branch <span class="tag bad">bug path</span></span><span class="ref">File.cpp:20</span><span class="d">Why it's wrong.</span></div>
+  <div class="step good"><span class="q">Fix <span class="tag good">new</span></span><span class="ref">File.cpp:16</span><span class="d">What it does instead.</span></div>
+</div>
+-->
+
+</div>
+<script>
+document.querySelectorAll('.shotbox').forEach(b => b.addEventListener('click', () => { const on = b.classList.toggle('big'); b.style.width = on ? b.dataset.w + 'px' : `min(100%,${b.dataset.w}px)`; }));
+</script>

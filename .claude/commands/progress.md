@@ -1,73 +1,19 @@
 ---
-description: Show project progress — files, tests, recent P4 activity, and next actions
+description: "Open-work view: unshelved and pending CLs memory cites, pending CLs no memory names, Next: lines, and the Jira status of the project's Jira keys in MEMORY.md"
 scope: project
-allowed-tools: Read, Glob, Bash(p4 changes:*), Bash(p4 opened:*), Bash(p4 info:*), Bash(find:*), Bash(wc:*)
+allowed-tools: Read, Bash(python -I -X utf8 $KC_PROJECT_ROOT/.claude/scripts/p4/progress_view.py*), mcp__atlassian__searchJiraIssuesUsingJql
 ---
 
-# Project Progress
+# Progress — where is all the open work?
 
-Check the actual state of all components and report status.
+For "where are we?" about **this session**, don't run this: answer in the 6-line shape from CLAUDE.local.md. This command is the whole-backlog view.
 
-## Instructions
-
-1. Read `@docs/ARCHITECTURE.md` for project context (if it exists)
-2. Detect the project type from files present (see below)
-3. Check source and test file counts
-4. Check recent Perforce activity
-
-## Project Type Detection
-
-```bash
-# Detect language/stack from root files
-ls -1 *.uproject *.sln *.csproj package.json pyproject.toml Cargo.toml go.mod CMakeLists.txt 2>/dev/null
-```
-
-## Source and Test Counts
-
-```bash
-echo "=== Source Files ==="
-# Adjust extensions to match detected project type
-find . -not -path './.git/*' -not -path '*/Intermediate/*' -not -path '*/Saved/*' \
-  -not -path '*/Binaries/*' -not -path '*/DerivedDataCache/*' \
-  \( -name "*.h" -o -name "*.cpp" -o -name "*.hpp" -o -name "*.inl" \
-     -o -name "*.py" -o -name "*.rs" -o -name "*.ts" -o -name "*.cs" \
-     -o -name "*.go" -o -name "*.java" \) 2>/dev/null | head -30
-
-echo ""
-echo "=== Test Files ==="
-find . -not -path './.git/*' -not -path '*/Intermediate/*' \
-  \( -name "*.test.*" -o -name "*.spec.*" -o -name "test_*.py" -o -name "*_test.go" \
-     -o -name "*Tests.cpp" -o -name "*Test.cpp" -o -name "*_test.rs" \) 2>/dev/null | head -30
-```
-
-## Perforce Activity
-
-```bash
-echo ""
-echo "=== Recent Submitted Changes (Last 15) ==="
-p4 changes -m 15 -u $P4USER -s submitted 2>/dev/null || echo "No recent submissions"
-
-echo ""
-echo "=== Pending Changelists ==="
-p4 changes -s pending -u $P4USER -c $P4CLIENT 2>/dev/null || echo "No pending changelists"
-
-echo ""
-echo "=== Currently Opened Files ==="
-p4 opened 2>/dev/null | head -20 || echo "No files currently opened"
-```
-
-## Output Format
-
-| Area          | Files   | Status | Notes |
-| ------------- | ------- | ------ | ----- |
-| Source code   | N files | ...    | ...   |
-| Tests         | N files | ...    | ...   |
-| Documentation | ...     | ...    | ...   |
-
-### Next Actions (Priority Order)
-
-Based on what's present and what's missing, suggest the top 3 next actions:
-
-1. ...
-2. ...
-3. ...
+1. From `{{PROJECT_ROOT}}`, run in the background (about 30-60 s, read-only): `python -I -X utf8 $KC_PROJECT_ROOT/.claude/scripts/p4/progress_view.py`
+2. In parallel, one JQL query for the {{JIRA_PROJECT_KEY}} keys the script prints last: `key in (<keys>)`, fields `summary,status`.
+3. Reply in this order, max ~25 lines:
+   1. **At risk** — every UNSHELVED and SHELF BEHIND DISK CL (work that exists only on disk), plus default-CL files (flag exclusive locks), one line each.
+   2. **Next actions** — the `Next:` lines, grouped by topic, most actionable first.
+   3. **Tickets** — key, status, summary; flag a Closed/Done ticket whose memory still has a Next: line.
+   4. **Pending CLs no memory names** — count, plus the newest 5 titles; offer to triage them.
+   5. **Cited pending CLs** — count only, unless the user asks for the list.
+4. Don't edit memory or Perforce from this command. Offer the follow-ups (shelve, archive, file a ticket) as a numbered list.

@@ -1,6 +1,6 @@
 # Confluence Page Reference
 
-Extracted from @project/docs/tech-stacks/atlassian_confluence.md -- do not edit directly.
+Extracted from docs/tech-stacks/atlassian_confluence.md -- do not edit directly.
 
 ---
 
@@ -68,3 +68,5 @@ Links to related content.
 - Always add labels to created pages
 - Create new pages under the selected root page ID
 - Use space conventions detected from existing pages
+- Skimmable layout: a "Start here" box at the top (what it is, the next action, time to read), one "In short:" line per section, numbered steps, a done/next/later tracker for plans, keep the diagrams
+- Record every page you create or move in `{{CONFLUENCE_PAGE_REGISTRY}}` (ID, parent, source, refresh skill)

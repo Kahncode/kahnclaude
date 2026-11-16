@@ -23,30 +23,33 @@ At the start of every task, load if they exist:
 
 ## Jira Configuration
 
-### Required Environment Variables
+Values come from `.claude/rules/project-vars.md`. When a value is empty, use the fallback.
+
+### Required Variables
 
 | Variable | Fallback |
 |----------|----------|
-| `JIRA_CLOUD_ID` | Ask user for any Atlassian URL, auto-extract |
-| `JIRA_PROJECT_KEY` | Ask user |
-| `JIRA_ASSIGNEE_ACCOUNT_ID` | Auto-detect via `atlassianUserInfo` MCP |
+| `{{JIRA_CLOUD_ID}}` | Ask user for any Atlassian URL, auto-extract |
+| `{{JIRA_PROJECT_KEY}}` | Ask user |
+| `{{JIRA_ASSIGNEE_ACCOUNT_ID}}` | Auto-detect via `atlassianUserInfo` MCP |
 
-### Optional Environment Variables
+### Optional Variables
 
 | Variable | Default |
 |----------|---------|
-| `JIRA_ACTIVE_EPIC` | _(none)_ — auto-detect via JQL if needed |
-| `JIRA_DEFAULT_ISSUE_TYPE` | `Task` |
-| `JIRA_LABELS` | `["claude_generated"]` |
-| `JIRA_COMPONENTS` | `[]` |
-| `JIRA_CONTENT_FORMAT` | `markdown` |
-| `JIRA_ACTIVE_SPRINT_ID` | Auto-detect via JQL |
+| `{{JIRA_ACTIVE_EPIC}}` | _(none)_ — auto-detect via JQL if needed |
+| `{{JIRA_DEFAULT_ISSUE_TYPE}}` | `Task` |
+| `{{JIRA_LABELS}}` | `["claude_generated"]` |
+| `{{JIRA_COMPONENTS}}` | `[]` |
+| `{{JIRA_CONTENT_FORMAT}}` | `markdown` |
+| `{{JIRA_ESTIMATE_LABELS}}` | _(empty)_ — story points |
+| Active sprint ID | Auto-detect via JQL |
 
 ### Sprint Detection
 
 Before creating issues, detect the active sprint:
 
-1. Query: `project = $JIRA_PROJECT_KEY AND sprint in openSprints()` with `maxResults: 1`, `fields: ["customfield_10020"]`
+1. Query: `project = {{JIRA_PROJECT_KEY}} AND sprint in openSprints()` with `maxResults: 1`, `fields: ["customfield_10020"]`
 2. Extract sprint ID from `customfield_10020[0].id`
 3. If no active sprint, proceed without sprint assignment
 
@@ -55,13 +58,13 @@ Skip sprint assignment if user says "no sprint" or "backlog".
 ### Issue Creation Defaults
 
 When creating issues:
-- `project`: `$JIRA_PROJECT_KEY`
-- `issueType`: `$JIRA_DEFAULT_ISSUE_TYPE`
-- `parent`: `$JIRA_ACTIVE_EPIC` (if set)
-- `additional_fields`: `{ "labels": ["claude_generated"], "components": [...], "customfield_10020": <sprint_id> }`
+- `project`: `{{JIRA_PROJECT_KEY}}`
+- `issueType`: `{{JIRA_DEFAULT_ISSUE_TYPE}}`
+- `parent`: `{{JIRA_ACTIVE_EPIC}}` (if set)
+- `additional_fields`: `{ "labels": {{JIRA_LABELS}}, "components": {{JIRA_COMPONENTS}}, "customfield_10020": <sprint_id> }`
   - Only include `customfield_10020` if active sprint was detected
 - ALWAYS add `claude_generated` label to created issues
-- Use `responseContentFormat: "markdown"` for all queries
+- Use `responseContentFormat: "{{JIRA_CONTENT_FORMAT}}"` for all queries
 - Keep `maxResults` low — field filtering is unimplemented (known bug)
 
 ## Intake
@@ -179,7 +182,7 @@ Record the estimate and any assumptions behind it.
 - [What's explicitly excluded]
 ```
 
-- **Metadata**: priority, labels, components, story points as discussed
+- **Metadata**: priority, labels, components, and the estimate: when `{{JIRA_ESTIMATE_LABELS}}` is set, as one of those labels (size labels, not story points); when it is empty, as story points
 - Present the full ticket to the user for approval before creating
 
 **For review mode** — update the ticket:

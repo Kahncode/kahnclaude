@@ -2,7 +2,7 @@
 .SYNOPSIS
     Ensures Visual Studio is open with the UE5 solution, then launches
     the Unreal Editor via Debug.Start (F5).
-    Reads $env:KC_UE_SOLUTION for the .sln path, $env:KC_UE_PROJECT for the .uproject.
+    Reads $env:UE_SOLUTION for the .sln path, $env:UE_PROJECT for the .uproject.
 .PARAMETER Configuration
     Solution configuration name (default: "DebugGame Editor")
 .PARAMETER Platform
@@ -15,15 +15,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$solutionPath = $env:KC_UE_SOLUTION
+. "$HOME\.claude\scripts\lib\ProjectVars.ps1"
+$solutionPath = Get-ProjectVar UE_SOLUTION -Default ''
 if (-not $solutionPath) {
-    Write-Error "KC_UE_SOLUTION is not set. Set it to your UE5.sln path."
+    Write-Error "UE_SOLUTION is not set (env var or .claude/rules/project-vars.md). Set it to your UE5.sln path."
     exit 1
 }
 
-$projectPath = $env:KC_UE_PROJECT
+$projectPath = Get-ProjectVar UE_PROJECT -Default ''
 if (-not $projectPath) {
-    Write-Error "KC_UE_PROJECT is not set. Set it to your .uproject path."
+    Write-Error "UE_PROJECT is not set (env var or .claude/rules/project-vars.md). Set it to your .uproject path."
     exit 1
 }
 
@@ -165,12 +166,20 @@ for ($i = 1; $i -le $maxAttempts; $i++) {
     }
 }
 
-# Wait for the Unreal Editor window to appear
+# Wait for the Unreal Editor window to appear (EDITOR_PROCESS, e.g. MyGameEditor-Win64-DebugGame.exe)
+$editorProcess = 'UnrealEditor.exe'
+try {
+    . "$HOME\.claude\scripts\lib\ProjectVars.ps1"
+    $editorProcess = Get-ProjectVar EDITOR_PROCESS -Default $editorProcess
+} catch {
+    Write-Warning "Project vars unavailable ($($_.Exception.Message)); waiting for UnrealEditor."
+}
+$editorNames = @([IO.Path]::GetFileNameWithoutExtension($editorProcess), 'UnrealEditor') | Select-Object -Unique
 $editorTimeout = 900
 $editorElapsed = 0
 Write-Host "Waiting for Unreal Editor window (this may take several minutes)..."
 while ($editorElapsed -lt $editorTimeout) {
-    $proc = Get-Process UnrealEditor -ErrorAction SilentlyContinue |
+    $proc = Get-Process -Name $editorNames -ErrorAction SilentlyContinue |
             Where-Object { $_.MainWindowTitle -ne "" } |
             Select-Object -First 1
     if ($proc) {

@@ -5,6 +5,7 @@ Does this code follow project and Epic conventions?
 Do not flag personal style preferences — only project/Epic standards.
 
 **Critical rule**: Style must match the NEIGHBOR code style, not just global rules. If the surrounding file uses a consistent pattern, new code must follow that pattern even if it differs from the global standard.
+**Exception (no neighbour override):** east const, one-line signatures/calls and the Namespaces rules below apply on every line the change touches, even where the neighbours differ. A file the CL substantially rewrites gets converted whole.
 
 ## Epic Naming Conventions
 
@@ -33,9 +34,11 @@ Names must communicate intent without requiring context lookup.
 
 **Ask:** "Would a new team member understand this name without reading the implementation?"
 
+**Project nouns:** reuse the nouns/verbs game code already uses (search `{{UE_GAME_MODULE}}` first); never coin new terms (`Probe`, `Dummy`). Test helpers: `Queue<Verb><Object>`.
+
 ## Comments
 
-Comments should explain **why**, never **what** (the code shows what).
+Comments should explain **why**, never **what** (the code shows what). Max 2 lines per comment (class/struct/enum doc comment: up to 5). Keep `.cpp` comments minimal.
 
 **Flags:**
 - Stale comments that contradict the code
@@ -51,15 +54,25 @@ Comments should explain **why**, never **what** (the code shows what).
 - **Allman braces** — opening brace on its own line
 - Space after `if`/`for`/`while`/`switch`, no space between function name and `(`
 - No trailing whitespace, one blank line between methods
+- Function declarations, definitions and calls stay on **one line**; never wrap arguments one per line
+- Functions ≤ 50 lines; extract helpers past that
+- BT node memory: `CastInstanceNodeMemory<T>(NodeMemory)`, never `reinterpret_cast`; non-POD memory implements `InitializeMemory`/`CleanupMemory`
 
 ## East Const
 
-Place `const` **after** the type:
+Place `const` **after** the type, always (including `auto const&`):
 ```cpp
 FVector const& Location = GetLocation();   // correct
 float const Elapsed = 1.f;                 // correct
+for (auto const& Entry : Entries)          // correct
 const FVector& Location = GetLocation();   // wrong
 ```
+
+## Namespaces
+
+- No anonymous `namespace {}`.
+- Tests ({{UE_TEST_MODULE}}): `<Owner>::Private` or `<File>Private` namespace.
+- Game code: a private (static) member declared in the header next to similar helpers; never a file-scope `static` function or a `<Class>::Private` namespace.
 
 ## Include Order
 
@@ -97,7 +110,7 @@ Wrap string literals in `TEXT()`.
 ## Modern C++ Rules
 
 - Use `auto` only when the type is obvious from context or extremely verbose. Never `auto` for `UPROPERTY` members
-- Prefer range-based `for` with `auto&` or `const auto&`
+- Prefer range-based `for` with `auto&` or `auto const&`
 - Mark overrides with `override`; sealed classes/methods with `final`
 - Use `= delete` and `= default` instead of empty or private implementations
 - Prefer `TOptional<T>` over sentinel/magic-number return values
@@ -173,4 +186,5 @@ Validating invariants that cannot be violated by design.
 
 - **CRITICAL**: None typical for style
 - **WARNING**: Missing Epic prefix, STL containers in UE code, wrong include order, `.generated.h` not last
-- **INFO**: East const suggestion, `DisplayName`/`ToolTip` suggestions, minor formatting
+- **MINOR**: West const (`const T&`) on any line the change touches, anonymous namespace, argument lists wrapped one per line, comment over 2 lines, coined term where a game-code noun exists
+- **INFO**: `DisplayName`/`ToolTip` suggestions, minor formatting

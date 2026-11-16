@@ -47,6 +47,7 @@ Always null-check results from:
 - Accessing other actors in `BeginPlay` (they may not have begun play)
 - Storing raw pointers to UObjects (GC can collect them)
 - Not checking `IsValid()` on `TWeakObjectPtr` before use
+- Project specifics: read {{PROJECT_NOTES_DIR}}\standards-code-correctness.md if it exists.
 
 ### Replication Bugs
 - Server-only logic running on client

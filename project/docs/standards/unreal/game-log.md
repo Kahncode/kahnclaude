@@ -80,7 +80,7 @@ grep -r "UE_LOG(LogCombat" Source/ --include="*.cpp"
 
 Crash logs are located in:
 ```
-$KC_PROJECT_ROOT/Saved/Crashes/<CrashID>/
+{{UE_PROJECT_DIR}}/Saved/Crashes/<CrashID>/
 ```
 
 Key files:

@@ -14,7 +14,7 @@ bRemoteExecution=True
 
 **Location:** `$KC_PROJECT_ROOT/.claude/scripts/editor/editor-py.py`
 
-This Python script lives in the target project (installed via `/kc:install`), not in the KahnClaude skill directory.
+This Python script lives user-level in `.claude/scripts/editor/`, not in the skill directory.
 
 ### Interface
 
@@ -52,5 +52,5 @@ The `unreal-asset-inspections` and `pie` skills use the same underlying Remote E
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
-| `KC_PROJECT_ROOT` | Yes | Locates the helper script at `.claude/scripts/editor/editor-py.py` |
-| `KC_UE_ENGINE` | Yes | UE engine root (used by the helper script internally) |
+| `PROJECT_ROOT` | Yes | Project root (the helper script itself is at `.claude/scripts/editor/editor-py.py`) |
+| `UE_ENGINE` | Yes | UE engine root (used by the helper script internally) |

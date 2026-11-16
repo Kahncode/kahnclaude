@@ -5,7 +5,7 @@ Usage:
     py editor-py.py --code "print(unreal.EditorLevelLibrary.get_editor_world().get_name())"
     py editor-py.py --file "/path/to/script.py"
 
-Requires KC_UE_ENGINE environment variable to locate the Remote Execution module.
+Requires UE_ENGINE environment variable to locate the Remote Execution module.
 """
 
 import argparse
@@ -13,7 +13,9 @@ import os
 import sys
 import time
 
-_ENGINE_ROOT = os.environ.get("KC_UE_ENGINE", "")
+sys.path.insert(0, os.path.join(os.path.expanduser("~"), ".claude", "scripts", "lib"))
+from project_vars import get as _project_var  # noqa: E402
+_ENGINE_ROOT = _project_var("UE_ENGINE", "")
 _RE_PATH = os.path.join(
     _ENGINE_ROOT,
     "Plugins", "Experimental", "PythonScriptPlugin", "Content", "Python",
@@ -63,7 +65,7 @@ def main() -> int:
     args = parser.parse_args()
 
     if not _ENGINE_ROOT:
-        print("ERROR: KC_UE_ENGINE environment variable not set", file=sys.stderr)
+        print("ERROR: UE_ENGINE is not set (env var or .claude/rules/project-vars.md).", file=sys.stderr)
         return 1
 
     if args.file:

@@ -1,0 +1,39 @@
+{
+  "_doc": "Colour schemes. 'tokens' override the illustrate base.html variables in figures (rendered light) and widgets (light + dark). 'native' uses Confluence's own palette so panels, table headers and heading colours still adapt to dark mode. Add a scheme by copying one entry.",
+  "bluescale": {
+    "_rule": "red and green mean only wrong and right; no orange, yellow, cyan or teal for things.",
+    "tokens_light": {"--a": "#1f4e9c", "--b": "#3a7bd5", "--c": "#8a5cd6", "--d": "#7fa8e6", "--good": "#1f8a3c", "--bad": "#c8422f", "--hl": "#e9f2ff"},
+    "tokens_dark": {"--a": "#6f9ae8", "--b": "#8fb8f5", "--c": "#b994ff", "--d": "#a9c6f2", "--good": "#5fd17f", "--bad": "#ff7a66", "--hl": "#1c2b41"},
+    "meaning": "--a navy is the main thing on a figure, --b blue the second thing (the other half, the other copy), --d sky blue a third thing, and --c violet only for what is selected or needs attention (the active button, the current step, a highlighted box). Things differ by depth of blue, not by hue. Green means right and red means wrong, and nothing else is red, green, orange, yellow, cyan or teal.",
+    "native": {
+      "heading_colors": {"2": "#0747A6"},
+      "table_header_bg": "#DEEBFF",
+      "tag_colors": {"bad": "red", "good": "green", "real": "blue", "dir": "blue", "inj": "purple", "open": "neutral", "warn": "yellow"},
+      "panels": {
+        "predict": {"panelType": "custom", "panelColor": "#DEEBFF", "panelIcon": ":bulb:", "panelIconId": "1f4a1", "panelIconText": "💡"},
+        "analogy": {"panelType": "custom", "panelColor": "#DEEBFF", "panelIcon": ":compass:", "panelIconId": "1f9ed", "panelIconText": "🧭"},
+        "inshort": {"panelType": "custom", "panelColor": "#DEEBFF", "panelIcon": ":pushpin:", "panelIconId": "1f4cc", "panelIconText": "📌"}
+      }
+    }
+  },
+  "blueprint": {
+    "tokens_light": {"--a": "#1d5fd6", "--b": "#0098b8", "--c": "#f08a24", "--good": "#1f8a3c", "--bad": "#d1352a", "--warn": "#c08a10", "--hl": "#e9f2ff"},
+    "tokens_dark": {"--a": "#6ea8ff", "--b": "#3cc8e6", "--c": "#ffad5c", "--good": "#5fd17f", "--bad": "#ff7a66", "--warn": "#e8b84a", "--hl": "#1c2b41"},
+    "meaning": "A = blue: the main thing on the figure. B = cyan: the second thing (the other half, the other copy). C = orange: what needs attention or is highlighted. Green right, red wrong.",
+    "native": {
+      "heading_colors": {"2": "#0747A6"},
+      "table_header_bg": "#DEEBFF",
+      "panels": {
+        "predict": {"panelType": "custom", "panelColor": "#E6FCFF", "panelIcon": ":bulb:", "panelIconId": "1f4a1", "panelIconText": "💡"},
+        "analogy": {"panelType": "custom", "panelColor": "#E6FCFF", "panelIcon": ":compass:", "panelIconId": "1f9ed", "panelIconText": "🧭"},
+        "inshort": {"panelType": "custom", "panelColor": "#DEEBFF", "panelIcon": ":pushpin:", "panelIconId": "1f4cc", "panelIconText": "📌"}
+      }
+    }
+  },
+  "calm": {
+    "tokens_light": {},
+    "tokens_dark": {},
+    "meaning": "The illustrate skill's own muted palette.",
+    "native": {"heading_colors": {}, "table_header_bg": null, "panels": {}}
+  }
+}

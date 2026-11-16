@@ -5,7 +5,7 @@
 Asset paths must be game-relative, starting with `/Game/`:
 
 ```
-/Game/AI/Definitions/Passengers/BD_Passenger_TC
+/Game/Characters/BP_Hero
 /Game/Blueprints/Items/BP_Sword
 /Game/DataTables/DT_ItemStats
 ```
@@ -33,7 +33,7 @@ config.behavior.aggression_level
 movement.max_speed
 ```
 
-Example: `set /Game/AI/BD_Enemy config.patrol_distance 500.0`
+Example: `set /Game/Data/DA_Enemy config.patrol_distance 500.0`
 
 ## Scripts
 

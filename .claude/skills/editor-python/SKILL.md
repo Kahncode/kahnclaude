@@ -12,12 +12,13 @@ Execute Python in the running Unreal Editor using the Remote Execution API (`Pyt
 
 See @docs/standards/unreal/editor-python.md for prerequisites, script interface, and examples.
 
-## Required Environment Variables
+## Required Variables
 
 | Variable | Purpose |
 |----------|---------|
-| `KC_PROJECT_ROOT` | Workspace root (parent of `.claude/`) |
-| `KC_UE_ENGINE` | UE root directory |
+| `PROJECT_ROOT` | Workspace root (parent of `.claude/`) |
+
+`editor-py.py` reads `UE_ENGINE` from the process env, set (with `PROJECT_ROOT`) in `.claude/settings.local.json` `env`; never set it inline. Unset → "UE_ENGINE environment variable not set" / "No module named remote_execution": start a new session or check that file.
 
 ## Flow
 
@@ -32,12 +33,12 @@ See @docs/standards/unreal/editor-python.md for prerequisites, script interface,
 ### 2. Execute
 
 **Inline code:**
-```bash
+```
 py "$KC_PROJECT_ROOT/.claude/scripts/editor/editor-py.py" --code "<code>"
 ```
 
 **File:**
-```bash
+```
 py "$KC_PROJECT_ROOT/.claude/scripts/editor/editor-py.py" --file "<path>"
 ```
 

@@ -134,9 +134,9 @@ Use the `p4` CLI directly through the Bash tool for all Perforce operations:
 
 | Action | Command |
 |--------|---------|
-| Open file for edit | `p4 edit <file>` |
-| Add new file | `p4 add <file>` |
-| Create changelist | `p4 change -o \| sed 's/<enter description here>/Description/' \| p4 change -i` |
+| Open file for edit | `p4 edit -c <CL#> <file>` |
+| Add new file | `p4 add -c <CL#> <file>` |
+| Create changelist | `p4 change -o \| sed -e 's/<enter description here>/Description/' -e '/^Files:/,$d' \| p4 change -i` (strip `Files:` or the new CL swallows the default changelist) |
 | Move file to CL | `p4 reopen -c <CL#> <file>` |
 | Revert file | `p4 revert <file>` |
 | Check status | `p4 status` |
@@ -145,8 +145,8 @@ Use the `p4` CLI directly through the Bash tool for all Perforce operations:
 ### File Workflow — Follow This Order
 
 1. **Create a changelist first** — always before touching any file.
-2. **Existing file** → run `p4 edit <file>` before writing to it.
-3. **New file** → create it, then run `p4 add <file>`.
+2. **Existing file** → run `p4 edit -c <CL#> <file>` before writing to it.
+3. **New file** → create it, then run `p4 add -c <CL#> <file>`.
 4. **Move all files** into the changelist with `p4 reopen -c <CL#> <file>`.
 
 #### p4 edit vs p4 add

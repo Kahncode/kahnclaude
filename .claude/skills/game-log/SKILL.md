@@ -1,6 +1,6 @@
 ---
 name: game-log
-description: "UE5 log analyst. ALWAYS invoke when the user asks about game logs, errors, warnings, crashes, or wants to tail a PIE session. Do not read log files directly — this skill auto-detects location, parses by category, and cross-references source code."
+description: "UE5 log analyst. ALWAYS invoke for game logs, errors, warnings, crashes or tailing a PIE session, and when the user hands over a log or report (a .log file, a QA or Horde step log, Saved/Automation/Reports/*/index.json, 'what failed in this log'). Finds the log, parses by category, cross-references source. A Horde job or Slack failure paste goes to horde-artifact first."
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
@@ -12,12 +12,14 @@ Use PROACTIVELY when the user says: `analyze game log`, `parse log file`, `read 
 
 See @docs/standards/unreal/game-log.md for UE log format, log categories, verbosity levels, and common error patterns.
 
-## Required Environment Variables
+## Required Variables
 
 | Variable | Purpose |
 |----------|---------|
-| `KC_UE_PROJECT` | Full path to `.uproject` (derive project name) |
-| `KC_PROJECT_ROOT` | Workspace root |
+| `UE_PROJECT` | Full path to `.uproject` (derive project name) |
+| `PROJECT_ROOT` | Workspace root |
+
+Set in the process env by `.claude/settings.local.json` `env` (values also listed in .claude/rules/project-vars.md).
 
 ## Flow
 
@@ -27,9 +29,10 @@ Auto-detect the appropriate log file based on context:
 
 | Context | Log Path |
 |---------|----------|
-| Default | `$KC_PROJECT_ROOT/Saved/Logs/<ProjectName>.log` |
-| User mentions "crash" | `$KC_PROJECT_ROOT/Saved/Crashes/*/CrashContext.runtime-xml` + `*.log` |
-| User mentions "test" | `$KC_PROJECT_ROOT/Saved/Logs/*Test*.log` |
+| Default | `{{UE_PROJECT_DIR}}/Saved/Logs/<ProjectName>.log` |
+| User mentions "crash" | `{{UE_PROJECT_DIR}}/Saved/Crashes/*/CrashContext.runtime-xml` + `*.log` |
+| User mentions "test" | `{{UE_PROJECT_DIR}}/Saved/Automation/Reports/<newest>/index.json`, then `{{UE_PROJECT_DIR}}/Saved/Logs/*Test*.log` |
+| User hands over a log/artifact path (`{{DOWNLOADS}}\*.log`, `step-saved_*`, a Horde zip) | that path; for a Horde artifact use `horde-artifact` first and read its `DIGEST.md` |
 | User provides a path | Use that path directly |
 | User mentions "PIE" or "live" | Tail the active log during a PIE session |
 
@@ -74,4 +77,4 @@ Offer: "Want me to investigate specific errors in detail?" If yes, delegate to t
 - Skip engine initialization noise unless specifically requested
 - Cross-reference EVERY error against source code when possible
 - For crash logs, also check `CrashContext.runtime-xml` for callstack
-- Derive project name from `$KC_UE_PROJECT` filename (without extension)
+- Derive project name from `UE_PROJECT` filename (without extension)

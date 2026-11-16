@@ -1,6 +1,6 @@
 ---
 name: blueprint-reviewer
-description: Blueprint asset reviewer. Inspects UE5 Blueprint properties via Python Remote Execution and checks against ue5-blueprints.md standards. Read-only — never modifies assets. Requires a running Unreal Editor.
+description: Blueprint asset reviewer. Inspects UE5 Blueprint properties via Python Remote Execution and checks against docs/standards/unreal/review-blueprint.md standards. Read-only — never modifies assets. Requires a running Unreal Editor.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 color: blue

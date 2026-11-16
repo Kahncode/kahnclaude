@@ -65,6 +65,17 @@ Every new project must have:
 
 ---
 
+## Project Variables (`{{VAR}}`)
+
+Shared skills, agents, commands and docs are project-agnostic and write project values as `{{NAME}}`.
+- `{{NAME}}` = the value of `NAME` in the current project's `.claude/rules/project-vars.md` (auto-loaded). Substitute it before running anything.
+- A needed var is missing or empty: stop, name it, and point to the KahnClaude template `project/templates/unreal-project/` (README = onboarding). Never guess a value.
+- Overlay: when a shared skill, agent or standard `X` runs, also read `{{PROJECT_NOTES_DIR}}\X.md` if it exists; project-only rules live there and win over the generic file.
+- `{{VAR}}` only in text Claude reads. Hook commands and script code use real env vars (`$CLAUDE_PROJECT_DIR`) and read vars through `.claude/scripts/lib/project_vars.py` / `ProjectVars.ps1`.
+- Project values → `{{VAR}}` in `.claude/rules/project-vars.md`; project-only rules → the `{{PROJECT_NOTES_DIR}}\X.md` overlay. Secrets never go in the vars file.
+
+---
+
 ## Communication
 
 - Ask before taking irreversible actions

@@ -4,7 +4,7 @@ Set a property on a UE5 .uasset via the Editor's Python Remote Execution protoco
 Usage:
     py set_uasset_property.py <asset_path> <property_path> <value>
 
-    asset_path    - Game-relative path, e.g. /Game/AI/Definitions/Passengers/BD_Passenger_TC
+    asset_path    - Game-relative path, e.g. /Game/Characters/BP_Hero
     property_path - Dot-separated property path, e.g. config.patrol_distance
     value         - The new value (auto-detected as float, int, bool, or string)
 
@@ -20,9 +20,11 @@ import sys
 import textwrap
 import time
 
-engine_root = os.environ.get("KC_UE_ENGINE")
+sys.path.insert(0, os.path.join(os.path.expanduser("~"), ".claude", "scripts", "lib"))
+from project_vars import get as _project_var  # noqa: E402
+engine_root = _project_var("UE_ENGINE", "")
 if not engine_root:
-    print("ERROR: KC_UE_ENGINE environment variable is not set.", file=sys.stderr)
+    print("ERROR: UE_ENGINE is not set (env var or .claude/rules/project-vars.md).", file=sys.stderr)
     sys.exit(1)
 ENGINE_PYTHON_PATH = os.path.join(
     engine_root, "Plugins", "Experimental",

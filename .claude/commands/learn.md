@@ -31,8 +31,8 @@ If `$ARGUMENTS` is a human-readable statement (not a CL number):
 
 Check in order:
 1. **Opened files** — `p4 diff`: if any diffs exist, use those
-2. **Pending changelists** — `p4 changes -s pending -u $P4USER -c $P4CLIENT`: if any exist, describe the most recent
-3. **Last submitted change** — `p4 changes -m 1 -u $P4USER -s submitted`: fallback if nothing is opened or pending
+2. **Pending changelists** — `p4 changes -s pending --me -c "$(p4 -ztag -F %clientName% info)"`: if any exist, describe the most recent
+3. **Last submitted change** — `p4 changes -m 1 --me -s submitted`: fallback if nothing is opened or pending
 
 ## Behavior
 

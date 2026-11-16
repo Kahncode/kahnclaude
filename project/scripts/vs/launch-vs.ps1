@@ -2,7 +2,7 @@
 .SYNOPSIS
     Triggers Start Debugging (F5) in the running Visual Studio instance.
     Builds if needed, then launches the editor with the debugger attached.
-    Reads $env:KC_UE_SOLUTION for the .sln path, $env:KC_UE_PROJECT for the .uproject.
+    Reads $env:UE_SOLUTION for the .sln path, $env:UE_PROJECT for the .uproject.
 .PARAMETER Configuration
     Solution configuration name (default: "DebugGame Editor")
 .PARAMETER Platform
@@ -15,15 +15,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$solutionPath = $env:KC_UE_SOLUTION
+. "$HOME\.claude\scripts\lib\ProjectVars.ps1"
+$solutionPath = Get-ProjectVar UE_SOLUTION -Default ''
 if (-not $solutionPath) {
-    Write-Error "KC_UE_SOLUTION is not set. Set it to your UE5.sln path."
+    Write-Error "UE_SOLUTION is not set (env var or .claude/rules/project-vars.md). Set it to your UE5.sln path."
     exit 1
 }
 
-$projectPath = $env:KC_UE_PROJECT
+$projectPath = Get-ProjectVar UE_PROJECT -Default ''
 if (-not $projectPath) {
-    Write-Error "KC_UE_PROJECT is not set. Set it to your .uproject path."
+    Write-Error "UE_PROJECT is not set (env var or .claude/rules/project-vars.md). Set it to your .uproject path."
     exit 1
 }
 

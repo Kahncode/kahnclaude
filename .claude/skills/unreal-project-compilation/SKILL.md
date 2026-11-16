@@ -12,38 +12,39 @@ Use PROACTIVELY when the user says: `compile project`, `build project`, `build e
 
 Load `@docs/standards/unreal/unreal-project-compilation.md` for build targets, VS DTE commands, UBT fallback, and error patterns.
 
-## Required Environment Variables
+## Required Variables
 
 | Variable | Purpose |
 |----------|---------|
-| `KC_UE_PROJECT` | Full path to `.uproject` file |
-| `KC_UE_SOLUTION` | Full path to `.sln` file |
-| `KC_PROJECT_ROOT` | Workspace root (parent of `.claude/`) |
-| `KC_UE_ENGINE` | UE root directory |
+| `UE_PROJECT` | Full path to `.uproject` file |
+| `UE_ENGINE` | UE engine root directory |
+
+Set in the process env by `.claude/settings.local.json` `env` (values also in .claude/rules/project-vars.md). The UBT command below still takes literal paths.
 
 ## Flow
 
-### 1. Detect Project
+### 1. Resolve Paths
 
-1. Read `$KC_UE_PROJECT` to get the `.uproject` path
-2. Derive project name from filename (without extension)
-3. Read `.uproject` for engine version and module list
+1. Read .claude/rules/project-vars.md for `UE_ENGINE` and `UE_PROJECT` values
+2. Derive project name from the .uproject filename (without extension)
 
 ### 2. Determine Target
 
-If user specified a target, use it. Otherwise, ask which Build target.
+If user specified a target, use it. Otherwise default to `{{UE_DEFAULT_TARGET}}` without asking.
+
+**Before building:** if the user said they're running tests / not to compile, or an automation run is in progress, don't build; report "build owed". If `{{EDITOR_PROCESS}}` is running with Live Coding active, UBT will refuse; for a body-only change use Live Coding instead (code-dev Step 2a), otherwise ask the user to close the editor.
 
 Default configuration: `DebugGame` for Editor, `Development` for others.
 
 ### 3. Build -- UBT
 
-Run in background (builds are long):
+Run in background (builds are long). Substitute the resolved paths into this command:
 
-```bash
-dotnet "$KC_UE_ENGINE/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll" \
-  -Target="${PROJECT_NAME}${SUFFIX} Win64 ${CONFIG} -Project=\"$KC_UE_PROJECT\"" \
-  -WaitMutex -architecture=x64
 ```
+"{{UBT_DOTNET}}" "{{UBT_DLL}}" -Target="<PROJECT_NAME><SUFFIX> Win64 <CONFIG> -Project=<UE_PROJECT>" -WaitMutex -architecture=x64
+```
+
+Use literal paths in the command — do NOT use shell variable syntax like `$env:` or `$VAR`.
 
 ### 4. Analyze Output
 
@@ -73,6 +74,7 @@ If user approves fixes:
 Report: `Build succeeded: ${TARGET} Win64 ${CONFIG}`
 
 ## Rules
-- Run builds in background -- they take a long time
+- Run builds in background (`run_in_background`) and wait for the completion notice or Monitor the log -- never a foreground `while`/`sleep` poll loop
+- Never `p4 edit`/`p4 add` rebuilt binaries; if one was opened by mistake, `p4 revert -k <file>`
 - Never modify `.generated.h`, `Intermediate/`, or `Saved/`
 - Regenerate project files after adding modules (`GenerateProjectFiles.bat`)

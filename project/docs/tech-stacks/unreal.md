@@ -1,5 +1,7 @@
 # Tech Stack Guide: Unreal Engine
 
+> Navigation internals (nav octree memory, Instant vs Lazy gathering): `unreal-navigation.md`.
+
 <!-- detection: auto | signal: .uproject at project root | prerequisite: none -->
 <!-- prompt: "Unreal Engine project detected. Configure UE-specific settings?" -->
 

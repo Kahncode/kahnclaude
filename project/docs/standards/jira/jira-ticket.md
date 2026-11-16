@@ -1,6 +1,6 @@
 # Jira Ticket Reference
 
-Extracted from @project/docs/tech-stacks/atlassian_jira.md -- do not edit directly.
+Extracted from docs/tech-stacks/atlassian_jira.md -- do not edit directly.
 
 ---
 
@@ -20,7 +20,7 @@ parent = <INITIATIVE_KEY> AND issuetype = Epic AND status = "In Progress"
 | Field | How to Set |
 |-------|-----------|
 | Component | `additional_fields: { "components": [{ "name": "<Name>" }] }` |
-| Label | `additional_fields: { "labels": ["claude_generated"] }` |
+| Label | `additional_fields: { "labels": ["<label>"] }` |
 | Sprint | `additional_fields: { "customfield_10020": <sprint_id> }` |
 | Combined | `additional_fields: { "components": [...], "labels": [...], "customfield_10020": ... }` |
 
@@ -40,8 +40,6 @@ Use `transitionJiraIssue` with the transition `id`. Common global transitions:
 | 11 | To Do | Backlog |
 | 21 | In Progress | In Progress |
 | 31 | Done | Done |
-| 41 | All | Blocked |
-| 51 | Review Required | Review Required |
 
 Note: IDs vary by project. Use `getTransitionsForJiraIssue` to get actual values.
 

@@ -62,15 +62,38 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
             "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/p4-commands-permission.py"
-          },
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
           {
             "type": "command",
             "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/block-dangerous-commands.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|PowerShell|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/block-asset-grep.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py $CLAUDE_PROJECT_DIR/.claude/hooks/glob-scope.py"
           }
         ]
       }

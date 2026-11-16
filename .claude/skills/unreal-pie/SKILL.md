@@ -12,12 +12,13 @@ Manage PIE sessions in the running Unreal Editor.
 
 See @docs/standards/unreal/pie.md for common console commands, PIE states, and troubleshooting.
 
-## Required Environment Variables
+## Required Variables
 
 | Variable | Purpose |
 |----------|---------|
-| `KC_PROJECT_ROOT` | Workspace root (parent of `.claude/`) |
-| `KC_UE_ENGINE` | UE root directory |
+| `UE_ENGINE` | UE engine root directory (read by the scripts) |
+
+Set in the process env by `.claude/settings.local.json` `env` (the scripts read `UE_ENGINE` from it; never set it inline). The scripts live in `.claude/scripts/unreal/pie/`.
 
 ## Flow
 
@@ -35,7 +36,7 @@ Parse `$ARGUMENTS` to determine the action:
 
 #### Start PIE
 
-```bash
+```
 py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_start.py"
 ```
 
@@ -44,7 +45,7 @@ py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_start.py"
 
 #### Stop PIE
 
-```bash
+```
 py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_stop.py"
 ```
 
@@ -53,8 +54,8 @@ py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_stop.py"
 
 #### Execute Console Command
 
-```bash
-py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_exec.py" "$COMMAND"
+```
+py "$KC_PROJECT_ROOT/.claude/scripts/unreal/pie/pie_exec.py" "<COMMAND>"
 ```
 
 - PIE not running → "PIE is not running. Start it first."

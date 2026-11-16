@@ -3,7 +3,7 @@
 block-dangerous-commands.py — Block destructive or unsafe Bash commands.
 
 Event: PreToolUse
-Matcher: Bash
+Matcher: Bash|PowerShell
 
 Exit codes:
   0 — Allow / no action
@@ -85,11 +85,15 @@ def check_bash_command(command: str) -> None:
         block("BLOCKED: mkfs command (disk formatting)", command)
 
     # Exfiltrating sensitive files via network tools
-    if re.search(r"(curl|wget|nc|netcat)\s+.*\.(env|pem|key|secret)", command):
+    if re.search(r"\b(curl|wget|nc|netcat|Invoke-WebRequest|Invoke-RestMethod|iwr|irm)\s+[^;&|\n]*\.(env|pem|key|secret)\b", command, re.IGNORECASE):
         block("BLOCKED: Command appears to exfiltrate sensitive files", command)
 
-    # Reading .env files via shell commands
-    if re.search(r"(cat|less|head|tail|more|bat)\s+.*\.env", command):
+    # Reading .env files via shell commands; stays within one pipeline segment and allows .env.example
+    if re.search(
+        r"\b(cat|less|head|tail|more|bat|type|gc|Get-Content)\s+[^;&|\n]*\.env(\.(local|production|staging|development|test))?(?![\w.])",
+        command,
+        re.IGNORECASE,
+    ):
         block(
             "BLOCKED: Reading .env file via shell command",
             command,

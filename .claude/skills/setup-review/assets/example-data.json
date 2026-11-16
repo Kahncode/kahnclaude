@@ -1,0 +1,32 @@
+{
+ "title": "Claude setup review",
+ "subtitle": "MyProject · 2026-01-15 · 5 agents",
+ "heading": "What to change in skills, agents and workflow",
+ "lede": "Five read-only agents went through your memory files, prompt history, recent session transcripts and the skill/agent/hook setup. Below is the merged list, highest impact first. Each item links to the subpage with the evidence. Nothing has been changed yet.",
+ "stats": [
+  ["20", "feedback + reference memories"],
+  ["100", "memory files"],
+  ["1,000", "prompts"],
+  ["60", "sessions mined"],
+  ["~30", "skills, agents, commands"],
+  ["8", "hooks"]
+ ],
+ "alert": "<strong>Do first.</strong> <code>~/.claude/history.jsonl</code> still holds one API token in plain text. Rotate it, then delete that line.",
+ "reports": {
+  "feedback-rules": {"file": "r1_feedback.md", "title": "Feedback rules vs skills and agents", "lede": "Each feedback and reference memory checked against the file that should enforce it.", "tab": "Feedback rules"},
+  "project-memory": {"file": "r2_project.md", "title": "Project memory: workflow gaps and open items", "lede": "Recurring work patterns, open items checked against Perforce, and a memory pruning proposal.", "tab": "Project memory"},
+  "prompt-history": {"file": "r3_history.md", "title": "Prompt history: what you type", "lede": "Skill and command usage, repeated manual prompts, and corrections.", "tab": "Prompt history"},
+  "session-friction": {"file": "r4_transcripts.md", "title": "Session friction from transcripts", "lede": "Interruptions, repeated tool errors, wait loops and permission issues.", "tab": "Session friction"},
+  "setup-audit": {"file": "r5_audit.md", "title": "Skills, agents, commands and hooks audit", "lede": "Overlap, gaps, stale values, broken frontmatter and hook coverage.", "tab": "Setup audit"}
+ },
+ "batches": [
+  {"id": "S", "name": "Security", "note": "Small edits, big blast radius. Settings and hook changes get confirmed one by one.", "items": [
+   {"n": 1, "sev": "crit", "title": "Rotate the leaked token and delete its line from history.jsonl", "detail": "An API token sits in plain text in <code>pastedContents</code>. Consider a <code>UserPromptSubmit</code> hook that warns when a prompt looks like a key.", "src": ["prompt-history", "session-friction"]},
+   {"n": 2, "sev": "high", "title": "Stop <code>p4 revert</code> from running without a prompt", "detail": "<code>settings.local.json</code> allows <code>Bash(p4 *)</code>; narrow it to read-only p4 commands.", "src": ["setup-audit"]}
+  ]},
+  {"id": "A", "name": "Implementation pipeline", "note": "Three of the five agents landed here.", "items": [
+   {"n": 3, "sev": "high", "title": "Move the \"run affected tests only\" rule from memory into the test skill", "detail": "<ul><li>The rule lives only in <code>feedback_example_rule.md</code>; subagents never read memory.</li><li>Corrected by hand in 6 sessions.</li></ul>", "src": ["feedback-rules", "session-friction"]},
+   {"n": 4, "sev": "", "title": "Retire the unused <code>/old-build</code> command", "detail": "Never typed or auto-triggered in 90 days; <code>unreal-project-compilation</code> covers it.", "src": ["prompt-history", "setup-audit"]}
+  ]}
+ ]
+}
