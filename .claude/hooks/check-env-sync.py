@@ -12,8 +12,8 @@ Exit codes:
   0 — Allow / no issues
   1 — Warning (missing keys printed to stderr, turn continues)
 """
+import os
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -30,19 +30,16 @@ def extract_keys(path: Path) -> set[str]:
     return set(_KEY_PATTERN.findall(content))
 
 
-def find_repo_root() -> Path | None:
-    result = subprocess.run(
-        ['git', 'rev-parse', '--show-toplevel'],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode == 0:
-        return Path(result.stdout.strip())
-    return None
+def find_project_root() -> Path | None:
+    """Find the project root using CLAUDE_PROJECT_DIR or fallback to cwd."""
+    project_dir = os.environ.get('CLAUDE_PROJECT_DIR', '')
+    if project_dir:
+        return Path(project_dir)
+    return Path.cwd()
 
 
 def main() -> None:
-    root = find_repo_root()
+    root = find_project_root()
     if root is None:
         sys.exit(0)
 
