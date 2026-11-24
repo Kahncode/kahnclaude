@@ -89,7 +89,14 @@ If this line is absent after substitution, insert it after the `## Project Overv
 
 **New file:** Write instantiated content to `<target>/AGENTS.md`. Report: "Generated AGENTS.md: N sections."
 
-**Enhance existing:** Parse existing `AGENTS.md` for `## Heading` sections. Compare against template sections. For each missing section, ask: "Missing: [Section]. Add it? (yes/skip)". Append accepted sections. Report: "Enhanced AGENTS.md: added N sections."
+**Enhance existing:**
+
+1. Parse existing `AGENTS.md` for `## Heading` sections and compare against the template's `##` headings. A template section is missing unless a heading with the same purpose exists (e.g. "Build & Test" for Development Commands). Do NOT treat a section as covered because its content appears inside another section (e.g. a folder list under "Where things are" does not cover Project Structure). Never drop a missing section from the list on your own judgment.
+2. Offer EVERY missing section to the user, in batches that fit the question tool (multi-select, max 4 options per question; use several questions or plain text if more). For a section whose content overlaps existing text, still offer it and note the overlap in its description; the user decides.
+3. Generate the content of each accepted section from code discovery (Phase 2) and the stack guide, never leave template placeholders. Project Structure is an ASCII tree of real folders; Key Patterns come from the codebase and existing rules.
+4. Insert accepted sections at the position given by the template's `ORDER` comment (orientation first, ALWAYS DO / NEVER DO last), not at the end. When an accepted section supersedes an existing one (e.g. Project Structure vs "Where things are"), tell the user and offer to merge them so no two sections compete; move facts, never drop them. Otherwise never edit or remove existing content. Report: "Enhanced AGENTS.md: added N sections", and list the sections offered but skipped.
+5. **Ordering suggestion.** Compare the order of existing sections with the template's `ORDER` comment. If they differ (e.g. rules before structure, ALWAYS DO / NEVER DO outside Critical Rules, diagnostics not last), suggest the template order and show the proposed sequence as a list. Reorder only if the user accepts; moving sections changes layout, never content.
+6. **Formatting upgrade.** Readability matters as much as content. Apply the `FORMATTING` rules at the top of `project/AGENTS.md` to the new sections, then check the existing ones: unaligned table pipes, trees without `├── └──` connectors or with ragged descriptions, long run-on bullets, unfenced commands. If any fall short, show a short before/after of the worst offender and ask: "Reformat N sections to match? (content unchanged)". On yes, change layout only (alignment, connectors, bullet splitting, code fences); never reword, add or drop facts. Report which sections were reformatted.
 
 **Shim:** if `<target>/CLAUDE.md` does not exist, write it with the single line `@AGENTS.md` (copy `project/CLAUDE.md`). If it exists with other content, do not touch it; tell the user to merge it into AGENTS.md.
 
