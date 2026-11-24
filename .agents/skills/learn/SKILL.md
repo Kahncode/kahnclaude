@@ -41,7 +41,7 @@ After resolving the source:
 1. Identify which parts of the codebase changed or which facts are new
 2. Determine which documentation files are affected
 3. **Ask the user to confirm before writing significant changes** (more than a few lines)
-4. Update only the docs relevant to what changed — do not rewrite unrelated sections
+4. Update only the docs relevant to what changed — do not rewrite unrelated sections. Always check `README.md` (written for humans, not agents) and update it when the change affects features, setup, usage, components, or structure
 5. Append a Decisions entry for non-trivial changes, facts, or tech choices
 6. Scan commit messages for decision-worthy changes (non-trivial refactors, tech choices, removals)
 
@@ -53,4 +53,4 @@ Pass to the agent:
 
 - The resolved diff, commit range, or plain-text fact as context
 - The source type and any SHA(s) for Decisions log entries
-- Instruction: "Update only the docs relevant to what changed. Ask the user before writing significant changes. Append Decisions entries where appropriate. Target project files (AGENTS.md, docs/*.md, README.md) — auto-memory files are not a substitute."
+- Instruction: "Update only the docs relevant to what changed. Ask the user before writing significant changes. Append Decisions entries where appropriate. Target project files (AGENTS.md, docs/*.md, README.md) — auto-memory files are not a substitute. Always review README.md for staleness; it is for human readers, so keep it concise and link to docs/ rather than duplicating them."

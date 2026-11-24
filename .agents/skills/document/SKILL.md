@@ -17,12 +17,12 @@ Build or update project documentation for the current codebase.
 
 Delegate to the `documenter` agent via the Agent tool with this context:
 
-> High-level pass only. Write or update `docs/ARCHITECTURE.md` as the system index: system overview diagram, component map with one-line responsibilities, technology choices and rationale, and links to any existing subsystem docs. Do not create subsystem files. Do not recurse.
+> High-level pass only. Write or update `docs/ARCHITECTURE.md` as the system index: system overview diagram, component map with one-line responsibilities, technology choices and rationale, and links to any existing subsystem docs. Also update `README.md` (human-facing overview, setup, usage, component list) so it matches the code. Do not create subsystem files. Do not recurse.
 
 ### With arguments — Deep-Dive Pass
 
 Delegate to the `documenter` agent via the Agent tool with this context:
 
-> Deep-dive into the `$ARGUMENTS` subsystem. Write `docs/<subsystem>.md` covering key concepts, entry points, data flow, Does/Does NOT table, and key file references. Generate Mermaid diagrams appropriate to what exists in the code — no speculation. Then update `docs/ARCHITECTURE.md` to link to the new or updated subsystem file.
+> Deep-dive into the `$ARGUMENTS` subsystem. Write `docs/<subsystem>.md` covering key concepts, entry points, data flow, Does/Does NOT table, and key file references. Generate Mermaid diagrams appropriate to what exists in the code — no speculation. Then update `docs/ARCHITECTURE.md` to link to the new or updated subsystem file. Also check `README.md` and update it if the subsystem affects what a human reader sees (features, commands, components, structure).
 
 The agent reads the code and decides which diagram types apply. No magic keywords are needed.
