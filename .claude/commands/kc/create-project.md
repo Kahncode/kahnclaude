@@ -7,7 +7,7 @@ argument-hint: <stack> <target-path> [description]
 
 # /kc:create-project
 
-Create a new project: official init CLI, then the template repo overlay, then an interview limited to what the template leaves open (run during the KahnClaude install), and a generated `CLAUDE.md`. Each phase is its own git commit so the overlay and install diffs stay reviewable.
+Create a new project: official init CLI, then the template repo overlay, then an interview limited to what the template leaves open (run during the KahnClaude install), a generated `CLAUDE.md`, and an updated `README.md`. Each phase is its own git commit so the overlay and install diffs stay reviewable.
 
 **Usage:** `/kc:create-project <stack> <target-path> [description]`
 
@@ -59,7 +59,15 @@ All guides, templates and scripts are read from the KahnClaude source directory,
    - Otherwise generate from `project/CLAUDE.md` as usual.
    - Commit: `docs: add project CLAUDE.md`.
 
-8. **Report**: commit list (`git log --oneline`), files overwritten by the template, what the template resolved vs what was asked, any failed steps, and next steps (`<pm> run dev`, review `CLAUDE.md`).
+8. **Update README.md**: the template's `README.md` still describes the template, so rewrite it for this project.
+   - Replace the title with the project name and the template blurb with the project description plus a one-line stack summary from the answers.
+   - Replace template-usage instructions ("create a repo from this template", "follow the checklist") with project setup: prerequisites (runtime version, package manager from the lockfile) and install steps.
+   - Keep sections that stay accurate (commands table, structure); correct any that no longer match `package.json`/`pyproject.toml` scripts. Link to `CLAUDE.md` and `docs/ARCHITECTURE.md` rather than duplicating them.
+   - If the template shipped no `README.md` (or only the init stub), generate a short one: title, description, stack, prerequisites, install, commands, links.
+   - Show the user a summary of changes; never invent features or URLs not present in the description or answers.
+   - Commit: `docs: update README`.
+
+9. **Report**: commit list (`git log --oneline`), files overwritten by the template, what the template resolved vs what was asked, any failed steps, and next steps (`<pm> run dev`, review `CLAUDE.md`).
 
 ## Notes
 

@@ -364,7 +364,7 @@ When `/kc:generate-claude-md` detects a manifest file (`.uproject`, `astro.confi
 
 ### Creating New Projects: `/kc:create-project <stack> <path> [description]`
 
-Guides with a `## Create Project` section (astro, nextjs, fastapi) can scaffold a new project. Flow, one git commit per phase: git init, official init CLI (skipped when the guide says `none`), overlay of a per-stack template repo (`scripts/apply_template.py`, template files win), then an interview limited to questions the template does not already answer (resolved via each question's auto-detection) run together with `/kc:install`, dependency install and build, then `/kc:generate-claude-md` with the interview answers. Requires git. Template repos are normal functional projects (own `package.json`, optional `CLAUDE.md`); URLs are set in the guide.
+Guides with a `## Create Project` section (astro, nextjs, fastapi) can scaffold a new project. Flow, one git commit per phase: git init, official init CLI (skipped when the guide says `none`), overlay of a per-stack template repo (`scripts/apply_template.py`, template files win), then an interview limited to questions the template does not already answer (resolved via each question's auto-detection) run together with `/kc:install`, dependency install and build, then `/kc:generate-claude-md` with the interview answers, and a rewrite of the template's `README.md` for the new project. Requires git. Template repos are normal functional projects (own `package.json`, optional `CLAUDE.md`); URLs are set in the guide.
 
 ### `@project/CLAUDE.local.md`
 
