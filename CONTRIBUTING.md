@@ -54,7 +54,7 @@ Use GitHub Issues. Include:
 
 ## Adding a Skill (or Slash Command)
 
-Skills follow the Agent Skills format and are shared by every harness (Claude Code, Codex, OpenCode, pi). A slash command is a skill. Each skill is a folder `.agents/skills/<name>/SKILL.md` (plus any bundled files). **Never edit `.claude/skills/`: it is a gitignored projection created by `.agents/skills/link-skills/scripts/link_skills.py`.**
+Skills follow the Agent Skills format and are shared by every harness (Claude Code, Codex, OpenCode, pi). A slash command is a skill. Each skill is a folder `.agents/skills/<name>/SKILL.md` (plus any bundled files). **Never edit `.claude/skills/`: it is a gitignored projection created by the `.claude/hooks/link_skills.py` SessionStart hook.**
 
 | Scope       | Location                              | Invocation   | Meaning                                  |
 | ----------- | ------------------------------------- | ------------ | ---------------------------------------- |

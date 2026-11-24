@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.agents/skills/link-skills/scripts/link_skills.py\" \"$CLAUDE_PROJECT_DIR\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/link_skills.py\" \"$CLAUDE_PROJECT_DIR\""
           }
         ]
       }

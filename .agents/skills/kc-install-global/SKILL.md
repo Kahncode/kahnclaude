@@ -1,10 +1,10 @@
 ---
 name: kc-install-global
-description: Install KahnClaude skills, agents, hooks, and config at user level (~/.agents/ and ~/.claude/)
+description: Install KahnClaude skills, agents, hooks, and config at user level for Claude Code (~/.claude/)
 scope: framework
 ---
 
-Install or merge the KahnClaude global config, skills, and agents at user level. Skills go to `~/.agents/skills/` (read by Codex, OpenCode and pi) and are projected into `~/.claude/skills/` for Claude Code. Agents, hooks and settings are Claude Code only and go to `~/.claude/`.
+Install or merge the KahnClaude global config, skills, and agents at user level. This installs for Claude Code only: skills, agents, hooks and settings all go to `~/.claude/`. Project installs are what make skills shared with other harnesses.
 
 ## Steps
 
@@ -32,9 +32,7 @@ Install or merge the KahnClaude global config, skills, and agents at user level.
 
 7. Create `~/.claude/agents/` if it doesn't exist. Copy selected agents to `~/.claude/agents/`, **preserving subfolder structure**. Create any needed subdirectories. Skip agents that already exist (ask before overwriting).
 
-8. Create `~/.agents/skills/` if it doesn't exist. Copy every skill folder from `.agents/skills/` → `~/.agents/skills/` (one folder per skill, bundled files included). Skip `scope: framework` skills. Skip skills that already exist (ask before overwriting).
-
-8a. The `link-skills` skill (copied in step 8) bundles the script. Run `python ~/.agents/skills/link-skills/scripts/link_skills.py ~` to project `~/.claude/skills` from `~/.agents/skills` (link, or copy if linking fails). If it reports unmanaged skills in `~/.claude/skills/`, move them into `~/.agents/skills/` (ask on name collisions) and re-run. Re-run it after any later skill change if the projection is a copy.
+8. Create `~/.claude/skills/` if it doesn't exist. Copy every skill folder from `.agents/skills/` → `~/.claude/skills/` (one folder per skill, bundled files included). Skip `scope: framework` skills. Skip skills that already exist (ask before overwriting).
 
 9. **Write the install manifest** to `~/.claude/.kahnclaude` as JSON:
 
@@ -45,7 +43,6 @@ Install or merge the KahnClaude global config, skills, and agents at user level.
      "commit": "<git-commit-hash>",
      "installed_at": "<ISO-8601-timestamp>",
      "scope": "global",
-     "projection": "<symlink|junction|copy>",
      "agents": ["<relative-agent-path>", ...],
      "notes": "<one-line summary of what was installed or merged>"
    }

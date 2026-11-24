@@ -53,7 +53,7 @@ The argument is the path to the target project. If omitted, ask the user for it 
 
 10. **Apply updates**: copy confirmed files, preserving subfolder structure. Create needed subdirectories.
 
-11. **Re-project skills** (skip if `manifest.projection` is `none`): run `python <target>/.agents/skills/link-skills/scripts/link_skills.py <target> --mode <manifest.projection is "copy" ? copy : auto>`.
+11. **Re-project skills** (skip if `manifest.projection` is `none`): run `python <target>/.claude/hooks/link_skills.py <target> --mode <manifest.projection is "copy" ? copy : auto>`.
 
 12. **Update the manifest** at `<target>/.agents/.kahnclaude`:
     - Re-verify the new commit hash with `git rev-parse --verify <new-hash>^{commit}`; abort if invalid
@@ -72,8 +72,8 @@ Make a dry-run summary first and wait for confirmation. Then run each phase as i
    - **Shipped by KahnClaude** (the name matches a `scope: project` skill in KahnClaude's `.agents/skills/`): the source is KahnClaude's `.agents/skills/<name>/`, not the target's old copy. Compare the old copy with it (normalise CRLF). Identical: `git rm` the old copy. Different: show the diff and ask, replace with KahnClaude's version or keep the local version as the project's own (moved unchanged into `.agents/skills/`, and later updates will diff it as usual). Then copy KahnClaude's version into `<target>/.agents/skills/<name>/` unless the local version was kept.
    - **Anything else** (custom, including a renamed KahnClaude skill): the project's own. Ask once, then move it using `/kc-install` step 9a-9b (same conversion, same name-collision handling, `git mv`, no content changes beyond `name:`, never add `disable-model-invocation`). If the user declines, leave these in place; phase 3 skips the projection.
    - Nothing is rewritten or deleted other than the replaced KahnClaude copies above.
-3. **Projection** — ensure the `link-skills` skill is present in `<target>/.agents/skills/` (copy it from KahnClaude if missing), ask the Claude-specific question (link, or copy), then do `/kc-install` step 9c (remove the now-empty `.claude/skills` and `.claude/commands`, then project, or skip with a warning if phase 2 left custom items behind).
-4. **Settings and ignore** — merge the `SessionStart` hook from `project/settings.json` into `<target>/.claude/settings.json` (merge rules as in step 6). Add `.claude/skills` to `.gitignore`.
+3. **Projection** — ensure `<target>/.claude/hooks/link_skills.py` is present (copy it from KahnClaude if missing), ask the Claude-specific question (link, or copy), then do `/kc-install` step 9c (remove the now-empty `.claude/skills` and `.claude/commands`, then project, or skip with a warning if phase 2 left custom items behind).
+4. **Settings and ignore** — merge the `SessionStart` hook from `project/settings.json` into `<target>/.claude/settings.json` (merge rules as in step 6). If the target has the older wiring that points at `.agents/skills/link-skills/scripts/link_skills.py`, replace that command with `.claude/hooks/link_skills.py` and remove the leftover `.agents/skills/link-skills/` folder (a KahnClaude-shipped skill that no longer exists). Add `.claude/skills` to `.gitignore`.
 5. **Manifest** — write `<target>/.agents/.kahnclaude` as `version: 2`, `layout: "agents"`, with the existing fields carried over plus `projection` (`"none"` if the projection was skipped). Delete `.claude/.kahnclaude`. Keep the old `commit` for now.
 
 ## Notes

@@ -46,7 +46,7 @@ All harnesses (Claude Code, Codex, OpenCode, pi) are supported by default; do no
 
 8. Copy all files from `.claude/hooks/` → `<target>/.claude/hooks/`
 
-9. **Migrate existing project skills, then project.** The `link-skills` skill (copied in step 6) bundles the projection script.
+9. **Migrate existing project skills, then project.** The projection script is the `link_skills.py` hook (copied in step 8).
 
    a. **Scan** `<target>/.claude/skills/` and `<target>/.claude/commands/`. Skip `.claude/skills` if it is already a link or a managed copy (it contains `.kahnclaude-copy`). Everything found is the project's own: projects are expected to hold more skills than KahnClaude ships, and a skill whose name differs from a KahnClaude one (e.g. renamed) is treated as custom. Never modify, delete or overwrite its content.
 
@@ -55,7 +55,7 @@ All harnesses (Claude Code, Codex, OpenCode, pi) are supported by default; do no
       - `.claude/commands/<n>.md` → `.agents/skills/<n>/SKILL.md`; `.claude/commands/<ns>/<n>.md` → `.agents/skills/<ns>-<n>/SKILL.md`. The only edit is setting `name:` in the frontmatter to the folder name (lowercase, hyphens), which the skill format requires. Add nothing else; in particular do not add `disable-model-invocation`.
       - **Name collision** with a skill already in `.agents/skills/`: touch neither; ask for a new folder name, or leave the item in place and skip the projection (c) with a warning.
 
-   c. **Clean up and project.** If `.claude/skills` and `.claude/commands` are now empty, remove them. If the user declined (b), skip the projection and tell them Claude Code will not see the skills in `.agents/skills/` until they migrate or run `/link-skills`. Otherwise run `python <target>/.agents/skills/link-skills/scripts/link_skills.py <target> --mode <auto|copy>` (per question 4b) and record the `PROJECTION=` value for the manifest.
+   c. **Clean up and project.** If `.claude/skills` and `.claude/commands` are now empty, remove them. If the user declined (b), skip the projection and tell them Claude Code will not see the skills in `.agents/skills/` until they migrate and run `python .claude/hooks/link_skills.py .`. Otherwise run `python <target>/.claude/hooks/link_skills.py <target> --mode <auto|copy>` (per question 4b) and record the `PROJECTION=` value for the manifest.
 
 10. **Handle settings.json**:
 
@@ -102,7 +102,7 @@ All harnesses (Claude Code, Codex, OpenCode, pi) are supported by default; do no
     - `commit` is the canonical commit hash from step 2
     - `installed_at` is when this manifest was first created
     - `updated_at` is set equal to `installed_at` at creation time; it will be updated by `/kc-update` and used for recovery if the commit hash becomes invalid
-    - `projection` is the value reported by `link_skills.py` (in the `link-skills` skill), or `none` if the projection was skipped
+    - `projection` is the value reported by `link_skills.py` (a hook in `.claude/hooks/`), or `none` if the projection was skipped
     - `agents` lists all agent paths that were copied (relative to `.claude/agents/`, e.g. `core/tech-lead-orchestrator.md`)
     - `notes` should capture what stack was detected and which optional agent groups the user chose
     - Add `.kahnclaude` to `<target>/.gitignore` if the user prefers not to commit it, but note that committing it allows teammates to know which version of KahnClaude is installed

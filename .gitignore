@@ -63,6 +63,6 @@ _ai_temp/
 # Uncomment this when importing from /inspiration to get claude code autocomplete. DO NOT COMMIT THIS CHANGE OR INSPIRATION TO THE REPOSITORY.
 inspiration/
 
-# Claude Code projection of .agents/skills (recreated by the link-skills skill's script)
+# Claude Code projection of .agents/skills (recreated by the link_skills.py SessionStart hook)
 .claude/skills
 .claude/skills.bak-*

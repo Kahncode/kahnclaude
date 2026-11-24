@@ -155,11 +155,11 @@ kahnclaude/
 │   └── skills/                  # Skills and slash-command workflows
 │       └── <name>/
 │           ├── SKILL.md         # scope: project → distributed; scope: framework → never distributed
-│           └── scripts/         # helper scripts bundled with the skill (e.g. link-skills, kc-create-project)
+│           └── scripts/         # helper scripts bundled with the skill (e.g. kc-create-project)
 │
 ├── .claude/                     # Claude Code components (framework + distributable)
 │   ├── settings.json            # Hooks wiring for this framework repo
-│   ├── skills/                  # Gitignored projection of .agents/skills (link-skills skill)
+│   ├── skills/                  # Gitignored projection of .agents/skills (link_skills.py hook)
 │   ├── agents/                  # Specialist subagents
 │   │   ├── <name>.md            # Universal agents
 │   │   ├── core/                # Cross-cutting specialists
@@ -205,7 +205,7 @@ The `kc-` name prefix marks skills that manage KahnClaude itself (invoked as `/k
 | ------------------------ | --------------------------------------------------------------------------------- |
 | `/kc-install`            | Install KahnClaude components into the current project                            |
 | `/kc-create-project`     | Create a new project (astro, nextjs, fastapi): init CLI, template overlay, targeted interview + install, AGENTS.md |
-| `/kc-install-global`     | Merge global config into `~/.claude/` and skills into `~/.agents/skills/` (never overwrites) |
+| `/kc-install-global`     | Merge global config, skills, agents and hooks into `~/.claude/` (never overwrites) |
 | `/kc-update`             | Update installed components from the latest framework source; migrates Claude-only installs to the `.agents/` layout |
 | `/kc-import`             | Analyze a repo's agent components and selectively integrate into KahnClaude |
 | `/kc-harvest`            | Pull improvements back from a target project into KahnClaude (reverse of update) |
@@ -217,7 +217,6 @@ The `kc-` name prefix marks skills that manage KahnClaude itself (invoked as `/k
 | ------------------------ | ---------------------------------------------------------------------------------------------- |
 | `/kc-create-agent-skill` | Create a new skill (or slash command) or agent following framework conventions |
 | `/kc-fix-agent-skill`    | Debug a misbehaving agent or skill — session analysis + convention audit          |
-| `/link-skills`           | Project `.agents/skills` into `.claude/skills` for Claude Code (junction/symlink/copy); runs automatically each session |
 | `/review`                | Review current diff for bugs, security issues, and best practices                              |
 | `/commit`                | Generate a conventional commit message and commit staged changes                               |
 | `/worktree`              | Create a git worktree + branch for isolated task work                                          |
@@ -251,7 +250,7 @@ Instructions and skills live in files every supported harness reads. Claude-spec
 | Hooks and settings | `.claude/` | native | not used | not used | not used |
 | Personal overrides | `CLAUDE.local.md` | native | not used | not used | not used |
 
-Claude Code does not read `.agents/skills/`, so the `link-skills` skill's script projects it into `.claude/skills/` (a junction on Windows, a symlink elsewhere, a copy as fallback). The projection is gitignored and recreated by a SessionStart hook. Claude-only frontmatter (`allowed-tools`, `argument-hint`, `$ARGUMENTS`) is ignored by other harnesses.
+Claude Code does not read `.agents/skills/`, so the `link_skills.py` SessionStart hook projects it into `.claude/skills/` (a junction on Windows, a symlink elsewhere, a copy as fallback). The projection is gitignored and recreated every session. Claude-only frontmatter (`allowed-tools`, `argument-hint`, `$ARGUMENTS`) is ignored by other harnesses.
 
 **Migrating a Claude-only repo:** run `/kc-update <path>`. A v1 install (manifest at `.claude/.kahnclaude`) is migrated first, one commit per phase: `CLAUDE.md` becomes `AGENTS.md` plus the shim, `.claude/commands/` and `.claude/skills/` move into `.agents/skills/`, the projection is created, and the manifest becomes v2 at `.agents/.kahnclaude`. Skills KahnClaude ships are installed from KahnClaude's `.agents/skills` (an old locally modified copy is diffed first); your own skills and commands are moved unchanged (only `name:` is set when a command becomes a skill). Anything that is not a KahnClaude skill, including a renamed one, is treated as yours and never modified. `/kc-install` offers the same move for repos that already have `.claude/skills` or `.claude/commands`. KahnClaude slash commands are renamed from `/kc:name` to `/kc-name`.
 

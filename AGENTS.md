@@ -26,7 +26,7 @@ Instructions for coding agents (Claude Code, Codex, OpenCode, pi) working on the
 | Folder | Purpose |
 |--------|---------|
 | `.agents/skills/` | Skills, including slash-command workflows — harness-neutral (Agent Skills format). `scope: project` ones are distributed to projects; `scope: framework` ones are never distributed. Skills that manage KahnClaude itself use the `kc-` prefix (`/kc-<name>`); the prefix does not imply scope |
-| `.claude/skills/` | Gitignored projection of `.agents/skills/` for Claude Code (junction/symlink/copy, created by the `link-skills` skill's script) |
+| `.claude/skills/` | Gitignored projection of `.agents/skills/` for Claude Code (junction/symlink/copy, created by the `link_skills.py` SessionStart hook) |
 | `.claude/agents/` | Agents distributed to projects (Claude Code only) |
 | `.claude/hooks/` | Hook scripts distributed to projects (Claude Code only) |
 | `.claude/settings.json` | Hooks wiring for this framework repo |
@@ -77,7 +77,7 @@ This repo primarily contains Markdown and Python. Follow these conventions:
 - Agents may be organized in subfolders: `core/` for cross-cutting concerns, `<stack>/` for tech-specific agents
 
 ### Python (hooks and skill scripts)
-- Scripts a skill needs live in that skill's `scripts/` folder (e.g. `.agents/skills/link-skills/scripts/`), never in a top-level `scripts/`; they are copied with the skill
+- Scripts a skill needs live in that skill's `scripts/` folder (e.g. `.agents/skills/kc-create-project/scripts/`), never in a top-level `scripts/`; they are copied with the skill
 - Type hints on all functions
 - Exit code semantics: `0` = allow, `2` = block with message, `1` = warn
 - Print blocking reason to `stderr` when exiting with code 2
