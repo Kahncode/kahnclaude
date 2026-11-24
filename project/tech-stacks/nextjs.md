@@ -1,6 +1,6 @@
 # Tech Stack Guide: Next.js
 
-Used by `/kc:generate-claude-md` when a Next.js project is detected, and by `/kc:create-project nextjs` to scaffold a new one.
+Used by `/kc-generate-agents-md` when a Next.js project is detected, and by `/kc-create-project nextjs` to scaffold a new one.
 
 ---
 
@@ -14,7 +14,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 ## Create Project
 
-Read by `/kc:create-project`. Values are literal; `<target>` is the project directory.
+Read by `/kc-create-project`. Values are literal; `<target>` is the project directory.
 
 - **Init command:** `npx create-next-app@latest <target> --ts --app --src-dir --tailwind --eslint --import-alias "@/*" --use-<pm> --skip-install --disable-git --yes`
 - **Template repo:** `https://github.com/kahncode/nextjs-template` (placeholder until the repo exists)
@@ -25,7 +25,7 @@ Read by `/kc:create-project`. Values are literal; `<target>` is the project dire
 Notes:
 
 - Flags were checked against the `create-next-app` reference. Init runs before the interview with these literal defaults; the template overlay overwrites the result, so the flags are not tailored to answers.
-- `--yes` uses defaults for anything not given. Recent versions also add `AGENTS.md`; pass `--no-agents-md` since KahnClaude generates `CLAUDE.md`.
+- `--yes` uses defaults for anything not given. Recent versions also add `AGENTS.md`.
 - The template repo is a normal functional Next.js project. Its files overwrite the init output, so init flags need not match user preferences.
 
 ---
@@ -36,9 +36,9 @@ Notes:
 
 **Question:** What will this app contain? (purpose, main screens, users)
 
-**Expected Answer:** Free text. Asked by `/kc:create-project` if no description was passed.
+**Expected Answer:** Free text. Asked by `/kc-create-project` if no description was passed.
 
-**CLAUDE.md Mapping:** Project Overview → Description; seeds Key Patterns & Conventions.
+**Instructions Mapping:** Project Overview → Description; seeds Key Patterns & Conventions.
 
 **Rationale:** Drives every later suggestion (data layer, auth, rendering strategy).
 
@@ -48,7 +48,7 @@ Notes:
 
 **Auto-detection:** `app/` vs `pages/` (or under `src/`); `next` version in `package.json`.
 
-**CLAUDE.md Mapping:** Tech Stack Details → `Router` row; Project-Specific Rules (server vs client component rules, `"use client"` boundaries).
+**Instructions Mapping:** Tech Stack Details → `Router` row; Project-Specific Rules (server vs client component rules, `"use client"` boundaries).
 
 ### 3. Data & Backend
 
@@ -56,7 +56,7 @@ Notes:
 
 **Auto-detection:** `prisma/`, `drizzle.config.*`, `@supabase/*`, ORM dependencies.
 
-**CLAUDE.md Mapping:** Tech Stack Details → `Database` row; Key Patterns (where queries live, server actions vs route handlers).
+**Instructions Mapping:** Tech Stack Details → `Database` row; Key Patterns (where queries live, server actions vs route handlers).
 
 ### 4. Authentication
 
@@ -64,7 +64,7 @@ Notes:
 
 **Auto-detection:** `next-auth`, `@clerk/*`, `@supabase/ssr` in dependencies.
 
-**CLAUDE.md Mapping:** Tech Stack Details → `Auth` row; Project-Specific Rules (protect routes in middleware/proxy and server actions).
+**Instructions Mapping:** Tech Stack Details → `Auth` row; Project-Specific Rules (protect routes in middleware/proxy and server actions).
 
 ### 5. Styling & UI
 
@@ -72,7 +72,7 @@ Notes:
 
 **Auto-detection:** `tailwindcss`, `components.json` (shadcn), `*.module.css`.
 
-**CLAUDE.md Mapping:** Code Style → styling row.
+**Instructions Mapping:** Code Style → styling row.
 
 ### 6. Deployment Target
 
@@ -80,7 +80,7 @@ Notes:
 
 **Auto-detection:** `vercel.json`, `Dockerfile`, `output` in `next.config.*`.
 
-**CLAUDE.md Mapping:** Tech Stack Details → `Hosting` row; Critical Rule 1 (never auto-deploy) names the target.
+**Instructions Mapping:** Tech Stack Details → `Hosting` row; Critical Rule 1 (never auto-deploy) names the target.
 
 ### 7. Package Manager & Node Version
 
@@ -88,7 +88,7 @@ Notes:
 
 **Auto-detection:** lockfile, `engines`, `.nvmrc`.
 
-**CLAUDE.md Mapping:** Development Commands (all rows) and Prerequisites.
+**Instructions Mapping:** Development Commands (all rows) and Prerequisites.
 
 ### 8. Testing & Quality
 
@@ -96,7 +96,7 @@ Notes:
 
 **Auto-detection:** devDependencies and `package.json` scripts.
 
-**CLAUDE.md Mapping:** Development Commands → test/lint/format/type-check rows; Code Style table.
+**Instructions Mapping:** Development Commands → test/lint/format/type-check rows; Code Style table.
 
 ### 9. Environment & Secrets
 
@@ -104,4 +104,4 @@ Notes:
 
 **Auto-detection:** `.env.example`, `process.env.*` usage.
 
-**CLAUDE.md Mapping:** Service Ports & Configuration → env var column; reinforces Critical Rule 0.
+**Instructions Mapping:** Service Ports & Configuration → env var column; reinforces Critical Rule 0.

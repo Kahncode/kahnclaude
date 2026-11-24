@@ -18,18 +18,17 @@ Use GitHub Issues. Include:
 1. Create a branch from `main` (`git checkout -b feat/your-change`)
 2. Make your changes
 3. Run `/review` in Claude Code on every file you changed
-4. Verify hooks pass syntax check: `python -m py_compile .claude/hooks/*.py`
-5. Commit with conventional format: `feat(commands): add review command`
+4. Verify hooks pass syntax check: `python -m py_compile .claude/hooks/*.py .agents/skills/*/scripts/*.py`
+5. Commit with conventional format: `feat(skills): add review skill`
 
 ---
 
 ## What's Welcome
 
-- New slash commands (`.claude/commands/`)
-- New skills (`.claude/skills/<name>/SKILL.md`)
+- New skills and slash commands (`.agents/skills/<name>/SKILL.md`)
 - New agents (`.claude/agents/`)
 - New hooks (`.claude/hooks/`)
-- Improvements to `global/CLAUDE.md` or `project/CLAUDE.md`
+- Improvements to `global/CLAUDE.md` or `project/AGENTS.md`
 - Documentation improvements
 
 ## What's NOT Welcome
@@ -49,73 +48,39 @@ Use GitHub Issues. Include:
 - Hooks use stdlib only unless dependency is clearly documented
 - Run `/review` before committing
 - Use `@path/to/file` syntax for absolute file path references in `.md` files (e.g. `@src/main.py`); relative or fuzzy references (e.g. `file.ext`) are fine as-is
-- See `CLAUDE.md` for the full standards
+- See `AGENTS.md` for the full standards
 
 ---
 
-## Adding a Slash Command
+## Adding a Skill (or Slash Command)
 
-Commands are Markdown files with YAML frontmatter. **Location depends on scope:**
+Skills follow the Agent Skills format and are shared by every harness (Claude Code, Codex, OpenCode, pi). A slash command is a skill. Each skill is a folder `.agents/skills/<name>/SKILL.md` (plus any bundled files). **Never edit `.claude/skills/`: it is a gitignored projection created by `.agents/skills/link-skills/scripts/link_skills.py`.**
 
-| Scope       | Location                        | Invocation   | Meaning                                  |
-| ----------- | ------------------------------- | ------------ | ---------------------------------------- |
-| `project`   | `.claude/commands/<name>.md`    | `/<name>`    | Installed into target projects.          |
-| `framework` | `.claude/commands/kc/<name>.md` | `/kc:<name>` | Framework management only. Never copied. |
-
-Project command example:
-
-```markdown
----
-name: command-name
-description: One-line description of what this command does
-scope: project
----
-
-Your command prompt here. Write in imperative form — instructions Claude follows
-when the user runs `/command-name`.
-```
-
-Framework command example (inside `.claude/commands/kc/`):
-
-```markdown
----
-name: command-name
-description: One-line description of what this command does
-scope: framework
----
-
-Your command prompt here. Invoked as `/kc:command-name`.
-```
-
-**Naming:** kebab-case, start with an action verb (`review`, `commit`, `check-`, `refactor`).
-
-**Description limit:** Must not exceed 400 characters.
-
-**After adding:** Update `README.md` (component listing) and this file if you introduced new conventions.
-
----
-
-## Adding a Skill
-
-Skills live in `.claude/skills/<name>/SKILL.md`:
+| Scope       | Location                              | Invocation   | Meaning                                  |
+| ----------- | ------------------------------------- | ------------ | ---------------------------------------- |
+| `project`   | `.agents/skills/<name>/SKILL.md`      | `/<name>`    | Installed into target projects.          |
+| `framework` | `.agents/skills/<name>/SKILL.md`      | `/<name>`    | Framework management only. Never copied. |
 
 ```markdown
 ---
 name: skill-name
-description: What this skill does
-triggers:
-  - keyword one
-  - keyword two
+description: What this skill does and when to use it
+scope: project
+disable-model-invocation: true
 ---
 
-# Skill: Name
-
-Structured template Claude follows when trigger keywords are detected in conversation.
+Instructions in imperative form. The user's argument, if any, follows the skill name.
 ```
 
-- Trigger keywords must be specific enough to avoid false activations
-- Each skill gets its own subdirectory: `.claude/skills/code-review/SKILL.md`
-- **Description limit:** Must not exceed 400 characters.
+- `name` must equal the folder name: lowercase letters, digits and hyphens (no `:`)
+- Add `disable-model-invocation: true` for workflows with side effects that should only run when the user invokes them
+- Claude-only frontmatter (`allowed-tools`, `argument-hint`) and `$ARGUMENTS` are allowed but ignored by other harnesses; the body must remain understandable without them
+- Do not tell the agent to read `AGENTS.md`; harnesses load it automatically
+- Description must be specific enough to avoid false activations
+- Skills that manage KahnClaude itself use the `kc-` prefix (e.g. `/kc-install`); the prefix does not imply scope
+- **Naming:** kebab-case, start with an action verb for workflows (`review`, `commit`, `refactor`)
+- **Description limit:** must not exceed 400 characters
+- **After adding:** update `README.md` (component listing) and this file if you introduced new conventions
 
 ---
 
@@ -214,17 +179,17 @@ if __name__ == "__main__":
 
 ## Adding a Tech Stack Guide
 
-CLAUDE.md generation templates and guides live in `project/` — the master template at `project/CLAUDE.md` and per-stack Q&A guides in `project/tech-stacks/<name>.md` (e.g., `unreal.md`). Read `project/tech-stacks/unreal.md` for an example of the expected structure: detection pattern, numbered questions with CLAUDE.md section mappings, and rationale for each question. Guides are Markdown only and are used by `/kc:generate-claude-md` from the KahnClaude source directory; they are never copied to target projects. After adding a guide, update `README.md` to list it.
+AGENTS.md generation templates and guides live in `project/` — the master template at `project/AGENTS.md` and per-stack Q&A guides in `project/tech-stacks/<name>.md` (e.g., `unreal.md`). Read `project/tech-stacks/unreal.md` for an example of the expected structure: detection pattern, numbered questions with AGENTS.md section mappings, and rationale for each question. Guides are Markdown only and are used by `/kc-generate-agents-md` from the KahnClaude source directory; they are never copied to target projects. After adding a guide, update `README.md` to list it.
 
-**Create Project section (optional):** a guide that adds a `## Create Project` section becomes available to `/kc:create-project`. It must list, as literal bold-labelled bullets: the init command per package manager (non-interactive, no install, no git, `<target>` placeholder; write `none` when the stack has no scaffolder and the template repo is the whole project), `Template repo` (git URL of a functional, opinionated project; it overlays the init output, and the guide's `Auto-detection` rules are run against the result to skip already-answered questions, so keep those rules accurate), `Template ref`, `Default package manager` (the language's own default, e.g. npm for Node; never assume an alternative) and `Post-init` steps. Verify init flags against current docs (Context7) when adding or changing one. Helper scripts live in `scripts/` (Python, stdlib only, type hints, cross-platform) and must pass `python -m py_compile`.
+**Create Project section (optional):** a guide that adds a `## Create Project` section becomes available to `/kc-create-project`. It must list, as literal bold-labelled bullets: the init command per package manager (non-interactive, no install, no git, `<target>` placeholder; write `none` when the stack has no scaffolder and the template repo is the whole project), `Template repo` (git URL of a functional, opinionated project; it overlays the init output, and the guide's `Auto-detection` rules are run against the result to skip already-answered questions, so keep those rules accurate), `Template ref`, `Default package manager` (the language's own default, e.g. npm for Node; never assume an alternative) and `Post-init` steps. Verify init flags against current docs (Context7) when adding or changing one. Helper scripts live in the skill's own folder (`.agents/skills/kc-create-project/scripts/`) (Python, stdlib only, type hints, cross-platform) and must pass `python -m py_compile`.
 
 ---
 
 ## Updating Templates
 
-### `@project/CLAUDE.md`
+### `@project/AGENTS.md`
 
-Starting point for a new project's `CLAUDE.md`. When editing:
+Starting point for a new project's `AGENTS.md` (`project/CLAUDE.md` is only the one-line `@AGENTS.md` shim). When editing:
 
 - Keep rules numbered with clear labels
 - Append new rules — never remove without discussion
@@ -235,14 +200,14 @@ Starting point for a new project's `CLAUDE.md`. When editing:
 Installed at `@~/.claude/CLAUDE.md`. Keep it:
 
 - Security and cross-project standards only
-- Free of project-specific rules (those belong in `project/CLAUDE.md`)
+- Free of project-specific rules (those belong in `project/AGENTS.md`)
 - Safe to merge into an existing global config without conflicts
 
 ---
 
 ## Checklist Before Committing
 
-- [ ] Component in correct location (`scope: project` → `.claude/commands/`, `scope: framework` → `.claude/commands/kc/`, skills, agents, hooks in their respective dirs)
+- [ ] Component in correct location (skills and slash commands in `.agents/skills/` with `kc-` prefix for `scope: framework`; agents and hooks in `.claude/`)
 - [ ] `README.md` updated with description
 - [ ] This file updated if new conventions introduced
 - [ ] If hook: syntax-checked (`python -m py_compile`)

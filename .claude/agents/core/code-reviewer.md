@@ -69,7 +69,7 @@ Always start by determining which changes to review using the above logic.
 
 ### 5. Architecture & Maintainability
 
-- Follow architectural rules from `CLAUDE.md`, `@docs/ARCHITECTURE.md` and relevant files
+- Follow architectural rules from `AGENTS.md`, `@docs/ARCHITECTURE.md` and relevant files
 - No circular dependencies
 - No dead code — no commented-out blocks, no unreachable code, no unused imports
 - File and function size within project limits

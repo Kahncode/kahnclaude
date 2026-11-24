@@ -1,12 +1,12 @@
 # KahnClaude
 
-> A personal Claude Code framework — commands, skills, agents, hooks, and CLAUDE.md templates for effective AI-assisted development across any language or stack.
+> A personal framework for AI coding agents — skills, agents, hooks, and AGENTS.md templates for effective AI-assisted development across any language or stack. Claude Code first; Codex, OpenCode and pi share the same files.
 
 ---
 
 ## What Is This?
 
-KahnClaude is a **Claude Code configuration layer**, not a project scaffold or runnable application. It provides the infrastructure that makes Claude dramatically more effective: slash commands, triggered skills, specialist agents, enforcement hooks, and CLAUDE.md templates.
+KahnClaude is an **agent configuration layer**, not a project scaffold or runnable application. It provides the infrastructure that makes coding agents dramatically more effective: skills (including slash-command workflows), specialist agents, enforcement hooks, and AGENTS.md templates.
 
 You use it to **configure** projects, not to run them. Drop it into any existing codebase — C++, Python, Rust, C#, web — and Claude immediately gains structured workflows, quality enforcement, and expert templates.
 
@@ -16,16 +16,16 @@ You use it to **configure** projects, not to run them. Drop it into any existing
 
 ```bash
 # Inside a Claude Code session in your project
-/kc:install
+/kc-install
 ```
 
-Non-destructive — only adds what's missing. Creates `.claude/` with all components.
+Non-destructive — only adds what's missing. Creates `AGENTS.md` (plus a one-line `CLAUDE.md` shim), `.agents/skills/`, and the Claude Code agents, hooks and settings under `.claude/`. Existing Claude-only installs migrate with `/kc-update` (see [Harness Support](#harness-support)).
 
 **B. Install global config once:**
 
 ```bash
 # Inside a Claude Code session (one-time, merges with any existing ~/.claude/)
-/kc:install-global
+/kc-install-global
 ```
 
 > **What NOT to do:** Don't expect a runnable app from this repo. This is the configuration layer that enhances Claude in your projects — it's not a project itself.
@@ -36,12 +36,11 @@ Non-destructive — only adds what's missing. Creates `.claude/` with all compon
 
 | Component             | Count | Purpose                                                                   |
 | --------------------- | ----- | ------------------------------------------------------------------------- |
-| **Slash Commands**    | 24    | On-demand workflows invoked with `/command`                               |
-| **Skills**            | 0     | Trigger-activated expertise templates                                     |
+| **Skills**            | 26    | Shared workflows and expertise (19 project, 7 framework), `/name` to invoke |
 | **Agents**            | 19    | Specialist subagents with restricted tool access                          |
-| **Hooks**             | 8     | Deterministic enforcement scripts (Python)                                |
-| **Project Template**  | 1     | Master `CLAUDE.md` with guide comments (used by `/kc:generate-claude-md`) |
-| **Tech-Stack Guides** | 1+    | Unreal Engine + placeholders for future stacks                            |
+| **Hooks**             | 9     | Deterministic enforcement scripts (Python)                                |
+| **Project Template**  | 1     | Master `AGENTS.md` with guide comments (used by `/kc-generate-agents-md`) |
+| **Tech-Stack Guides** | 4+    | Unreal, Astro, Next.js, FastAPI (+ placeholders for future stacks)        |
 | **Global Template**   | 1     | `@~/.claude/CLAUDE.md` for cross-project rules                            |
 
 ---
@@ -54,14 +53,14 @@ git clone <repo-url> ~/tools/kahnclaude
 
 # 2. Install global config (one-time)
 #    Open Claude Code from anywhere and run:
-/kc:install-global
+/kc-install-global
 
 # 3. In any project, install the Claude layer:
 cd ~/your-project
 claude
-/kc:install
+/kc-install
 
-# 4. Customize CLAUDE.md for your project
+# 4. Customize AGENTS.md for your project
 
 # 5. Configure MCPs for your tools and stack (see MCP section below)
 
@@ -147,19 +146,20 @@ KahnClaude is **language-agnostic**. Components are designed to work across:
 kahnclaude/
 ├── README.md
 ├── CONTRIBUTING.md
-├── CLAUDE.md                    # This repo's own Claude rules
+├── AGENTS.md                    # This repo's own agent rules
+├── CLAUDE.md                    # One-line shim: @AGENTS.md
 ├── LICENSE
 ├── .gitignore
 │
-├── .claude/                     # All Claude components (framework + distributable)
+├── .agents/                     # Harness-neutral components (read by Codex, OpenCode, pi)
+│   └── skills/                  # Skills and slash-command workflows
+│       └── <name>/
+│           ├── SKILL.md         # scope: project → distributed; scope: framework → never distributed
+│           └── scripts/         # helper scripts bundled with the skill (e.g. link-skills, kc-create-project)
+│
+├── .claude/                     # Claude Code components (framework + distributable)
 │   ├── settings.json            # Hooks wiring for this framework repo
-│   ├── commands/                # Slash commands
-│   │   ├── <name>.md            # scope: project → distributed to projects
-│   │   └── kc/                  # scope: framework → KahnClaude management only
-│   │       └── <name>.md        # invoked as /kc:<name>
-│   ├── skills/                  # Triggered expertise templates
-│   │   └── <name>/
-│   │       └── SKILL.md
+│   ├── skills/                  # Gitignored projection of .agents/skills (link-skills skill)
 │   ├── agents/                  # Specialist subagents
 │   │   ├── <name>.md            # Universal agents
 │   │   ├── core/                # Cross-cutting specialists
@@ -169,18 +169,16 @@ kahnclaude/
 │   └── hooks/                   # Enforcement scripts (Python only)
 │       └── <name>.py
 │
-├── project/                     # CLAUDE.md templates for new projects
-│   ├── CLAUDE.md                # Master template with guide comments (used by /kc:generate-claude-md)
-│   ├── CLAUDE.local.md
+├── project/                     # Templates for new projects
+│   ├── AGENTS.md                # Master template with guide comments (used by /kc-generate-agents-md)
+│   ├── CLAUDE.md                # One-line shim: @AGENTS.md
+│   ├── CLAUDE.local.md          # Optional Claude-only personal overrides
 │   └── tech-stacks/             # Tech-specific Q&A guides for auto-generation
 │       ├── unreal.md            # Unreal Engine detection + 8 guided questions
 │       ├── astro.md             # Astro detection + questions + create-project recipe
 │       ├── nextjs.md            # Next.js detection + questions + create-project recipe
 │       ├── fastapi.md           # FastAPI detection + questions + create-project recipe (template-only)
 │       └── [more stacks...].md
-│
-├── scripts/                     # Framework helper scripts (Python, cross-platform)
-│   └── apply_template.py        # Overlay a template git repo onto a new project
 │
 ├── global/                      # Global ~/.claude/ config templates
 │   ├── CLAUDE.md
@@ -192,35 +190,38 @@ kahnclaude/
 
 ---
 
-## Commands — On-Demand Workflows
+## Skills — Workflows and Expertise
 
-Invoke with `/command-name` inside any Claude Code session. Commands are Markdown files with YAML frontmatter. Two scopes:
+Skills follow the [Agent Skills](https://agentskills.io) format: `.agents/skills/<name>/SKILL.md` with YAML frontmatter. Slash commands are skills; user-invoked ones are invoked as `/name` (`$name` in Codex). Two scopes:
 
-- **`scope: project`** — distributed to target projects via `/kc:install`; live in `.claude/commands/`
-- **`scope: framework`** — KahnClaude management only, never distributed; live in `.claude/commands/kc/`, invoked as `/kc:<name>`
+- **`scope: project`** — distributed to target projects via `/kc-install`
+- **`scope: framework`** — KahnClaude management only, never distributed
 
-### Framework Commands
+The `kc-` name prefix marks skills that manage KahnClaude itself (invoked as `/kc-<name>`); it does not imply scope. `kc-create-agent-skill` and `kc-fix-agent-skill` are `scope: project` so they are installed into projects too. The tables below are grouped by `scope`.
 
-| Command                  | What It Does                                                                      |
+### Framework Skills (`scope: framework`)
+
+| Skill                    | What It Does                                                                      |
 | ------------------------ | --------------------------------------------------------------------------------- |
-| `/kc:install`            | Install KahnClaude components into the current project                            |
-| `/kc:create-project`     | Create a new project (astro, nextjs, fastapi): init CLI, template overlay, targeted interview + install, CLAUDE.md |
-| `/kc:install-global`     | Merge global config into `~/.claude/` (smart merge, never overwrites)             |
-| `/kc:update`             | Update installed components from the latest framework source                      |
-| `/kc:import`             | Analyze a repo's Claude Code components and selectively integrate into KahnClaude |
-| `/kc:harvest`            | Pull improvements back from a target project into KahnClaude (reverse of update) |
-| `/kc:create-agent-skill` | Create a new agent, skill, or slash command following framework conventions       |
-| `/kc:fix-agent-skill`    | Debug a misbehaving agent or skill — session analysis + convention audit          |
+| `/kc-install`            | Install KahnClaude components into the current project                            |
+| `/kc-create-project`     | Create a new project (astro, nextjs, fastapi): init CLI, template overlay, targeted interview + install, AGENTS.md |
+| `/kc-install-global`     | Merge global config into `~/.claude/` and skills into `~/.agents/skills/` (never overwrites) |
+| `/kc-update`             | Update installed components from the latest framework source; migrates Claude-only installs to the `.agents/` layout |
+| `/kc-import`             | Analyze a repo's agent components and selectively integrate into KahnClaude |
+| `/kc-harvest`            | Pull improvements back from a target project into KahnClaude (reverse of update) |
+| `/kc-generate-agents-md` | Auto-detect tech stack and generate AGENTS.md (+ CLAUDE.md shim); enhances an existing file |
 
-### Project Commands
+### Project Skills (`scope: project`)
 
-| Command                  | What It Does                                                                                   |
+| Skill                    | What It Does                                                                                   |
 | ------------------------ | ---------------------------------------------------------------------------------------------- |
-| `/kc:generate-claude-md` | Auto-detect tech stack and generate a complete CLAUDE.md; use `--additive` to enhance existing |
+| `/kc-create-agent-skill` | Create a new skill (or slash command) or agent following framework conventions |
+| `/kc-fix-agent-skill`    | Debug a misbehaving agent or skill — session analysis + convention audit          |
+| `/link-skills`           | Project `.agents/skills` into `.claude/skills` for Claude Code (junction/symlink/copy); runs automatically each session |
 | `/review`                | Review current diff for bugs, security issues, and best practices                              |
 | `/commit`                | Generate a conventional commit message and commit staged changes                               |
 | `/worktree`              | Create a git worktree + branch for isolated task work                                          |
-| `/refactor`              | Refactor a file against CLAUDE.md rules — split, extract, clean up                             |
+| `/refactor`              | Refactor a file against AGENTS.md rules — split, extract, clean up                             |
 | `/progress`              | Show file counts, test status, recent git activity, and next actions                           |
 | `/document`              | Build or update project docs: no args = ARCHITECTURE.md index, with args = subsystem deep-dive |
 | `/learn`                 | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes             |
@@ -236,11 +237,21 @@ Invoke with `/command-name` inside any Claude Code session. Commands are Markdow
 
 ---
 
-## Skills — Triggered Expertise
+## Harness Support
 
-Skills activate automatically when Claude detects trigger keywords in conversation. No explicit invocation needed.
+Instructions and skills live in files every supported harness reads. Claude-specific pieces stay under `.claude/`.
 
-No skills are included yet. Use `/kc:create-agent-skill` to add one.
+| Piece | Location | Claude Code | Codex | OpenCode | pi |
+| ----- | -------- | ----------- | ----- | -------- | -- |
+| Instructions | `AGENTS.md` | via `CLAUDE.md` shim (`@AGENTS.md`) | native | native | native |
+| Skills | `.agents/skills/` | via `.claude/skills` projection | native | native | native |
+| Agents | `.claude/agents/` | native | not used | not used | not used |
+| Hooks and settings | `.claude/` | native | not used | not used | not used |
+| Personal overrides | `CLAUDE.local.md` | native | not used | not used | not used |
+
+Claude Code does not read `.agents/skills/`, so the `link-skills` skill's script projects it into `.claude/skills/` (a junction on Windows, a symlink elsewhere, a copy as fallback). The projection is gitignored and recreated by a SessionStart hook. Claude-only frontmatter (`allowed-tools`, `argument-hint`, `$ARGUMENTS`) is ignored by other harnesses.
+
+**Migrating a Claude-only repo:** run `/kc-update <path>`. A v1 install (manifest at `.claude/.kahnclaude`) is migrated first, one commit per phase: `CLAUDE.md` becomes `AGENTS.md` plus the shim, `.claude/commands/` and `.claude/skills/` move into `.agents/skills/`, the projection is created, and the manifest becomes v2 at `.agents/.kahnclaude`. Skills KahnClaude ships are installed from KahnClaude's `.agents/skills` (an old locally modified copy is diffed first); your own skills and commands are moved unchanged (only `name:` is set when a command becomes a skill). Anything that is not a KahnClaude skill, including a renamed one, is treated as yours and never modified. `/kc-install` offers the same move for repos that already have `.claude/skills` or `.claude/commands`. KahnClaude slash commands are renamed from `/kc:name` to `/kc-name`.
 
 ---
 
@@ -296,10 +307,10 @@ Agents are specialists Claude delegates to automatically. Each has restricted to
 
 ## Hooks — Enforcement Over Suggestion
 
-CLAUDE.md rules are suggestions. Hooks are **deterministic** — they always run as Python scripts at specific lifecycle points.
+AGENTS.md rules are suggestions. Hooks are **deterministic** — they always run as Python scripts at specific lifecycle points.
 
 ```
-CLAUDE.md rule: "don't read .env"
+AGENTS.md rule: "don't read .env"
   → Parsed by LLM → Weighed against context → Maybe followed
 
 PreToolUse hook blocking .env access
@@ -338,9 +349,9 @@ PreToolUse hook blocking .env access
 
 ## Templates
 
-### `@project/CLAUDE.md`
+### `@project/AGENTS.md` and `@project/CLAUDE.md`
 
-Master template for auto-generating project-specific `CLAUDE.md` files. Used by `/kc:generate-claude-md` command to:
+Master template for auto-generating project-specific `AGENTS.md` files; `project/CLAUDE.md` is the one-line `@AGENTS.md` shim written next to it. Used by `/kc-generate-agents-md` command to:
 
 - Auto-detect tech stack (Unreal, Node.js, Python, Rust, etc.)
 - Load tech-specific Q&A guides (e.g., Unreal Engine)
@@ -352,7 +363,7 @@ Every section includes `<!-- GUIDE: ... -->` comments explaining purpose, format
 
 ### Tech-Stack Guides: `@project/tech-stacks/`
 
-Specialized Q&A guides loaded by `/kc:generate-claude-md` when a tech stack is detected.
+Specialized Q&A guides loaded by `/kc-generate-agents-md` when a tech stack is detected.
 
 - **`unreal.md`** — Unreal Engine (8 guided questions: version, project type, platforms, C++ vs Blueprint, plugins, content structure, build targets, do's/don'ts)
 - **`astro.md`** — Astro (9 questions: description, rendering mode, content source, islands, styling, deploy, package manager, testing, SEO)
@@ -360,15 +371,15 @@ Specialized Q&A guides loaded by `/kc:generate-claude-md` when a tech stack is d
 - **`fastapi.md`** — FastAPI (9 questions: description, database, auth, storage, deploy, environments, tooling, testing, structure); scaffolds from `Kahncode/py-fastapi-template` with no init CLI
 - **`[more stacks].md`** — Additional stacks (Django, Rust, C#/.NET) can be added following the same pattern
 
-When `/kc:generate-claude-md` detects a manifest file (`.uproject`, `astro.config.*`, `next.config.*`, `pyproject.toml`, etc.), it loads the matching guide and asks all questions to build a complete, annotated CLAUDE.md.
+When `/kc-generate-agents-md` detects a manifest file (`.uproject`, `astro.config.*`, `next.config.*`, `pyproject.toml`, etc.), it loads the matching guide and asks all questions to build a complete, annotated AGENTS.md.
 
-### Creating New Projects: `/kc:create-project <stack> <path> [description]`
+### Creating New Projects: `/kc-create-project <stack> <path> [description]`
 
-Guides with a `## Create Project` section (astro, nextjs, fastapi) can scaffold a new project. Flow, one git commit per phase: git init, official init CLI (skipped when the guide says `none`), overlay of a per-stack template repo (`scripts/apply_template.py`, template files win), then an interview limited to questions the template does not already answer (resolved via each question's auto-detection) run together with `/kc:install`, dependency install and build, then `/kc:generate-claude-md` with the interview answers, and a rewrite of the template's `README.md` for the new project. Requires git. Template repos are normal functional projects (own `package.json`, optional `CLAUDE.md`); URLs are set in the guide.
+Guides with a `## Create Project` section (astro, nextjs, fastapi) can scaffold a new project. Flow, one git commit per phase: git init, official init CLI (skipped when the guide says `none`), overlay of a per-stack template repo (`kc-create-project/scripts/apply_template.py`, template files win), then an interview limited to questions the template does not already answer (resolved via each question's auto-detection) run together with `/kc-install`, dependency install and build, then `/kc-generate-agents-md` with the interview answers, and a rewrite of the template's `README.md` for the new project. Requires git. Template repos are normal functional projects (own `package.json`, optional `AGENTS.md`); URLs are set in the guide.
 
 ### `@project/CLAUDE.local.md`
 
-Personal overrides — gitignored, never committed. For individual workflow preferences, local environment details, and project-specific personal notes.
+Optional personal overrides for Claude Code — gitignored, never committed (other harnesses do not read it). For individual workflow preferences, local environment details, and project-specific personal notes.
 
 ### `@global/CLAUDE.md`
 
@@ -392,7 +403,7 @@ Three layers of enforcement, strongest to weakest:
 
 1. **`.gitignore`** — last line of defense, filesystem-level (strongest)
 2. **Hooks** — guaranteed to run, blocks operations before they happen
-3. **`CLAUDE.md` rules** — behavioral suggestions (weakest — Claude can override under context pressure)
+3. **`AGENTS.md` rules** — behavioral suggestions (weakest — Claude can override under context pressure)
 
 ### One Task, One Chat
 
@@ -402,7 +413,7 @@ Research shows **39% performance degradation** when mixing unrelated topics in a
 
 For non-trivial tasks, start in plan mode. Don't let Claude write code until you've agreed on the plan. Every plan step must have a unique name so you can reference and replace steps cleanly.
 
-### CLAUDE.md Is Team Memory
+### AGENTS.md Is Team Memory
 
 Every time Claude makes a mistake, add a rule to prevent it recurring. The file is in git — the whole team benefits from every lesson learned.
 
@@ -418,12 +429,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 | Component           | Location                         | Naming                                          |
 | ------------------- | -------------------------------- | ----------------------------------------------- |
-| Command (project)   | `.claude/commands/<name>.md`     | kebab-case action verb                          |
-| Command (framework) | `.claude/commands/kc/<name>.md`  | kebab-case action verb; invoked as `/kc:<name>` |
-| Skill               | `.claude/skills/<name>/SKILL.md` | kebab-case category                             |
+| Skill (project)     | `.agents/skills/<name>/SKILL.md` | kebab-case action verb or category              |
+| Skill (KahnClaude management) | `.agents/skills/kc-<name>/SKILL.md` | `kc-` prefix; `scope` decides distribution |
 | Agent               | `.claude/agents/<name>.md`       | kebab-case role                                 |
 | Hook                | `.claude/hooks/<name>.py`        | `block-`, `check-`, `lint-`, `verify-` prefix   |
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Contributions of commands, skills, agents, and hooks are welcome. Bash scripts are not — Python only.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Contributions of skills, agents, and hooks are welcome. Bash scripts are not — Python only.

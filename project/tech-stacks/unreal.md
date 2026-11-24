@@ -1,8 +1,8 @@
 # Tech Stack Guide: Unreal Engine
 
-This guide is used by `/kc:generate-claude-md` when an Unreal Engine project is detected (`.uproject` file in root).
+This guide is used by `/kc-generate-agents-md` when an Unreal Engine project is detected (`.uproject` file in root).
 
-The following questions help populate `CLAUDE.md` sections with Unreal-specific configurations and conventions.
+The following questions help populate `AGENTS.md` sections with Unreal-specific configurations and conventions.
 
 ---
 
@@ -24,7 +24,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 **Auto-detection:** The command attempts to read `.uproject` and extract `EngineAssociation` or `EngineVersion`. User can confirm or override.
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Tech Stack Details → Row 1
   - Decision: `Engine`
@@ -43,7 +43,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 **Auto-detection:** Check for `.git/`, `.p4ignore`, `.svn/`, or similar markers.
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Tech Stack Details
   - Decision: `Source Control`
@@ -60,7 +60,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 **Expected Answer:** One of: `Single-Player Game`, `Multiplayer Game`, `Tool/Editor Plugin`, `VR Application`, `Mobile Game`, `Server-Side Tool` + clarify: `Single-Player` or `Multiplayer`
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Project Overview → Description
   - Enhance: "Unreal Engine [version] [Project Type] ([Scope])"
@@ -93,7 +93,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
    - Empty/missing + parent folders contain `Engine/` → **In-Engine**
 3. Check for `Engine/` folder at repo root → **Engine-Source Mods**
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Project Structure
   - Add note describing setup:
@@ -117,7 +117,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 **Expected Answer:** Comma-separated list or bullet list
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Tech Stack Details
   - Decision: `Target Platforms`
@@ -140,7 +140,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 - `Modular Framework:` Game code provides modular systems; high-level game logic glues them together in Blueprint
 - `[Custom split]`
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Project-Specific Rules
   - Add rule: `C++ vs Blueprint Philosophy: [User Answer]`
@@ -161,7 +161,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 **Expected Answer:** List of plugin names (e.g., "Advanced Sessions", "Niagara Particle System")
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Tech Stack Details
   - Decision: `Key Plugins`
@@ -178,7 +178,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 **Expected Answer:** Description of folder organization (e.g., "Characters/, Maps/, UI/, Blueprint/, Plugins/")
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Project Structure
   - Add to tree:
@@ -199,7 +199,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 **Expected Answer:** List of build targets (e.g., "Development, Shipping, Test")
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Service Ports & Configuration
   - Add rows:
@@ -217,7 +217,7 @@ When detected, this guide is loaded and the user is asked all questions below (o
 
 **Expected Answer:** Bulleted list of project-specific conventions
 
-**CLAUDE.md Mapping:**
+**Instructions Mapping:**
 
 - **Section:** Notes for Claude → Do / Don't
   - Add Unreal-specific items:

@@ -62,3 +62,7 @@ _ai_temp/
 # Inspiration folder
 # Uncomment this when importing from /inspiration to get claude code autocomplete. DO NOT COMMIT THIS CHANGE OR INSPIRATION TO THE REPOSITORY.
 inspiration/
+
+# Claude Code projection of .agents/skills (recreated by the link-skills skill's script)
+.claude/skills
+.claude/skills.bak-*
