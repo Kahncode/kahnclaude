@@ -36,7 +36,7 @@ Non-destructive — only adds what's missing. Creates `AGENTS.md` (plus a one-li
 
 | Component             | Count | Purpose                                                                   |
 | --------------------- | ----- | ------------------------------------------------------------------------- |
-| **Skills**            | 26    | Shared workflows and expertise (19 project, 7 framework), `/name` to invoke |
+| **Skills**            | 28    | Shared workflows and expertise (21 project, 7 framework), `/name` to invoke |
 | **Agents**            | 19    | Specialist subagents with restricted tool access                          |
 | **Hooks**             | 9     | Deterministic enforcement scripts (Python)                                |
 | **Project Template**  | 1     | Master `AGENTS.md` with guide comments (used by `/kc-generate-agents-md`) |
@@ -227,9 +227,11 @@ The `kc-` name prefix marks skills that manage KahnClaude itself (invoked as `/k
 | `/learn`                 | Update docs from a git SHA, SHA range, a plain-text fact, or auto-detected changes             |
 | `/linear`                | Implement a Linear issue — set In Progress, branch, plan, code, test, PR                       |
 | `/jira`                  | Implement a Jira issue — transition In Progress, branch, plan, code, test, PR                  |
+| `/github-issue`             | Implement a GitHub issue via `gh` — assign, branch, plan, code, test, PR                       |
 | `/pr`                    | Generate a PR title and description from the current branch diff; optionally create via `gh`   |
 | `/linear-plan`           | Brainstorm and create or update Linear issues (planning only, no implementation)               |
 | `/jira-plan`             | Brainstorm and create or update Jira issues (planning only, no implementation)                |
+| `/github-issue-plan`          | Brainstorm and create or update GitHub issues via `gh` (planning only, no implementation)      |
 | `/explain`               | Explain code in detail — overview, components, control flow, dependencies, gotchas, usage      |
 | `/answer`                | Research a question using general knowledge, codebase search, Context7 docs, or web search     |
 | `/test`                  | Generate tests by delegating to the `test-writer` agent (single source of truth)               |
