@@ -44,7 +44,7 @@ All harnesses (Claude Code, Codex, OpenCode, pi) are supported by default; do no
 
 7. Copy only the selected agents to `<target>/.claude/agents/`, **preserving subfolder structure** (e.g. `agents/python/fastapi-dev.md` → `<target>/.claude/agents/python/fastapi-dev.md`). Create any needed subdirectories.
 
-8. Copy all files from `.claude/hooks/` → `<target>/.claude/hooks/`
+8. Copy all files from `.claude/hooks/` → `<target>/.claude/hooks/`, except `notify.py` (global-only: it is about the user's machine, installed by `/kc-install-global`)
 
 9. **Migrate existing project skills, then project.** The projection script is the `link_skills.py` hook (copied in step 8).
 
@@ -61,7 +61,7 @@ All harnesses (Claude Code, Codex, OpenCode, pi) are supported by default; do no
 
     a. If `<target>/.claude/settings.json` does NOT exist: copy `project/settings.json` → `<target>/.claude/settings.json`
 
-    b. If it already exists: deep-merge — add any `permissions.allow`, `permissions.deny`, and `hooks` entries from `project/settings.json` that are not already present. Never remove existing entries. Show the user what will be added and confirm before applying.
+    b. If it already exists: deep-merge — add any `permissions.allow`, `permissions.deny`, and `hooks` entries from `project/settings.json` that are not already present; a hook counts as present when an existing entry's command references the same script file name (quoting and path style differ between versions); in that case update the existing entry's `matcher` to the shipped one instead of adding a second entry. Never remove existing entries. Show the user what will be added and confirm before applying.
 
 11. **Handle AGENTS.md generation** (run from the KahnClaude working directory; guides in `project/tech-stacks/` are used here and never copied to the target). When invoked by `/kc-create-project`, skip this step: create-project generates `AGENTS.md` itself afterwards with the interview answers.
 

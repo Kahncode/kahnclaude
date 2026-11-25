@@ -122,16 +122,19 @@ You are a specialist in [domain]. Your job is to [specific goal].
 
 Hooks live in `.claude/hooks/<name>.py`. **Python only — no bash.**
 
-**Naming conventions:**
+Only add a hook for something Claude Code does not do natively. Safety rules go in `permissions.deny` in `project/settings.json` (avoid `ask` rules: they force a prompt even in auto mode); linting, formatting, secret scanning and branch policy belong to each project's git hooks and CI, not KahnClaude.
 
-| Prefix    | Behavior                                           |
-| --------- | -------------------------------------------------- |
-| `block-`  | Blocks the operation (exit 2)                      |
-| `check-`  | Checks condition, warns or blocks                  |
-| `lint-`   | Lints after file write (PostToolUse) or at Stop    |
-| `verify-` | Verifies at turn end (Stop)                        |
-| `after-`  | Runs post-edit formatting (PostToolUse)            |
-| `notify-` | Sends a desktop/system notification (Notification) |
+**Naming:** kebab-case describing the behavior; prefix `block-` when the hook denies or asks. `link_skills.py` keeps its snake_case name because skills invoke it as a script.
+
+**Exit codes and output (Claude Code semantics):**
+
+| Code | Effect |
+| ---- | ------ |
+| `0`  | Proceed. Print JSON on stdout to steer Claude: PreToolUse `hookSpecificOutput.permissionDecision` (`allow`/`deny`/`ask`) with `permissionDecisionReason`; PostToolUse/Stop `{"decision": "block", "reason": ...}`; `hookSpecificOutput.additionalContext` to inject context |
+| `2`  | Block; stderr is fed back to Claude. On Stop this forces Claude to continue: check `stop_hook_active` to avoid loops |
+| other | Non-blocking error shown to the user only; Claude never sees it. Never use `1` to "warn" |
+
+A missing hook script makes `python3` exit 2, which blocks every matching tool call. When removing a hook, remove its wiring from every `settings.json` first.
 
 **Required structure:**
 
@@ -140,13 +143,12 @@ Hooks live in `.claude/hooks/<name>.py`. **Python only — no bash.**
 """
 hook-name.py — Brief description.
 
-Event: PreToolUse | PostToolUse | Stop | Notification
-Matcher: Read|Write|Edit|Bash  (PreToolUse/PostToolUse only; use * for Stop/Notification)
+Event: PreToolUse | PostToolUse | Stop | Notification | SessionStart
+Matcher: Edit|Write|Bash  (tool events only)
 
 Exit codes:
-  0 — Allow / no action
-  1 — Warning (printed, continues)
-  2 — Block (printed to stderr, operation stopped)
+  0 — Proceed (decision, if any, returned as JSON on stdout)
+  2 — Block (reason on stderr, fed back to Claude)
 """
 import json
 import sys
@@ -155,13 +157,16 @@ import sys
 def main() -> None:
     try:
         data = json.load(sys.stdin)
-    except (json.JSONDecodeError, EOFError):
+    except (json.JSONDecodeError, ValueError):
         sys.exit(0)
 
     tool_input = data.get("tool_input", {})
 
-    # Your logic here.
+    # Your logic here. To ask the user:
+    # print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+    #     "permissionDecision": "ask", "permissionDecisionReason": "why"}}))
     # To block: print("BLOCKED: reason", file=sys.stderr); sys.exit(2)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
@@ -171,9 +176,9 @@ if __name__ == "__main__":
 **After adding a hook:**
 
 1. Wire it in `@.claude/settings.json`
-2. Document the wiring example in `@global/settings.json`
+2. Wire it in `@project/settings.json` (`$CLAUDE_PROJECT_DIR/.claude/hooks/...`) and, if it is useful globally, in `@global/settings.json` (`~/.claude/hooks/...`)
 3. Syntax-check: `python -m py_compile .claude/hooks/your-hook.py`
-4. Test with mock stdin: `echo '{"tool_name":"Write","tool_input":{"file_path":".env"}}' | python3 .claude/hooks/your-hook.py`
+4. Test with mock stdin: `echo '{"tool_name":"Write","tool_input":{"file_path":"/tmp/x"}}' | python3 .claude/hooks/your-hook.py`
 
 ---
 

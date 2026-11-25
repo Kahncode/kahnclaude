@@ -239,11 +239,12 @@ If the user requests modifications: apply them, re-show, re-ask.
 
 **Hooks**
 - Always written in Python — rewrite from any other language without exception
-- Naming prefix: `block-` (exit 2), `check-` (conditional), `lint-` (PostToolUse), `verify-` (Stop)
-- Exit codes: 0=allow, 1=warn, 2=block; print blocking reason to stderr on exit 2
+- Skip hooks that duplicate native features (permission rules, notifications) or project tooling (lint, format, secret scan, branch policy); suggest a `permissions` rule instead where one fits
+- Naming: kebab-case; `block-` prefix when it denies or asks
+- Exit codes: 0 = proceed (JSON decision on stdout to deny/ask), 2 = block with reason on stderr; never 1 to warn (Claude never sees it)
 - Target: `.claude/hooks/<name>.py`
 - Follow the hook template from CONTRIBUTING.md exactly
-- After writing: wire in `@.claude/settings.json`, then syntax-check immediately
+- After writing: wire in `@.claude/settings.json` and `@project/settings.json`, then syntax-check immediately
 
 **Merge actions**
 - Read the existing KahnClaude file first

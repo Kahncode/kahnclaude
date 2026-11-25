@@ -38,7 +38,7 @@ Non-destructive — only adds what's missing. Creates `AGENTS.md` (plus a one-li
 | --------------------- | ----- | ------------------------------------------------------------------------- |
 | **Skills**            | 28    | Shared workflows and expertise (21 project, 7 framework), `/name` to invoke |
 | **Agents**            | 19    | Specialist subagents with restricted tool access                          |
-| **Hooks**             | 9     | Deterministic enforcement scripts (Python)                                |
+| **Hooks**             | 3     | Claude Code hooks for what the harness lacks natively (Python)            |
 | **Project Template**  | 1     | Master `AGENTS.md` with guide comments (used by `/kc-generate-agents-md`) |
 | **Tech-Stack Guides** | 4+    | Unreal, Astro, Next.js, FastAPI (+ placeholders for future stacks)        |
 | **Global Template**   | 1     | `@~/.claude/CLAUDE.md` for cross-project rules                            |
@@ -82,9 +82,10 @@ These MCPs are useful in virtually every project. MCPs are project-scoped by def
 
 | MCP            | What It Adds                                                                                  | Install                                                                                                                                       |
 | -------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Context7**   | Up-to-date library docs and code examples pulled at query time — eliminates hallucinated APIs | `claude mcp add context7 -- npx -y @upstash/context7-mcp@latest`                                                                              |
+| **Context7**   | Version-specific library docs pulled at query time — covers APIs newer than the model's training cutoff. Free tier is rate-limited; add an API key (`--header "CONTEXT7_API_KEY: ..."`, never committed) for heavy use | `claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp`                                                          |
 | **GitHub**     | Read issues, PRs, and code from any repo without leaving Claude                               | `claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer YOUR_GITHUB_PAT"}}'` |
-| **Filesystem** | Lets Claude read/write files outside the project root (cross-repo work, config management)    | `claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allow`                                                  |
+
+> **No Filesystem MCP needed.** Claude Code's built-in file tools cover it. To give access outside the project root, use `--add-dir`, `/add-dir`, or `permissions.additionalDirectories` in `settings.json`. Unlike the MCP, these keep permission rules, the sandbox, and checkpoints in effect.
 
 ### Project-Type Recommendations
 
@@ -166,7 +167,7 @@ kahnclaude/
 │   │   ├── python/              # Python specialists
 │   │   ├── frontend/            # Web/React specialists
 │   │   └── mobile/              # React Native/Expo specialists
-│   └── hooks/                   # Enforcement scripts (Python only)
+│   └── hooks/                   # Claude Code hooks (Python only)
 │       └── <name>.py
 │
 ├── project/                     # Templates for new projects
@@ -205,7 +206,7 @@ The `kc-` name prefix marks skills that manage KahnClaude itself (invoked as `/k
 | ------------------------ | --------------------------------------------------------------------------------- |
 | `/kc-install`            | Install KahnClaude components into the current project                            |
 | `/kc-create-project`     | Create a new project (astro, nextjs, fastapi): init CLI, template overlay, targeted interview + install, AGENTS.md |
-| `/kc-install-global`     | Merge global config, skills, agents and hooks into `~/.claude/` (never overwrites) |
+| `/kc-install-global`     | Pick which global config, hooks, skills and agents to merge into `~/.claude/` (never overwrites) |
 | `/kc-update`             | Update installed components from the latest framework source; migrates Claude-only installs to the `.agents/` layout |
 | `/kc-import`             | Analyze a repo's agent components and selectively integrate into KahnClaude |
 | `/kc-harvest`            | Pull improvements back from a target project into KahnClaude (reverse of update) |
@@ -306,45 +307,43 @@ Agents are specialists Claude delegates to automatically. Each has restricted to
 
 ---
 
-## Hooks — Enforcement Over Suggestion
+## Hooks and Permissions
 
-AGENTS.md rules are suggestions. Hooks are **deterministic** — they always run as Python scripts at specific lifecycle points.
+KahnClaude keeps Claude Code hooks to what the harness does not do natively. Safety comes from `permissions` deny rules, auto mode and the sandbox; linting, formatting, secret scanning and branch policy belong to each project's own git hooks and CI, not to KahnClaude.
 
-```
-AGENTS.md rule: "don't read .env"
-  → Parsed by LLM → Weighed against context → Maybe followed
+| Hook                       | Event        | Behavior                                                                                                                              |
+| -------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `link_skills`              | SessionStart | Projects `.agents/skills/` into `.claude/skills/` (junction, symlink or copy)                                                         |
+| `block-write-outside-repo` | PreToolUse   | Asks before Edit/Write/NotebookEdit outside the project, `~/.claude/`, the temp dir or `permissions.additionalDirectories`, or into `.git/` |
+| `notify`                   | Notification | **Global only** (`/kc-install-global`), never installed in projects. Desktop notification when Claude needs attention (Windows toast, macOS, Linux, WSL, bell fallback) |
 
-PreToolUse hook blocking .env access
-  → Always executes → Exit code 2 → Operation blocked. Period.
-```
+`block-write-outside-repo` limits:
 
-| Hook                       | Event        | Behavior                                                                                                                    |
-| -------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `block-secrets`            | PreToolUse   | Blocks Read/Edit on `.env`, SSH keys, credentials, and secret path patterns                                                 |
-| `block-dangerous-commands` | PreToolUse   | Blocks `rm -rf /`, force-push to main, `chmod 777`, `curl \| sh`, `mkfs`, and secret exfiltration                           |
-| `verify-no-secrets`        | Stop         | Warns if staged files contain secrets (AWS keys, GitHub tokens, Stripe keys, PEM)                                           |
-| `check-branch`             | PreToolUse   | Blocks `git commit` on `main`/`master` when `KC_BRANCH_PROTECT=true` or marker file present                                 |
-| `check-env-sync`           | Stop         | Warns if `.env` has keys missing from `.env.example`                                                                        |
-| `after-edit`               | PostToolUse  | Auto-formats files after edit/write: prettier (JS/TS/JSON/MD/CSS), black+ruff (Python), gofmt (Go), rustfmt (Rust)          |
-| `notify`                   | Notification | Sends desktop notifications when Claude needs attention (Windows toast, macOS, Linux, terminal bell fallback)               |
-| `lint-on-stop`             | Stop         | Runs linters at end of turn: ruff+mypy (Python), cargo check+clippy (Rust), go vet+staticcheck (Go), npm lint+tsc (Node/TS) |
+- It only sees the file tools; Bash redirections and `cp`/`mv` bypass it (the sandbox covers those).
+- Directories added with `--add-dir` or `/add-dir` are invisible to hooks, so writes there still ask. Put permanent ones in `permissions.additionalDirectories`.
+- If it is wired both globally and in the project, the project copy exits early so the check runs once.
 
-### Hook Lifecycle
+### Permissions
 
-| Event          | When It Fires                                  |
-| -------------- | ---------------------------------------------- |
-| `PreToolUse`   | Before Claude reads, writes, or runs a command |
-| `PostToolUse`  | After Claude writes or edits a file            |
-| `Stop`         | When Claude finishes a turn                    |
-| `Notification` | When Claude sends a notification to the user   |
+The shipped `settings.json` relies on Claude Code's own layers and only adds what they lack:
+
+- **Read-only commands** (`ls`, `cat`, `grep`, `head`, `tail`, `wc`, read-only `git`, ...) never prompt, so they are not in `allow`. `allow` only lists routine writes (`git add`, `git commit`, `git tag`, `mkdir`) and Context7.
+- **No `ask` rules.** Ask rules run before the auto-mode classifier and force a prompt in every mode; the classifier already blocks force pushes and other irreversible actions, and default mode prompts for them anyway.
+- **`deny`** (holds in every mode, including auto and `bypassPermissions`):
+  - Read: `.env` variants (`.env.example` stays readable; Write stays allowed so setup can create `.env`)
+  - Read and Edit: `secrets/`, `secrets.*`, `.secrets`, `.secrets/`, `.secrets.*`, `*credential*`, `service-account*.json`, `.npmrc`, `.pypirc`, `.pgpass`, `.my.cnf`, `.git-credentials`, `.netrc`, `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, SSH private keys, `~/.ssh/`, `~/.aws/`, `~/.azure/`, `~/.config/gcloud/`, `~/.docker/config.json`
+  - Bash: `rm -rf` on `/`, `~` or `$HOME`, as a backstop for `bypassPermissions`
+- **No filesystem MCP.** MCP tools are not covered by `Read`/`Edit` deny rules; use `--add-dir` or `additionalDirectories` instead.
+
+Read deny rules also apply to Bash commands Claude Code can analyze (`cat`, `head`, `tail`, `sed`, redirections), but not to `grep -r` over a folder or to scripts that open files themselves. For OS-level enforcement, enable the sandbox (`/sandbox`, macOS, Linux and WSL2): it merges these deny rules into its filesystem policy.
 
 ### Exit Codes
 
-| Code | Meaning                                                  |
-| ---- | -------------------------------------------------------- |
-| `0`  | Allow — no action                                        |
-| `1`  | Warning — shown, operation continues                     |
-| `2`  | **Block** — stderr fed back to Claude, operation stopped |
+| Code      | Meaning                                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `0`       | Proceed. stdout may carry JSON: `permissionDecision` (`allow`/`deny`/`ask`), `decision: "block"`, `additionalContext`  |
+| `2`       | **Block**: stderr is fed back to Claude                                                                                |
+| `1`/other | Non-blocking error, shown to the user only; Claude never sees it. Never use it to warn                                 |
 
 ---
 
@@ -403,7 +402,7 @@ Installed to `~/.claude/statusline.py`. Renders the Claude Code status line show
 Three layers of enforcement, strongest to weakest:
 
 1. **`.gitignore`** — last line of defense, filesystem-level (strongest)
-2. **Hooks** — guaranteed to run, blocks operations before they happen
+2. **Permissions and hooks** — guaranteed to run, block or ask before an operation happens
 3. **`AGENTS.md` rules** — behavioral suggestions (weakest — Claude can override under context pressure)
 
 ### One Task, One Chat
@@ -433,7 +432,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 | Skill (project)     | `.agents/skills/<name>/SKILL.md` | kebab-case action verb or category              |
 | Skill (KahnClaude management) | `.agents/skills/kc-<name>/SKILL.md` | `kc-` prefix; `scope` decides distribution |
 | Agent               | `.claude/agents/<name>.md`       | kebab-case role                                 |
-| Hook                | `.claude/hooks/<name>.py`        | `block-`, `check-`, `lint-`, `verify-` prefix   |
+| Hook                | `.claude/hooks/<name>.py`        | kebab-case; `block-` if it denies or asks       |
 
 ## Contributing
 

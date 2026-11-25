@@ -35,11 +35,19 @@ The argument is the path to the target project. If omitted, ask the user for it 
 6. **Filter changed files by category:**
    - `.agents/skills/<name>/**` (excluding skills with `scope: framework`) → candidates for `<target>/.agents/skills/<name>/`
    - `.claude/agents/` files **listed in `manifest.agents`** → candidates for `<target>/.claude/agents/`
-   - `.claude/hooks/` files → candidates for `<target>/.claude/hooks/`
-   - `project/settings.json` → candidate for `<target>/.claude/settings.json` (**merge only** — never overwrite; add any `permissions.allow`, `permissions.deny`, and `hooks` entries not already present; show diff and confirm before applying)
+   - `.claude/hooks/` files (except `notify.py`, global-only) → candidates for `<target>/.claude/hooks/`
+   - `project/settings.json` → candidate for `<target>/.claude/settings.json` (**merge only** — never overwrite; add any `permissions.allow`, `permissions.deny`, and `hooks` entries not already present; a hook counts as present when an existing entry's command references the same script file name (quoting and path style differ between versions); in that case update the existing entry's `matcher` to the shipped one instead of adding a second entry; show diff and confirm before applying)
    - `project/AGENTS.md`, `project/CLAUDE.md` or `project/CLAUDE.local.md` → skip (never overwrite)
 
    Ignore changed files outside these categories (e.g. `global/`, `inspiration/`, `README.md`, `CONTRIBUTING.md`).
+
+6a. **Remove retired hooks.** KahnClaude no longer ships these hooks: `after-edit.py`, `block-dangerous-commands.py`, `block-secrets.py`, `check-branch.py`, `check-env-sync.py`, `lint-on-stop.py`, `verify-no-secrets.py` (replaced by `permissions` deny rules, auto mode, and the project's own git hooks). For each one present in `<target>/.claude/settings.json` or `<target>/.claude/hooks/`:
+   - Remove every `hooks` entry whose command references it from `<target>/.claude/settings.json` (and `settings.local.json`), dropping matcher groups and events left empty. Do this **before** deleting the script: a hook pointing at a missing script makes `python3` exit 2, which blocks every matching tool call.
+   - Delete the script from `<target>/.claude/hooks/` if it is identical to the last version KahnClaude shipped (`git show <manifest.commit>:.claude/hooks/<name>`, CRLF normalised); if the project modified it, ask before deleting.
+   - Mention that the project's linting, formatting and secret scanning should live in its own git hooks or CI.
+   - Offer to remove the `mcp__filesystem__*` allow entry if present: MCP tools bypass `Read`/`Edit` deny rules, and `--add-dir` or `additionalDirectories` replace it.
+   - `notify.py` moved to global-only: remove its `Notification` entry and the script the same way, and suggest `/kc-install-global` so notifications keep working.
+   Show the list with the step 8 summary; this is the one exception to "never delete files".
 
 7. **Check for new agents** in the diff (added agent files not in `manifest.agents`): group by subfolder, ask which to add (plain text for groups larger than a question tool allows), and add the selection to the candidates and to `manifest.agents`.
 
@@ -78,7 +86,7 @@ Make a dry-run summary first and wait for confirmation. Then run each phase as i
 
 ## Notes
 
-- Never delete files that exist in the target but not in KahnClaude (the project may have custom components)
+- Never delete files that exist in the target but not in KahnClaude (the project may have custom components), except the retired hooks in step 6a
 - Skills in `<target>/.agents/skills/` that KahnClaude does not ship, including renamed or removed KahnClaude skills, are the project's own: never modify, delete or flag them as stale
 - Never overwrite `AGENTS.md`, `CLAUDE.md` or `CLAUDE.local.md` (project-specific), except for the migration steps above
 - Only update files that changed since `manifest.commit` — keeps updates minimal and reviewable (except compare-all mode)

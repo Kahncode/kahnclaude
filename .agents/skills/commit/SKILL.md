@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Smart commit — stages nothing extra, commits with a conventional message, stops if pre-commit hooks fail
+description: Smart commit — stages nothing extra, commits with a conventional message, re-stages auto-fixes from pre-commit hooks once, stops on real hook failures
 scope: project
 allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*)
 argument-hint: [optional commit message override]
@@ -51,12 +51,17 @@ Generate an appropriate message based on **only the staged changes** (use `git d
 
 ### Pre-commit hook failures
 
-If the commit attempt triggers pre-commit hooks that fail:
+Before the first commit attempt, record the staged files (`git diff --cached --name-only`) and the files with unstaged changes (`git diff --name-only`).
 
-1. Diagnose each failure and fix the affected files
-2. **Do NOT stage any files modified as a result of fixing pre-commit errors**
-3. **Stop here** — report to the user: which hooks failed, what was fixed, and which files were changed
-4. Ask the user to review the fixes and stage them manually before re-running `/commit`
+If the commit fails because of git hooks:
+
+1. **Auto-fixes only** (formatters or fixers rewrote files and nothing else failed): re-stage the rewritten files that were in the recorded staged set **and** had no unstaged changes before the attempt (re-adding a partially staged file would pull in hunks the user did not stage). Retry the commit **once**. This is the only case where `/commit` runs `git add`.
+2. **Anything else** (lint or type errors, secret scan findings, a rewritten file that was partially staged, or the retry failed again):
+   - Diagnose each failure and fix the affected files, except secret findings: never edit around those, report them
+   - **Do NOT stage the fixes**
+   - **Stop** and report which hooks failed, what was fixed and which files changed; ask the user to review, stage and re-run `/commit`
+
+Never bypass hooks with `--no-verify`.
 
 ### GitHub MCP (if available)
 

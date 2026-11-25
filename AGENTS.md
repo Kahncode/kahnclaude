@@ -44,7 +44,7 @@ When adding any component (skill or slash command, agent, hook), update ALL of:
 2. `README.md` — component listing and description
 3. `CONTRIBUTING.md` — any new conventions introduced
 
-If adding a hook: also wire it in `@.claude/settings.json` and document the wiring in `@global/settings.json`.
+If adding a hook: also wire it in `@.claude/settings.json` and `@project/settings.json`, and in `@global/settings.json` (with `~/.claude/hooks/` paths) if it is useful globally. If removing one: remove its wiring from all three before deleting the script, and add it to the removed-hooks list in `/kc-update`.
 
 ---
 
@@ -79,8 +79,8 @@ This repo primarily contains Markdown and Python. Follow these conventions:
 ### Python (hooks and skill scripts)
 - Scripts a skill needs live in that skill's `scripts/` folder (e.g. `.agents/skills/kc-create-project/scripts/`), never in a top-level `scripts/`; they are copied with the skill
 - Type hints on all functions
-- Exit code semantics: `0` = allow, `2` = block with message, `1` = warn
-- Print blocking reason to `stderr` when exiting with code 2
+- Hook exit codes (Claude Code semantics): `0` = proceed, optionally with a JSON decision on stdout (`permissionDecision`: `allow`/`deny`/`ask`, or `decision: "block"`); `2` = block, reason on `stderr` (fed back to Claude). Never exit `1` to warn: Claude never sees it
+- Prefer `permissions` deny rules over a hook when they can express the rule; avoid `ask` rules, which force a prompt even in auto mode
 - No external dependencies without documentation
 
 ---
