@@ -331,7 +331,7 @@ The shipped `settings.json` relies on Claude Code's own layers and only adds wha
 - **No `ask` rules.** Ask rules run before the auto-mode classifier and force a prompt in every mode; the classifier already blocks force pushes and other irreversible actions, and default mode prompts for them anyway.
 - **`deny`** (holds in every mode, including auto and `bypassPermissions`):
   - Read: `.env` variants (`.env.example` stays readable; Write stays allowed so setup can create `.env`)
-  - Read and Edit: `secrets/`, `secrets.*`, `.secrets`, `.secrets/`, `.secrets.*`, `*credential*`, `service-account*.json`, `.npmrc`, `.pypirc`, `.pgpass`, `.my.cnf`, `.git-credentials`, `.netrc`, `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, SSH private keys, `~/.ssh/`, `~/.aws/`, `~/.azure/`, `~/.config/gcloud/`, `~/.docker/config.json`
+  - Read and Edit: `secrets/` and `.secrets/` folders, `*credential*`, `service-account*.json`, `.npmrc`, `.pypirc`, `.pgpass`, `.my.cnf`, `.git-credentials`, `.netrc`, `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, SSH private keys, `~/.ssh/`, `~/.aws/`, `~/.azure/`, `~/.config/gcloud/`, `~/.docker/config.json`
   - Bash: `rm -rf` on `/`, `~` or `$HOME`, as a backstop for `bypassPermissions`
 - **No filesystem MCP.** MCP tools are not covered by `Read`/`Edit` deny rules; use `--add-dir` or `additionalDirectories` instead.
 
